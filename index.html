@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SevenRooms | Sandys Onboarding Flow</title>
+  <title>SevenRooms | Client Onboarding Flow</title>
   <style>
     :root {
       --bg: #f6f5f2;
@@ -130,7 +130,7 @@
 
     .lead {
       margin: 0 0 24px;
-      max-width: 66ch;
+      max-width: 68ch;
       color: var(--muted);
       font-size: 17px;
       line-height: 1.6;
@@ -140,16 +140,24 @@
       background: var(--surface-strong);
       border: 1px solid var(--line);
       border-radius: 22px;
-      padding: 16px;
+      padding: 18px;
     }
 
-    .search-label, .card-label {
+    .section-label, .card-label {
       font-size: 13px;
       font-weight: 800;
       color: var(--muted);
       margin-bottom: 10px;
       text-transform: uppercase;
       letter-spacing: 0.08em;
+    }
+
+    .field-hint {
+      margin-top: -4px;
+      margin-bottom: 12px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
     }
 
     .search-row {
@@ -411,6 +419,17 @@
       color: var(--sr-charcoal);
     }
 
+    .notice {
+      margin-top: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(47, 191, 143, 0.20);
+      background: rgba(47, 191, 143, 0.08);
+      padding: 14px 16px;
+      color: #125d45;
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
     code {
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       font-size: 0.95em;
@@ -435,33 +454,54 @@
         <div class="brand-mark" aria-hidden="true"></div>
         <div>
           SevenRooms
-          <small>Sandys onboarding flow</small>
+          <small>Client onboarding flow</small>
         </div>
       </div>
-      <div class="pill">Prototype · client journey first</div>
+      <div class="pill" id="topPill">Client route ready</div>
     </header>
 
     <main class="hero">
       <section class="panel panel-main">
         <div class="eyebrow">Client-facing onboarding experience</div>
-        <h1 id="pageTitle">Welcome, Sandys.</h1>
+        <h1 id="pageTitle">Welcome.</h1>
         <p class="lead" id="pageLead">
-          This is the first cut of the real onboarding journey for Sandys. The goal here is to make the flow feel like a product: clear steps, progress, and actions that can be completed and saved.
+          Open a client-specific journey using the <code>?client=</code> parameter. The form below is intentionally signposted so the first step is obvious: launch date, venue name, and main contact.
         </p>
 
-        <div class="client-chip" id="clientChip">Client mode: Sandys</div>
+        <div class="client-chip" id="clientChip">Client mode: loading</div>
 
         <div class="search-card">
-          <div class="search-label">Step 1 · confirm onboarding details</div>
+          <div class="section-label">Step 1 · confirm the venue details</div>
+          <div class="field-hint">
+            Start here. These three fields define the onboarding record and should be the first things the client sees.
+          </div>
+
+          <div class="field">
+            <label for="venueName">Venue name</label>
+            <input id="venueName" type="text" placeholder="e.g. Sandys" />
+          </div>
+
           <div class="search-row">
-            <input id="launchDate" type="text" placeholder="Launch date" />
-            <input id="mainContact" type="text" placeholder="Main contact" />
+            <div class="field" style="flex: 1 1 220px; margin-top: 0;">
+              <label for="launchDate">Launch date</label>
+              <input id="launchDate" type="text" placeholder="YYYY-MM-DD" />
+            </div>
+            <div class="field" style="flex: 1 1 220px; margin-top: 0;">
+              <label for="mainContact">Main contact</label>
+              <input id="mainContact" type="text" placeholder="Operations team / manager" />
+            </div>
           </div>
+
           <div class="search-row" style="margin-top:12px;">
-            <input id="venueName" type="text" placeholder="Venue name" />
             <button class="btn" id="saveBtn" type="button">Save step 1</button>
+            <button class="btn secondary" id="copyBtn" type="button">Copy current link</button>
           </div>
-          <div class="helper">This first step is intentionally simple. Later we can connect it to a real backend, invite tokens, and permissions.</div>
+
+          <div class="helper" id="saveMeta">Changes are saved locally in this prototype for now. Later, this becomes the backend save action.</div>
+        </div>
+
+        <div class="notice">
+          The flow below is the next part of the client journey. Step 1 is about confirming the setup. Step 2 and onward can then branch into integrations, data, training, and launch.
         </div>
 
         <div class="progress">
@@ -479,7 +519,7 @@
 
         <div class="journey" id="step-1">
           <div class="section-title">
-            <h2>Sandys onboarding journey</h2>
+            <h2 id="journeyTitle">Client journey</h2>
             <div class="meta" id="journeyMeta">Step 1 in focus</div>
           </div>
           <div class="step-list" id="stepList"></div>
@@ -509,146 +549,151 @@
 
         <div class="journey">
           <div class="section-title">
-            <h2>What Sandys sees</h2>
+            <h2>What the client sees</h2>
           </div>
-          <div class="step-list">
-            <div class="step active">
-              <div class="dot"></div>
-              <div>
-                <h3>Confirm details</h3>
-                <p>Venue name, main contact, and launch date.</p>
-              </div>
-              <span class="badge done">Open</span>
-            </div>
-            <div class="step">
-              <div class="dot"></div>
-              <div>
-                <h3>Set up integrations</h3>
-                <p>POS, payments, and related systems.</p>
-              </div>
-              <span class="badge high">Next</span>
-            </div>
-            <div class="step">
-              <div class="dot"></div>
-              <div>
-                <h3>Upload guest data</h3>
-                <p>Guest database and reservation imports.</p>
-              </div>
-              <span class="badge high">Next</span>
-            </div>
-          </div>
+          <div class="step-list" id="summaryList"></div>
         </div>
       </aside>
     </main>
 
     <section class="panel path">
       <div class="section-title">
-        <h2>First steps of the flow</h2>
-        <div class="meta">Build the journey before permissions</div>
+        <h2>How this flow is structured</h2>
+        <div class="meta">Build now, permissions later</div>
       </div>
       <div class="path-grid">
         <div class="path-card">
           <div class="num">1</div>
           <h3>Step 1: Confirm details</h3>
-          <p>Capture venue name, launch date, and main contact. This is the first actionable screen and sets the tone for the whole experience.</p>
+          <p>Launch date, venue name, and main contact are the first fields because they anchor the rest of the journey.</p>
         </div>
         <div class="path-card">
           <div class="num">2</div>
           <h3>Step 2: Integrations</h3>
-          <p>Show only the integrations that matter for Sandys. This can later branch based on client setup.</p>
+          <p>Only show the systems relevant to that client. This is where POS, payments, and related setup appear.</p>
         </div>
         <div class="path-card">
           <div class="num">3</div>
           <h3>Step 3: Data and training</h3>
-          <p>Guide them through uploads, testing, and training so the page feels like a real onboarding journey rather than a static form.</p>
+          <p>Move them through uploads, testing, and training so the experience feels like a guided product flow.</p>
         </div>
       </div>
     </section>
 
     <section class="footer-note">
       <div class="note">
-        <strong>Keep the HTML static for now</strong>
-        <p>We are shaping the client journey first. The data model and invite permissions can come after the flow feels right.</p>
+        <strong>Keep the client lookup dynamic</strong>
+        <p>This version reads <code>?client=demo</code>, <code>?client=sandys</code>, or <code>?client=test</code> and swaps the data accordingly.</p>
       </div>
       <div class="note">
-        <strong>Sandys becomes the reference case</strong>
-        <p>Build around one real client so the interactions, copy, and progress states are grounded.</p>
+        <strong>Make Step 1 obvious</strong>
+        <p>The form is now visually signposted with a heading, helper text, and field labels so users know exactly what to do first.</p>
       </div>
       <div class="note">
-        <strong>Backend later, product now</strong>
-        <p>Once the flow is solid, we can plug in invites, auth, and persistence without rethinking the page structure.</p>
+        <strong>Permissions can come later</strong>
+        <p>Once the journey feels right, we can layer in invites, tokens, saving, and access control without changing this layout much.</p>
       </div>
     </section>
   </div>
 
   <script>
-    const DATA = {
-      venueName: "Sandys",
-      mainContact: "Operations Team",
-      launchDate: "2026-05-01",
-      phases: 5,
-      tasks: 12,
-      guides: 4,
-      progress: 20,
-      currentStep: 1,
-      steps: [
-        {
-          title: "Confirm onboarding details",
-          body: "Review venue name, main contact, launch date, and any important launch notes.",
-          tone: "done",
-          status: "Open"
-        },
-        {
-          title: "Set up integrations",
-          body: "POS, payments, and any required systems for Sandys.",
-          tone: "high",
-          status: "Next"
-        },
-        {
-          title: "Upload guest data",
-          body: "Provide guest database and reservation imports.",
-          tone: "high",
-          status: "Next"
-        },
-        {
-          title: "Training and testing",
-          body: "Complete staff training and test the booking flow.",
-          tone: "medium",
-          status: "Later"
-        },
-        {
-          title: "Go live",
-          body: "Final checks before launching the booking journey.",
-          tone: "high",
-          status: "Launch gate"
-        }
-      ]
+    const CLIENTS = {
+      demo: {
+        name: "Demo Venue",
+        title: "Welcome to your onboarding journey.",
+        lead: "This is a demo client view. Use the client query string to switch the page into a specific venue journey.",
+        phases: 5,
+        tasks: 12,
+        guides: 4,
+        progress: 20,
+        currentStep: 1,
+        venueName: "Demo Venue",
+        mainContact: "Demo contact",
+        launchDate: "2026-05-01",
+        steps: [
+          { title: "Confirm onboarding details", body: "Venue name, launch date, and main contact.", tone: "done", status: "Open" },
+          { title: "Set up integrations", body: "POS, payments, and relevant systems.", tone: "high", status: "Next" },
+          { title: "Upload guest data", body: "Guest database and reservation imports.", tone: "high", status: "Next" },
+          { title: "Training and testing", body: "Staff training and booking flow checks.", tone: "medium", status: "Later" },
+          { title: "Go live", body: "Final checks before launch.", tone: "high", status: "Launch gate" }
+        ]
+      },
+      sandys: {
+        name: "Sandys",
+        title: "Welcome, Sandys.",
+        lead: "This onboarding flow is tailored to Sandys. Step 1 is designed to capture the details that unlock the rest of the journey.",
+        phases: 5,
+        tasks: 12,
+        guides: 4,
+        progress: 20,
+        currentStep: 1,
+        venueName: "Sandys",
+        mainContact: "Operations Team",
+        launchDate: "2026-05-01",
+        steps: [
+          { title: "Confirm onboarding details", body: "Review venue name, launch date, and main contact.", tone: "done", status: "Open" },
+          { title: "Set up integrations", body: "POS, payments, and any required systems for Sandys.", tone: "high", status: "Next" },
+          { title: "Upload guest data", body: "Provide guest database and reservation imports.", tone: "high", status: "Next" },
+          { title: "Training and testing", body: "Complete staff training and test the booking flow.", tone: "medium", status: "Later" },
+          { title: "Go live", body: "Final checks before launching the booking journey.", tone: "high", status: "Launch gate" }
+        ]
+      },
+      test: {
+        name: "Test",
+        title: "Welcome, Test.",
+        lead: "This is a test client record. It uses the same flow, but lets you verify the page changes based on the client key in the URL.",
+        phases: 5,
+        tasks: 10,
+        guides: 3,
+        progress: 20,
+        currentStep: 1,
+        venueName: "Test",
+        mainContact: "Test contact",
+        launchDate: "2026-06-15",
+        steps: [
+          { title: "Confirm onboarding details", body: "Check the core client details and launch date.", tone: "done", status: "Open" },
+          { title: "Set up integrations", body: "Show the systems that matter for this test record.", tone: "high", status: "Next" },
+          { title: "Upload guest data", body: "Verify the upload and save paths.", tone: "high", status: "Next" },
+          { title: "Training and testing", body: "Use this client to check the journey logic.", tone: "medium", status: "Later" },
+          { title: "Go live", body: "Final launch step for this flow.", tone: "high", status: "Launch gate" }
+        ]
+      }
     };
 
     const els = {
       pageTitle: document.getElementById('pageTitle'),
       pageLead: document.getElementById('pageLead'),
       clientChip: document.getElementById('clientChip'),
+      topPill: document.getElementById('topPill'),
       venueName: document.getElementById('venueName'),
       mainContact: document.getElementById('mainContact'),
       launchDate: document.getElementById('launchDate'),
       saveBtn: document.getElementById('saveBtn'),
+      copyBtn: document.getElementById('copyBtn'),
       stepList: document.getElementById('stepList'),
+      summaryList: document.getElementById('summaryList'),
       phaseCount: document.getElementById('phaseCount'),
       taskCount: document.getElementById('taskCount'),
       guideCount: document.getElementById('guideCount'),
       progressFill: document.getElementById('progressFill'),
       progressText: document.getElementById('progressText'),
       journeyMeta: document.getElementById('journeyMeta'),
+      journeyTitle: document.getElementById('journeyTitle'),
       subnavButtons: Array.from(document.querySelectorAll('.subnav button')),
-      stepCards: [
-        document.querySelector('.panel-main .search-card'),
-        document.querySelector('.panel-side .step-list')
-      ]
+      saveMeta: document.getElementById('saveMeta')
     };
 
-    function renderSteps(activeStep = 1) {
-      els.stepList.innerHTML = DATA.steps.map((step, index) => `
+    let currentClientKey = 'demo';
+    let currentRecord = null;
+
+    function getClientKey() {
+      const params = new URLSearchParams(window.location.search);
+      const raw = (params.get('client') || 'demo').trim().toLowerCase();
+      return CLIENTS[raw] ? raw : 'demo';
+    }
+
+    function renderStepList(record, activeStep = 1, targetElement = els.stepList) {
+      targetElement.innerHTML = record.steps.map((step, index) => `
         <div class="step ${index + 1 === activeStep ? 'active' : ''}">
           <div class="dot"></div>
           <div>
@@ -658,49 +703,77 @@
           <span class="badge ${step.tone}">${step.status}</span>
         </div>
       `).join('');
-
-      els.journeyMeta.textContent = `Step ${activeStep} in focus`;
-      els.progressText.textContent = `${DATA.progress}%`;
-      els.progressFill.style.width = `${DATA.progress}%`;
-      els.phaseCount.textContent = String(DATA.phases).padStart(2, '0');
-      els.taskCount.textContent = String(DATA.tasks).padStart(2, '0');
-      els.guideCount.textContent = String(DATA.guides).padStart(2, '0');
     }
 
-    function hydrateForm() {
-      els.venueName.value = DATA.venueName;
-      els.mainContact.value = DATA.mainContact;
-      els.launchDate.value = DATA.launchDate;
-      els.pageTitle.textContent = `Welcome, ${DATA.venueName}.`;
-      els.pageLead.textContent = 'This is the first cut of the real onboarding journey for Sandys. The page is designed to feel like a product and later become connected to saved progress, invites, and permissions.';
-      els.clientChip.textContent = `Client mode: ${DATA.venueName}`;
-    }
+    function hydrate(record) {
+      currentRecord = { ...record };
+      currentClientKey = getClientKey();
 
-    function setActiveStep(step) {
-      DATA.currentStep = step;
-      renderSteps(step);
-      els.subnavButtons.forEach(btn => btn.classList.toggle('active', Number(btn.dataset.step) === step));
+      els.pageTitle.textContent = record.title;
+      els.pageLead.textContent = record.lead;
+      els.clientChip.textContent = `Client mode: ${record.name}`;
+      els.topPill.textContent = `Client route · ${currentClientKey}`;
+      els.venueName.value = record.venueName || record.name;
+      els.mainContact.value = record.mainContact || '';
+      els.launchDate.value = record.launchDate || '';
+      els.phaseCount.textContent = String(record.phases).padStart(2, '0');
+      els.taskCount.textContent = String(record.tasks).padStart(2, '0');
+      els.guideCount.textContent = String(record.guides).padStart(2, '0');
+      els.progressText.textContent = `${record.progress}%`;
+      els.progressFill.style.width = `${record.progress}%`;
+      els.journeyMeta.textContent = `Step ${record.currentStep} in focus`;
+      els.journeyTitle.textContent = `${record.name} onboarding journey`;
+      renderStepList(record, record.currentStep, els.stepList);
+      renderStepList(record, record.currentStep, els.summaryList);
+
+      els.subnavButtons.forEach(btn => {
+        btn.classList.toggle('active', Number(btn.dataset.step) === record.currentStep);
+      });
     }
 
     function saveStep1() {
-      DATA.venueName = els.venueName.value.trim() || DATA.venueName;
-      DATA.mainContact = els.mainContact.value.trim() || DATA.mainContact;
-      DATA.launchDate = els.launchDate.value.trim() || DATA.launchDate;
-      els.clientChip.textContent = `Client mode: ${DATA.venueName}`;
-      els.pageTitle.textContent = `Welcome, ${DATA.venueName}.`;
-      els.pageLead.textContent = 'Step 1 has been saved locally in this prototype. Next we can persist the journey and connect it to an invite flow.';
-      renderSteps(DATA.currentStep);
-      const savedAt = new Date().toLocaleString();
-      document.querySelector('.helper').textContent = `Saved locally at ${savedAt}. This is the part we will later connect to a backend.`;
+      if (!currentRecord) return;
+      currentRecord = {
+        ...currentRecord,
+        venueName: els.venueName.value.trim() || currentRecord.venueName,
+        mainContact: els.mainContact.value.trim() || currentRecord.mainContact,
+        launchDate: els.launchDate.value.trim() || currentRecord.launchDate,
+      };
+
+      els.clientChip.textContent = `Client mode: ${currentRecord.venueName}`;
+      els.pageTitle.textContent = currentRecord.title;
+      els.saveMeta.textContent = `Saved locally at ${new Date().toLocaleString()}.`;
+      renderStepList(currentRecord, currentRecord.currentStep, els.stepList);
+      renderStepList(currentRecord, currentRecord.currentStep, els.summaryList);
+    }
+
+    function copyCurrentLink() {
+      const url = new URL(window.location.href);
+      url.searchParams.set('client', currentClientKey);
+      url.hash = '#step-1';
+      navigator.clipboard.writeText(url.toString()).then(() => {
+        els.copyBtn.textContent = 'Copied';
+        setTimeout(() => (els.copyBtn.textContent = 'Copy current link'), 1100);
+      }).catch(() => {
+        prompt('Copy this link:', url.toString());
+      });
     }
 
     els.saveBtn.addEventListener('click', saveStep1);
+    els.copyBtn.addEventListener('click', copyCurrentLink);
+
     els.subnavButtons.forEach(btn => {
-      btn.addEventListener('click', () => setActiveStep(Number(btn.dataset.step)));
+      btn.addEventListener('click', () => {
+        if (!currentRecord) return;
+        currentRecord.currentStep = Number(btn.dataset.step);
+        els.journeyMeta.textContent = `Step ${currentRecord.currentStep} in focus`;
+        renderStepList(currentRecord, currentRecord.currentStep, els.stepList);
+        renderStepList(currentRecord, currentRecord.currentStep, els.summaryList);
+        els.subnavButtons.forEach(b => b.classList.toggle('active', b === btn));
+      });
     });
 
-    hydrateForm();
-    renderSteps(1);
+    hydrate(CLIENTS[getClientKey()]);
   </script>
 </body>
 </html>
