@@ -430,6 +430,40 @@
       font-size: 14px;
     }
 
+    .resource-box {
+      margin-top: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(122, 62, 240, 0.18);
+      background: rgba(122, 62, 240, 0.06);
+      padding: 14px 16px;
+    }
+
+    .resource-box strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    .resource-box p {
+      margin: 0 0 10px;
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .resource-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      text-decoration: none;
+      color: var(--sr-charcoal);
+      padding-bottom: 2px;
+      border-bottom: 1px solid rgba(18, 18, 18, 0.18);
+    }
+
+    .hidden { display: none !important; }
+
     code {
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       font-size: 0.95em;
@@ -611,6 +645,7 @@
         venueName: "Demo Venue",
         mainContact: "Demo contact",
         launchDate: "2026-05-01",
+        posSystem: "",
         steps: [
           { title: "Confirm onboarding details", body: "Venue name, launch date, and main contact.", tone: "done", status: "Open" },
           { title: "Set up integrations", body: "POS, payments, and relevant systems.", tone: "high", status: "Next" },
@@ -631,6 +666,7 @@
         venueName: "Sandys",
         mainContact: "Operations Team",
         launchDate: "2026-05-01",
+        posSystem: "",
         steps: [
           { title: "Confirm onboarding details", body: "Review venue name, launch date, and main contact.", tone: "done", status: "Open" },
           { title: "Set up integrations", body: "POS, payments, and any required systems for Sandys.", tone: "high", status: "Next" },
@@ -651,6 +687,7 @@
         venueName: "Test",
         mainContact: "Test contact",
         launchDate: "2026-06-15",
+        posSystem: "",
         steps: [
           { title: "Confirm onboarding details", body: "Check the core client details and launch date.", tone: "done", status: "Open" },
           { title: "Set up integrations", body: "Show the systems that matter for this test record.", tone: "high", status: "Next" },
@@ -662,6 +699,9 @@
     };
 
     const STORAGE_PREFIX = 'onboarding_flow_';
+    const GUIDE_URLS = {
+      lightspeed: '#lightspeed-guide'
+    };
 
     const els = {
       pageTitle: document.getElementById('pageTitle'),
@@ -778,20 +818,26 @@
 
       persistCurrentRecord();
       hydrate(currentRecord);
+      renderStep2Panel();
+      const guide = document.getElementById('posGuideCard');
+      if (guide) guide.classList.add('hidden');
       document.getElementById('step-1').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     function completeStep2() {
       if (!currentRecord) return;
 
+      const posSystem = document.getElementById('posSystem')?.value || '';
       currentRecord = {
         ...currentRecord,
+        posSystem,
         currentStep: 3,
         progress: 60
       };
 
       persistCurrentRecord();
       hydrate(currentRecord);
+      renderStep3Panel();
       document.getElementById('step-1').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
@@ -820,6 +866,24 @@
       }).catch(() => {
         prompt('Copy this link:', url.toString());
       });
+    }
+
+    function updatePosGuide() {
+      const select = document.getElementById('posSystem');
+      const card = document.getElementById('posGuideCard');
+      if (!select || !card) return;
+
+      const value = (select.value || '').trim().toLowerCase();
+      if (value === 'lightspeed') {
+        card.classList.remove('hidden');
+        const link = document.getElementById('posGuideLink');
+        if (link) {
+          link.href = GUIDE_URLS.lightspeed;
+          link.textContent = 'Open Lightspeed guide';
+        }
+      } else {
+        card.classList.add('hidden');
+      }
     }
 
     function renderStep3Panel() {
@@ -884,10 +948,10 @@
         <div class="field">
           <label for="posSystem">POS system</label>
           <select id="posSystem">
-            <option>Select POS</option>
-            <option>Lightspeed</option>
-            <option>Square</option>
-            <option>Toast</option>
+            <option value="">Select POS</option>
+            <option value="lightspeed">Lightspeed</option>
+            <option value="square">Square</option>
+            <option value="toast">Toast</option>
           </select>
         </div>
 
@@ -906,12 +970,24 @@
           <label><input type="checkbox" /> WhatsApp</label>
         </div>
 
+        <div class="resource-box hidden" id="posGuideCard">
+          <strong>Lightspeed resource</strong>
+          <p>Because Lightspeed is selected, the setup guide is now available.</p>
+          <a class="resource-link" id="posGuideLink" href="#" target="_blank" rel="noopener">Open Lightspeed guide</a>
+        </div>
+
         <div class="search-row" style="margin-top:12px;">
           <button class="btn" type="button" id="completeStep2Btn">Complete step 2</button>
         </div>
       `;
 
       els.stepList.parentNode.insertBefore(card, els.stepList);
+
+      const posSelect = card.querySelector('#posSystem');
+      posSelect.value = currentRecord?.posSystem || '';
+      posSelect.addEventListener('change', updatePosGuide);
+      updatePosGuide();
+
       card.querySelector('#completeStep2Btn').addEventListener('click', completeStep2);
     }
 
@@ -938,7 +1014,6 @@
       if (currentRecord.currentStep >= 2) renderStep2Panel();
       if (currentRecord.currentStep >= 3) renderStep3Panel();
 
-      // Keep the flow visible as the user advances.
       if (currentRecord.currentStep >= 4) {
         els.saveMeta.textContent = 'Setup is complete. Data will be the next pre-launch gate.';
       }
