@@ -739,21 +739,33 @@
       });
     }
 
-    function saveStep1() {
-      if (!currentRecord) return;
-      currentRecord = {
-        ...currentRecord,
-        venueName: els.venueName.value.trim() || currentRecord.venueName,
-        mainContact: els.mainContact.value.trim() || currentRecord.mainContact,
-        launchDate: els.launchDate.value.trim() || currentRecord.launchDate,
-      };
+   function saveStep1() {
+  if (!currentRecord) return;
 
-      els.clientChip.textContent = `Client mode: ${currentRecord.venueName}`;
-      els.pageTitle.textContent = currentRecord.title;
-      els.saveMeta.textContent = `Saved locally at ${new Date().toLocaleString('en-GB')}. Launch date: ${formatUKDate(currentRecord.launchDate)}.`;
-      renderStepList(currentRecord, currentRecord.currentStep, els.stepList);
-      renderStepList(currentRecord, currentRecord.currentStep, els.summaryList);
-    }
+  currentRecord = {
+    ...currentRecord,
+    venueName: els.venueName.value.trim() || currentRecord.venueName,
+    mainContact: els.mainContact.value.trim() || currentRecord.mainContact,
+    launchDate: els.launchDate.value.trim() || currentRecord.launchDate,
+    currentStep: 2, // 👈 move to step 2
+    progress: 40    // 👈 update progress
+  };
+
+  // Update UI
+  els.clientChip.textContent = `Client mode: ${currentRecord.venueName}`;
+  els.pageTitle.textContent = currentRecord.title;
+
+  els.saveMeta.textContent =
+    `Step 1 saved. Moving to Step 2 → Integrations`;
+
+  // Re-render everything
+  hydrate(currentRecord);
+
+  // Scroll to journey
+  document.getElementById("step-1").scrollIntoView({
+    behavior: "smooth"
+  });
+}
 
     function copyCurrentLink() {
       const url = new URL(window.location.href);
