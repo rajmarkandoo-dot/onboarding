@@ -6,152 +6,226 @@
 <title>SevenRooms | Client Onboarding</title>
 
 <style>
-body {
-  font-family: Arial, sans-serif;
-  background: #f6f5f2;
-  margin: 0;
-  padding: 40px;
-}
+  :root {
+    --bg: #f6f5f2;
+    --card: #ffffff;
+    --text: #121212;
+    --muted: #6b7280;
+    --line: #e5e7eb;
+    --brand: #7a3ef0;
+    --brand-2: #ff6b5d;
+    --good: #2fbf8f;
+    --warn: #f2b84b;
+    --danger: #ff6b5d;
+  }
 
-.container {
-  max-width: 900px;
-  margin: auto;
-}
+  * { box-sizing: border-box; }
 
-h1 {
-  margin-bottom: 10px;
-}
+  body {
+    font-family: Arial, sans-serif;
+    background: var(--bg);
+    margin: 0;
+    padding: 40px;
+    color: var(--text);
+  }
 
-.card {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  margin-top: 20px;
-  border: 1px solid #ddd;
-}
+  .container {
+    max-width: 900px;
+    margin: auto;
+  }
 
-.step {
-  border-bottom: 1px solid #eee;
-  padding: 10px 0;
-}
+  h1 {
+    margin: 0 0 10px;
+    font-size: 40px;
+    letter-spacing: -0.03em;
+  }
 
-.badge {
-  float: right;
-  font-size: 12px;
-  padding: 4px 8px;
-  border-radius: 8px;
-}
+  .subtle {
+    margin: 0 0 18px;
+    color: var(--muted);
+  }
 
-.done { background: #d1fae5; }
-.high { background: #fee2e2; }
-.medium { background: #fef3c7; }
+  .chip {
+    display: inline-block;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(122, 62, 240, 0.10);
+    color: var(--text);
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 18px;
+  }
 
-input {
-  padding: 10px;
-  width: 60%;
-}
+  .card {
+    background: var(--card);
+    padding: 20px;
+    border-radius: 14px;
+    margin-top: 20px;
+    border: 1px solid var(--line);
+    box-shadow: 0 10px 30px rgba(18, 18, 18, 0.06);
+  }
 
-button {
-  padding: 10px;
-  background: black;
-  color: white;
-  border: none;
-}
+  .step {
+    border-bottom: 1px solid var(--line);
+    padding: 12px 0;
+  }
+
+  .step:last-child {
+    border-bottom: none;
+  }
+
+  .step strong {
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .badge {
+    float: right;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-weight: bold;
+    text-transform: capitalize;
+  }
+
+  .done { background: rgba(47, 191, 143, 0.16); color: #117a58; }
+  .high { background: rgba(255, 107, 93, 0.16); color: #b42318; }
+  .medium { background: rgba(242, 184, 75, 0.18); color: #8a5900; }
+
+  .input-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+  }
+
+  input {
+    padding: 12px 14px;
+    min-width: 280px;
+    flex: 1;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    font-size: 16px;
+  }
+
+  button {
+    padding: 12px 16px;
+    background: var(--text);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  button:hover {
+    opacity: 0.92;
+  }
+
+  code {
+    background: rgba(18, 18, 18, 0.06);
+    padding: 2px 6px;
+    border-radius: 6px;
+  }
 </style>
 </head>
 
 <body>
+  <div class="container">
+    <h1 id="title">Loading...</h1>
+    <p class="subtle" id="lead"></p>
 
-<div class="container">
+    <div class="chip" id="clientMode">Client mode: loading</div>
 
-<h1 id="title">Loading...</h1>
-<p id="lead"></p>
-
-<input id="clientInput" placeholder="Enter venue name" />
-<button onclick="start()">Start</button>
-
-<div class="card" id="steps"></div>
-
-</div>
-
-<script>
-const CLIENTS = {
-
-  demo: {
-    name: "Demo Venue",
-    title: "Welcome to your onboarding journey.",
-    lead: "This is a demo client.",
-    steps: [
-      {title: "Confirm details", body: "Check launch date", tone: "done"},
-      {title: "Setup integrations", body: "POS + payments", tone: "high"},
-      {title: "Import data", body: "Upload guests", tone: "high"}
-    ]
-  },
-
-  sandys: {
-    name: "Sandys",
-    title: "Welcome, Sandys.",
-    lead: "Your onboarding journey is ready. Follow the steps below to get set up for launch.",
-    steps: [
-      {
-        title: "Confirm launch details",
-        body: "Review launch date and main contact.",
-        tone: "done"
-      },
-      {
-        title: "Set up integrations",
-        body: "POS, payments, and required systems.",
-        tone: "high"
-      },
-      {
-        title: "Upload guest data",
-        body: "Provide your database and reservations.",
-        tone: "high"
-      },
-      {
-        title: "Training & testing",
-        body: "Complete staff training and test bookings.",
-        tone: "medium"
-      }
-    ]
-  }
-
-};
-
-function getClient() {
-  const params = new URLSearchParams(window.location.search);
-  return params.get("client") || "demo";
-}
-
-function render(clientKey) {
-  const client = CLIENTS[clientKey] || CLIENTS["demo"];
-
-  document.getElementById("title").innerText = client.title;
-  document.getElementById("lead").innerText = client.lead;
-
-  const stepsHTML = client.steps.map(step => `
-    <div class="step">
-      <strong>${step.title}</strong>
-      <span class="badge ${step.tone}">${step.tone}</span>
-      <p>${step.body}</p>
+    <div class="input-row">
+      <input id="clientInput" placeholder="Enter venue name" />
+      <button onclick="start()">Start</button>
     </div>
-  `).join("");
 
-  document.getElementById("steps").innerHTML = stepsHTML;
-}
+    <div class="card" id="steps"></div>
+  </div>
 
-function slugify(text) {
-  return text.toLowerCase().replace(/\s+/g, "-");
-}
+  <script>
+    const CLIENTS = {
+      demo: {
+        name: "Demo Venue",
+        title: "Welcome to your onboarding journey.",
+        lead: "This is a demo client.",
+        steps: [
+          { title: "Confirm details", body: "Check launch date", tone: "done" },
+          { title: "Setup integrations", body: "POS + payments", tone: "high" },
+          { title: "Import data", body: "Upload guests", tone: "high" }
+        ]
+      },
 
-function start() {
-  const value = document.getElementById("clientInput").value;
-  const slug = slugify(value);
-  window.location.href = "?client=" + slug;
-}
+      sandys: {
+        name: "Sandys",
+        title: "Welcome, Sandys.",
+        lead: "Your onboarding journey is ready. Follow the steps below to get set up for launch.",
+        steps: [
+          {
+            title: "Confirm launch details",
+            body: "Review launch date and main contact.",
+            tone: "done"
+          },
+          {
+            title: "Set up integrations",
+            body: "POS, payments, and required systems.",
+            tone: "high"
+          },
+          {
+            title: "Upload guest data",
+            body: "Provide your database and reservations.",
+            tone: "high"
+          },
+          {
+            title: "Training & testing",
+            body: "Complete staff training and test bookings.",
+            tone: "medium"
+          }
+        ]
+      }
+    };
 
-render(getClient());
-</script>
+    function getClient() {
+      const params = new URLSearchParams(window.location.search);
+      return (params.get("client") || "demo").trim().toLowerCase();
+    }
 
+    function render(clientKey) {
+      const client = CLIENTS[clientKey] || CLIENTS.demo;
+
+      document.getElementById("title").innerText = client.title;
+      document.getElementById("lead").innerText = client.lead;
+      document.getElementById("clientMode").innerText = "Client mode: " + client.name;
+
+      const stepsHTML = client.steps.map(step => `
+        <div class="step">
+          <span class="badge ${step.tone}">${step.tone}</span>
+          <strong>${step.title}</strong>
+          <p>${step.body}</p>
+        </div>
+      `).join("");
+
+      document.getElementById("steps").innerHTML = stepsHTML;
+    }
+
+    function slugify(text) {
+      return text
+        .trim()
+        .toLowerCase()
+        .replace(/['’]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+    }
+
+    function start() {
+      const value = document.getElementById("clientInput").value.trim();
+      const slug = value ? slugify(value) : "demo";
+      window.location.href = "?client=" + encodeURIComponent(slug) + "#step-1";
+    }
+
+    render(getClient());
+  </script>
 </body>
 </html>
