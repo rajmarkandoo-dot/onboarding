@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SevenRooms | Secure Onboarding Invite</title>
+  <title>SevenRooms | Sandys Onboarding Flow</title>
   <style>
     :root {
       --bg: #f6f5f2;
-      --surface: rgba(255, 255, 255, 0.86);
+      --surface: rgba(255, 255, 255, 0.88);
       --surface-strong: #ffffff;
       --text: #1f2937;
       --muted: #667085;
@@ -136,7 +136,7 @@
       line-height: 1.6;
     }
 
-    .search-card, .form-card, .status-card {
+    .search-card, .status-card {
       background: var(--surface-strong);
       border: 1px solid var(--line);
       border-radius: 22px;
@@ -159,7 +159,7 @@
       flex-wrap: wrap;
     }
 
-    .search-row input, .field input, .field textarea {
+    .search-row input, .field input, .field textarea, .field select {
       width: 100%;
       border: 1px solid var(--line);
       background: #faf8f4;
@@ -172,7 +172,7 @@
       font-family: inherit;
     }
 
-    .search-row input:focus, .field input:focus, .field textarea:focus {
+    .search-row input:focus, .field input:focus, .field textarea:focus, .field select:focus {
       border-color: rgba(122, 62, 240, 0.45);
       box-shadow: 0 0 0 4px rgba(122, 62, 240, 0.12);
     }
@@ -237,6 +237,11 @@
       border: 1px solid var(--line);
       border-radius: 18px;
       padding: 14px 16px;
+    }
+
+    .step.active {
+      border-color: rgba(122, 62, 240, 0.22);
+      box-shadow: 0 0 0 4px rgba(122, 62, 240, 0.08);
     }
 
     .dot {
@@ -342,15 +347,6 @@
 
     .path-card h3 { margin: 0 0 8px; font-size: 16px; }
     .path-card p { margin: 0; color: var(--muted); line-height: 1.55; font-size: 14px; }
-    .anchored {
-      display: inline-flex;
-      margin-top: 12px;
-      color: var(--sr-charcoal);
-      font-weight: 800;
-      text-decoration: none;
-      border-bottom: 1px solid rgba(18, 18, 18, 0.2);
-      padding-bottom: 2px;
-    }
 
     .client-chip {
       display: inline-flex;
@@ -365,18 +361,55 @@
       margin-bottom: 14px;
     }
 
-    .alert {
-      border-radius: 18px;
-      border: 1px solid rgba(255, 107, 93, 0.20);
-      background: rgba(255, 107, 93, 0.08);
-      padding: 14px 16px;
-      margin-bottom: 14px;
-      color: #8a1f1f;
-      line-height: 1.5;
-      display: none;
+    .progress {
+      margin: 14px 0 0;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 14px;
     }
 
-    .hidden { display: none !important; }
+    .progress-bar {
+      width: 260px;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(18, 18, 18, 0.08);
+      overflow: hidden;
+    }
+
+    .progress-bar span {
+      display: block;
+      height: 100%;
+      width: 20%;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--sr-plum), var(--sr-coral));
+      transition: width 0.25s ease;
+    }
+
+    .subnav {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .subnav button {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.8);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .subnav button.active {
+      background: rgba(122, 62, 240, 0.10);
+      border-color: rgba(122, 62, 240, 0.20);
+      color: var(--sr-charcoal);
+    }
 
     code {
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
@@ -391,6 +424,7 @@
       .footer-note, .path-grid { grid-template-columns: 1fr; }
       .stat-grid { grid-template-columns: 1fr; }
       .topbar { flex-direction: column; align-items: flex-start; }
+      .progress-bar { width: 100%; }
     }
   </style>
 </head>
@@ -401,69 +435,52 @@
         <div class="brand-mark" aria-hidden="true"></div>
         <div>
           SevenRooms
-          <small>Secure onboarding invite</small>
+          <small>Sandys onboarding flow</small>
         </div>
       </div>
-      <div class="pill" id="topPill">Invite link · ready</div>
+      <div class="pill">Prototype · client journey first</div>
     </header>
 
     <main class="hero">
       <section class="panel panel-main">
-        <div class="eyebrow">Invite-only onboarding experience</div>
-        <h1 id="pageTitle">Open your onboarding invite.</h1>
+        <div class="eyebrow">Client-facing onboarding experience</div>
+        <h1 id="pageTitle">Welcome, Sandys.</h1>
         <p class="lead" id="pageLead">
-          Enter your invite token to load your saved onboarding journey. The same invite can be used to return later and continue where you left off.
+          This is the first cut of the real onboarding journey for Sandys. The goal here is to make the flow feel like a product: clear steps, progress, and actions that can be completed and saved.
         </p>
 
-        <div class="alert" id="errorBox"></div>
+        <div class="client-chip" id="clientChip">Client mode: Sandys</div>
 
-        <div class="search-card" id="inviteGate">
-          <div class="search-label">Step 1 · enter your invite token</div>
+        <div class="search-card">
+          <div class="search-label">Step 1 · confirm onboarding details</div>
           <div class="search-row">
-            <input id="inviteInput" type="text" placeholder="Paste invite token or open a magic link" />
-            <button class="btn" id="openInviteBtn" type="button">Open invite</button>
-            <button class="btn secondary" id="resumeBtn" type="button">Resume saved invite</button>
+            <input id="launchDate" type="text" placeholder="Launch date" />
+            <input id="mainContact" type="text" placeholder="Main contact" />
           </div>
-          <div class="helper">
-            Example link format: <code>?invite=8f3Kq91Lm</code>. In production, the token should map to a venue, a user, and the saved onboarding state.
+          <div class="search-row" style="margin-top:12px;">
+            <input id="venueName" type="text" placeholder="Venue name" />
+            <button class="btn" id="saveBtn" type="button">Save step 1</button>
           </div>
+          <div class="helper">This first step is intentionally simple. Later we can connect it to a real backend, invite tokens, and permissions.</div>
         </div>
 
-        <div class="form-card hidden" id="onboardingCard">
-          <div class="card-label">Your onboarding details</div>
-
-          <div class="field">
-            <label for="venueName">Venue name</label>
-            <input id="venueName" type="text" />
-          </div>
-
-          <div class="field">
-            <label for="mainContact">Main contact</label>
-            <input id="mainContact" type="text" />
-          </div>
-
-          <div class="field">
-            <label for="launchDate">Launch date</label>
-            <input id="launchDate" type="text" placeholder="YYYY-MM-DD" />
-          </div>
-
-          <div class="field">
-            <label for="notes">Notes</label>
-            <textarea id="notes" placeholder="Anything the client needs to remember..."></textarea>
-          </div>
-
-          <div class="search-row" style="margin-top:14px;">
-            <button class="btn" id="saveBtn" type="button">Save progress</button>
-            <button class="btn secondary" id="copyBtn" type="button">Copy resume link</button>
-          </div>
-
-          <div class="helper" id="saveMeta">Nothing saved yet.</div>
+        <div class="progress">
+          <div class="progress-bar" aria-hidden="true"><span id="progressFill"></span></div>
+          <div><strong id="progressText">20%</strong> complete</div>
         </div>
 
-        <div class="journey hidden" id="journeySection">
+        <div class="subnav" aria-label="Journey sections">
+          <button class="active" data-step="1">1. Details</button>
+          <button data-step="2">2. Integrations</button>
+          <button data-step="3">3. Data</button>
+          <button data-step="4">4. Training</button>
+          <button data-step="5">5. Launch</button>
+        </div>
+
+        <div class="journey" id="step-1">
           <div class="section-title">
-            <h2>Suggested journey structure</h2>
-            <div class="meta" id="journeyMeta">Rendered from invite data</div>
+            <h2>Sandys onboarding journey</h2>
+            <div class="meta" id="journeyMeta">Step 1 in focus</div>
           </div>
           <div class="step-list" id="stepList"></div>
         </div>
@@ -471,53 +488,53 @@
 
       <aside class="panel panel-side">
         <div class="section-title">
-          <h2>Invite snapshot</h2>
-          <div class="meta">Session-aware</div>
+          <h2>Snapshot</h2>
+          <div class="meta">Live progress</div>
         </div>
 
         <div class="stat-grid">
           <div class="stat">
-            <strong id="phaseCount">--</strong>
+            <strong id="phaseCount">05</strong>
             <span>Onboarding phases</span>
           </div>
           <div class="stat">
-            <strong id="taskCount">--</strong>
+            <strong id="taskCount">12</strong>
             <span>Key tasks</span>
           </div>
           <div class="stat">
-            <strong id="guideCount">--</strong>
+            <strong id="guideCount">04</strong>
             <span>Relevant guides</span>
           </div>
         </div>
 
         <div class="journey">
           <div class="section-title">
-            <h2>What the client gets</h2>
+            <h2>What Sandys sees</h2>
           </div>
           <div class="step-list">
-            <div class="step">
+            <div class="step active">
               <div class="dot"></div>
               <div>
-                <h3>Invite-only access</h3>
-                <p>Only users with a valid token can open the portal.</p>
+                <h3>Confirm details</h3>
+                <p>Venue name, main contact, and launch date.</p>
               </div>
-              <span class="badge done">Secure</span>
+              <span class="badge done">Open</span>
             </div>
             <div class="step">
               <div class="dot"></div>
               <div>
-                <h3>Saved progress</h3>
-                <p>The same invite token can be used to return later.</p>
+                <h3>Set up integrations</h3>
+                <p>POS, payments, and related systems.</p>
               </div>
-              <span class="badge medium">Persistent</span>
+              <span class="badge high">Next</span>
             </div>
             <div class="step">
               <div class="dot"></div>
               <div>
-                <h3>Editable onboarding</h3>
-                <p>Venue details, notes, and step state can be updated over time.</p>
+                <h3>Upload guest data</h3>
+                <p>Guest database and reservation imports.</p>
               </div>
-              <span class="badge high">Editable</span>
+              <span class="badge high">Next</span>
             </div>
           </div>
         </div>
@@ -526,131 +543,113 @@
 
     <section class="panel path">
       <div class="section-title">
-        <h2>How the secure invite flow works</h2>
-        <div class="meta">Front end + backend contract</div>
+        <h2>First steps of the flow</h2>
+        <div class="meta">Build the journey before permissions</div>
       </div>
       <div class="path-grid">
         <div class="path-card">
           <div class="num">1</div>
-          <h3>Client opens a magic link</h3>
-          <p>The link contains a random token such as <code>?invite=8f3Kq91Lm</code>. No venue names are exposed in the URL.</p>
+          <h3>Step 1: Confirm details</h3>
+          <p>Capture venue name, launch date, and main contact. This is the first actionable screen and sets the tone for the whole experience.</p>
         </div>
         <div class="path-card">
           <div class="num">2</div>
-          <h3>Backend validates the token</h3>
-          <p>The page calls an API to confirm the invite exists, is active, and belongs to the correct venue and user.</p>
+          <h3>Step 2: Integrations</h3>
+          <p>Show only the integrations that matter for Sandys. This can later branch based on client setup.</p>
         </div>
         <div class="path-card">
           <div class="num">3</div>
-          <h3>Progress is saved and resumed</h3>
-          <p>Edits are written to storage, so the same invite can reopen the same onboarding state later.</p>
+          <h3>Step 3: Data and training</h3>
+          <p>Guide them through uploads, testing, and training so the page feels like a real onboarding journey rather than a static form.</p>
         </div>
       </div>
-      <a class="anchored" href="#step-1" id="jumpLink">Jump to invite flow</a>
     </section>
 
     <section class="footer-note">
       <div class="note">
-        <strong>Monday stays behind the scenes</strong>
-        <p>Use Monday as the internal source of truth while the client sees a polished onboarding portal.</p>
+        <strong>Keep the HTML static for now</strong>
+        <p>We are shaping the client journey first. The data model and invite permissions can come after the flow feels right.</p>
       </div>
       <div class="note">
-        <strong>One page, many invites</strong>
-        <p>The HTML stays the same. Only the invite token changes between clients or users.</p>
+        <strong>Sandys becomes the reference case</strong>
+        <p>Build around one real client so the interactions, copy, and progress states are grounded.</p>
       </div>
       <div class="note">
-        <strong>Easy to move to Supabase or Firebase</strong>
-        <p>The data model here is ready to connect to a real backend when you are ready.</p>
+        <strong>Backend later, product now</strong>
+        <p>Once the flow is solid, we can plug in invites, auth, and persistence without rethinking the page structure.</p>
       </div>
     </section>
   </div>
 
   <script>
-    const MOCK_INVITES = {
-      "8f3Kq91Lm": {
-        invite: "8f3Kq91Lm",
-        venueId: "sr_1029",
-        venueName: "Sandys",
-        mainContact: "Operations Team",
-        launchDate: "2026-05-01",
-        notes: "Priority: POS and payments. Training planned for next week.",
-        phases: 5,
-        tasks: 12,
-        guides: 4,
-        steps: [
-          { title: "Confirm launch details", body: "Review launch date, venue name, and the main contact.", tone: "done", status: "Ready" },
-          { title: "Set up integrations", body: "POS, payments, and any required systems for this site.", tone: "high", status: "High priority" },
-          { title: "Upload guest data", body: "Provide your database and reservations securely.", tone: "high", status: "High priority" },
-          { title: "Training & testing", body: "Complete staff training and test bookings.", tone: "medium", status: "In progress" },
-          { title: "Go live", body: "Final checks before launching your booking journey.", tone: "high", status: "Launch gate" }
-        ]
-      }
+    const DATA = {
+      venueName: "Sandys",
+      mainContact: "Operations Team",
+      launchDate: "2026-05-01",
+      phases: 5,
+      tasks: 12,
+      guides: 4,
+      progress: 20,
+      currentStep: 1,
+      steps: [
+        {
+          title: "Confirm onboarding details",
+          body: "Review venue name, main contact, launch date, and any important launch notes.",
+          tone: "done",
+          status: "Open"
+        },
+        {
+          title: "Set up integrations",
+          body: "POS, payments, and any required systems for Sandys.",
+          tone: "high",
+          status: "Next"
+        },
+        {
+          title: "Upload guest data",
+          body: "Provide guest database and reservation imports.",
+          tone: "high",
+          status: "Next"
+        },
+        {
+          title: "Training and testing",
+          body: "Complete staff training and test the booking flow.",
+          tone: "medium",
+          status: "Later"
+        },
+        {
+          title: "Go live",
+          body: "Final checks before launching the booking journey.",
+          tone: "high",
+          status: "Launch gate"
+        }
+      ]
     };
 
     const els = {
       pageTitle: document.getElementById('pageTitle'),
       pageLead: document.getElementById('pageLead'),
-      topPill: document.getElementById('topPill'),
-      errorBox: document.getElementById('errorBox'),
-      inviteGate: document.getElementById('inviteGate'),
-      onboardingCard: document.getElementById('onboardingCard'),
-      journeySection: document.getElementById('journeySection'),
-      inviteInput: document.getElementById('inviteInput'),
-      openInviteBtn: document.getElementById('openInviteBtn'),
-      resumeBtn: document.getElementById('resumeBtn'),
-      saveBtn: document.getElementById('saveBtn'),
-      copyBtn: document.getElementById('copyBtn'),
+      clientChip: document.getElementById('clientChip'),
       venueName: document.getElementById('venueName'),
       mainContact: document.getElementById('mainContact'),
       launchDate: document.getElementById('launchDate'),
-      notes: document.getElementById('notes'),
-      saveMeta: document.getElementById('saveMeta'),
+      saveBtn: document.getElementById('saveBtn'),
+      stepList: document.getElementById('stepList'),
       phaseCount: document.getElementById('phaseCount'),
       taskCount: document.getElementById('taskCount'),
       guideCount: document.getElementById('guideCount'),
-      stepList: document.getElementById('stepList'),
+      progressFill: document.getElementById('progressFill'),
+      progressText: document.getElementById('progressText'),
       journeyMeta: document.getElementById('journeyMeta'),
-      jumpLink: document.getElementById('jumpLink')
+      subnavButtons: Array.from(document.querySelectorAll('.subnav button')),
+      stepCards: [
+        document.querySelector('.panel-main .search-card'),
+        document.querySelector('.panel-side .step-list')
+      ]
     };
 
-    let currentInvite = null;
-    let currentRecord = null;
-
-    function getInviteFromUrl() {
-      const params = new URLSearchParams(window.location.search);
-      return (params.get('invite') || '').trim();
-    }
-
-    function storageKey(invite) {
-      return `onboarding_invite_${invite}`;
-    }
-
-    function loadSavedState(invite) {
-      try {
-        const raw = localStorage.getItem(storageKey(invite));
-        return raw ? JSON.parse(raw) : null;
-      } catch {
-        return null;
-      }
-    }
-
-    function saveState(invite, record) {
-      localStorage.setItem(storageKey(invite), JSON.stringify(record));
-    }
-
-    function showError(message) {
-      els.errorBox.textContent = message;
-      els.errorBox.style.display = 'block';
-    }
-
-    function clearError() {
-      els.errorBox.textContent = '';
-      els.errorBox.style.display = 'none';
-    }
-
-    function renderSteps(record) {
-      els.stepList.innerHTML = record.steps.map((step, index) => `
-        <div class="step">
+    function renderSteps(activeStep = 1) {
+      els.stepList.innerHTML = DATA.steps.map((step, index) => `
+        <div class="step ${index + 1 === activeStep ? 'active' : ''}">
           <div class="dot"></div>
           <div>
             <h3>${index + 1}. ${step.title}</h3>
@@ -659,137 +658,49 @@
           <span class="badge ${step.tone}">${step.status}</span>
         </div>
       `).join('');
+
+      els.journeyMeta.textContent = `Step ${activeStep} in focus`;
+      els.progressText.textContent = `${DATA.progress}%`;
+      els.progressFill.style.width = `${DATA.progress}%`;
+      els.phaseCount.textContent = String(DATA.phases).padStart(2, '0');
+      els.taskCount.textContent = String(DATA.tasks).padStart(2, '0');
+      els.guideCount.textContent = String(DATA.guides).padStart(2, '0');
     }
 
-    function hydrateForm(record) {
-      els.venueName.value = record.venueName || '';
-      els.mainContact.value = record.mainContact || '';
-      els.launchDate.value = record.launchDate || '';
-      els.notes.value = record.notes || '';
-      els.phaseCount.textContent = String(record.phases || 0).padStart(2, '0');
-      els.taskCount.textContent = String(record.tasks || 0).padStart(2, '0');
-      els.guideCount.textContent = String(record.guides || 0).padStart(2, '0');
-      els.journeyMeta.textContent = `Invite ${record.invite} · Venue ${record.venueId}`;
-      renderSteps(record);
+    function hydrateForm() {
+      els.venueName.value = DATA.venueName;
+      els.mainContact.value = DATA.mainContact;
+      els.launchDate.value = DATA.launchDate;
+      els.pageTitle.textContent = `Welcome, ${DATA.venueName}.`;
+      els.pageLead.textContent = 'This is the first cut of the real onboarding journey for Sandys. The page is designed to feel like a product and later become connected to saved progress, invites, and permissions.';
+      els.clientChip.textContent = `Client mode: ${DATA.venueName}`;
     }
 
-    function setAppState(open) {
-      els.inviteGate.classList.toggle('hidden', open);
-      els.onboardingCard.classList.toggle('hidden', !open);
-      els.journeySection.classList.toggle('hidden', !open);
-      els.topPill.textContent = open ? `Active invite · ${currentInvite}` : 'Invite link · ready';
+    function setActiveStep(step) {
+      DATA.currentStep = step;
+      renderSteps(step);
+      els.subnavButtons.forEach(btn => btn.classList.toggle('active', Number(btn.dataset.step) === step));
     }
 
-    function openInvite(invite) {
-      clearError();
-      const token = invite.trim();
-      if (!token) {
-        showError('Enter an invite token or use the magic link from your email.');
-        return;
-      }
-
-      const initial = MOCK_INVITES[token];
-      const saved = loadSavedState(token);
-      const record = saved || initial;
-
-      if (!record) {
-        currentInvite = null;
-        currentRecord = null;
-        setAppState(false);
-        showError('That invite token was not recognised. Check the link or ask for a new invite.');
-        els.pageTitle.textContent = 'Invite not found.';
-        els.pageLead.textContent = 'The onboarding portal only opens for a valid invite token.';
-        return;
-      }
-
-      currentInvite = token;
-      currentRecord = {
-        ...initial,
-        ...record,
-        invite: token,
-        steps: (record.steps || initial.steps || []).map((step, idx) => ({
-          ...step,
-          status: step.status || (initial.steps && initial.steps[idx] ? initial.steps[idx].status : 'Pending'),
-          tone: step.tone || (initial.steps && initial.steps[idx] ? initial.steps[idx].tone : 'medium')
-        }))
-      };
-
-      window.history.replaceState({}, '', `${window.location.pathname}?invite=${encodeURIComponent(token)}#step-1`);
-      els.pageTitle.textContent = `Welcome, ${currentRecord.venueName}.`;
-      els.pageLead.textContent = 'This onboarding guide is saved against your invite token. You can exit and return later using the same link.';
-      setAppState(true);
-      hydrateForm(currentRecord);
-      els.saveMeta.textContent = saved ? 'Saved progress loaded from this browser.' : 'Loaded invite record. Make edits and save progress.';
-      document.getElementById('step-1').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    function saveStep1() {
+      DATA.venueName = els.venueName.value.trim() || DATA.venueName;
+      DATA.mainContact = els.mainContact.value.trim() || DATA.mainContact;
+      DATA.launchDate = els.launchDate.value.trim() || DATA.launchDate;
+      els.clientChip.textContent = `Client mode: ${DATA.venueName}`;
+      els.pageTitle.textContent = `Welcome, ${DATA.venueName}.`;
+      els.pageLead.textContent = 'Step 1 has been saved locally in this prototype. Next we can persist the journey and connect it to an invite flow.';
+      renderSteps(DATA.currentStep);
+      const savedAt = new Date().toLocaleString();
+      document.querySelector('.helper').textContent = `Saved locally at ${savedAt}. This is the part we will later connect to a backend.`;
     }
 
-    function captureForm() {
-      if (!currentRecord) return null;
-      return {
-        ...currentRecord,
-        venueName: els.venueName.value.trim(),
-        mainContact: els.mainContact.value.trim(),
-        launchDate: els.launchDate.value.trim(),
-        notes: els.notes.value.trim()
-      };
-    }
-
-    function persistCurrent() {
-      if (!currentInvite || !currentRecord) {
-        showError('Open a valid invite first.');
-        return;
-      }
-      const updated = captureForm();
-      saveState(currentInvite, updated);
-      currentRecord = updated;
-      hydrateForm(updated);
-      els.saveMeta.textContent = `Saved at ${new Date().toLocaleString()}`;
-      clearError();
-    }
-
-    async function copyResumeLink() {
-      if (!currentInvite) {
-        showError('Open a valid invite first.');
-        return;
-      }
-      const link = `${window.location.origin}${window.location.pathname}?invite=${encodeURIComponent(currentInvite)}`;
-      try {
-        await navigator.clipboard.writeText(link);
-        els.copyBtn.textContent = 'Copied';
-        setTimeout(() => (els.copyBtn.textContent = 'Copy resume link'), 1200);
-      } catch {
-        prompt('Copy this resume link:', link);
-      }
-    }
-
-    function resumeSavedInvite() {
-      const invite = getInviteFromUrl();
-      if (!invite) {
-        showError('No invite token is present in the URL. Use a magic link or paste one into the field.');
-        return;
-      }
-      openInvite(invite);
-    }
-
-    function initFromUrl() {
-      const invite = getInviteFromUrl();
-      if (invite) {
-        els.inviteInput.value = invite;
-        openInvite(invite);
-      } else {
-        setAppState(false);
-      }
-    }
-
-    els.openInviteBtn.addEventListener('click', () => openInvite(els.inviteInput.value));
-    els.resumeBtn.addEventListener('click', resumeSavedInvite);
-    els.saveBtn.addEventListener('click', persistCurrent);
-    els.copyBtn.addEventListener('click', copyResumeLink);
-    els.inviteInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') openInvite(els.inviteInput.value);
+    els.saveBtn.addEventListener('click', saveStep1);
+    els.subnavButtons.forEach(btn => {
+      btn.addEventListener('click', () => setActiveStep(Number(btn.dataset.step)));
     });
 
-    initFromUrl();
+    hydrateForm();
+    renderSteps(1);
   </script>
 </body>
 </html>
