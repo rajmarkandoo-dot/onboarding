@@ -1,231 +1,795 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>SevenRooms | Client Onboarding</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SevenRooms | Secure Onboarding Invite</title>
+  <style>
+    :root {
+      --bg: #f6f5f2;
+      --surface: rgba(255, 255, 255, 0.86);
+      --surface-strong: #ffffff;
+      --text: #1f2937;
+      --muted: #667085;
+      --line: rgba(31, 41, 55, 0.10);
+      --sr-charcoal: #121212;
+      --sr-plum: #7a3ef0;
+      --sr-coral: #ff6b5d;
+      --sr-mint: #2fbf8f;
+      --sr-gold: #f2b84b;
+      --shadow: 0 22px 60px rgba(17, 24, 39, 0.09);
+      --radius: 26px;
+    }
 
-<style>
-  :root {
-    --bg: #f6f5f2;
-    --card: #ffffff;
-    --text: #121212;
-    --muted: #6b7280;
-    --line: #e5e7eb;
-    --brand: #7a3ef0;
-    --brand-2: #ff6b5d;
-    --good: #2fbf8f;
-    --warn: #f2b84b;
-    --danger: #ff6b5d;
-  }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(122, 62, 240, 0.14), transparent 24%),
+        radial-gradient(circle at top right, rgba(255, 107, 93, 0.13), transparent 22%),
+        linear-gradient(180deg, #fffefb 0%, var(--bg) 100%);
+    }
 
-  * { box-sizing: border-box; }
+    .shell {
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 28px 20px 44px;
+    }
 
-  body {
-    font-family: Arial, sans-serif;
-    background: var(--bg);
-    margin: 0;
-    padding: 40px;
-    color: var(--text);
-  }
+    .topbar, .hero, .footer-note, .path {
+      width: min(1180px, 100%);
+    }
 
-  .container {
-    max-width: 900px;
-    margin: auto;
-  }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
 
-  h1 {
-    margin: 0 0 10px;
-    font-size: 40px;
-    letter-spacing: -0.03em;
-  }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
 
-  .subtle {
-    margin: 0 0 18px;
-    color: var(--muted);
-  }
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--sr-plum) 0%, var(--sr-coral) 50%, var(--sr-gold) 100%);
+      box-shadow: 0 10px 30px rgba(122, 62, 240, 0.25);
+    }
 
-  .chip {
-    display: inline-block;
-    padding: 8px 12px;
-    border-radius: 999px;
-    background: rgba(122, 62, 240, 0.10);
-    color: var(--text);
-    font-size: 14px;
-    font-weight: bold;
-    margin-bottom: 18px;
-  }
+    .brand small {
+      display: block;
+      font-weight: 600;
+      color: var(--muted);
+      margin-top: 2px;
+    }
 
-  .card {
-    background: var(--card);
-    padding: 20px;
-    border-radius: 14px;
-    margin-top: 20px;
-    border: 1px solid var(--line);
-    box-shadow: 0 10px 30px rgba(18, 18, 18, 0.06);
-  }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.72);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      box-shadow: 0 8px 26px rgba(16, 24, 40, 0.04);
+      backdrop-filter: blur(12px);
+    }
 
-  .step {
-    border-bottom: 1px solid var(--line);
-    padding: 12px 0;
-  }
+    .hero {
+      display: grid;
+      grid-template-columns: 1.08fr 0.92fr;
+      gap: 22px;
+      align-items: stretch;
+    }
 
-  .step:last-child {
-    border-bottom: none;
-  }
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+    }
 
-  .step strong {
-    display: block;
-    margin-bottom: 6px;
-  }
+    .panel-main { padding: 30px; }
+    .panel-side { padding: 22px; display: grid; gap: 14px; align-content: start; }
 
-  .badge {
-    float: right;
-    font-size: 12px;
-    padding: 4px 8px;
-    border-radius: 999px;
-    font-weight: bold;
-    text-transform: capitalize;
-  }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--sr-charcoal);
+      background: rgba(18, 18, 18, 0.06);
+      border: 1px solid rgba(18, 18, 18, 0.08);
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 800;
+      margin-bottom: 18px;
+    }
 
-  .done { background: rgba(47, 191, 143, 0.16); color: #117a58; }
-  .high { background: rgba(255, 107, 93, 0.16); color: #b42318; }
-  .medium { background: rgba(242, 184, 75, 0.18); color: #8a5900; }
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(34px, 5vw, 56px);
+      line-height: 1.02;
+      letter-spacing: -0.05em;
+    }
 
-  .input-row {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-top: 14px;
-  }
+    .lead {
+      margin: 0 0 24px;
+      max-width: 66ch;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.6;
+    }
 
-  input {
-    padding: 12px 14px;
-    min-width: 280px;
-    flex: 1;
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    font-size: 16px;
-  }
+    .search-card, .form-card, .status-card {
+      background: var(--surface-strong);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 16px;
+    }
 
-  button {
-    padding: 12px 16px;
-    background: var(--text);
-    color: white;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    font-weight: bold;
-  }
+    .search-label, .card-label {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--muted);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
 
-  button:hover {
-    opacity: 0.92;
-  }
+    .search-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
 
-  code {
-    background: rgba(18, 18, 18, 0.06);
-    padding: 2px 6px;
-    border-radius: 6px;
-  }
-</style>
+    .search-row input, .field input, .field textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #faf8f4;
+      color: var(--text);
+      padding: 14px 16px;
+      border-radius: 16px;
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      font-family: inherit;
+    }
+
+    .search-row input:focus, .field input:focus, .field textarea:focus {
+      border-color: rgba(122, 62, 240, 0.45);
+      box-shadow: 0 0 0 4px rgba(122, 62, 240, 0.12);
+    }
+
+    .field { margin-top: 12px; }
+    .field label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 14px; }
+    .field textarea { min-height: 104px; resize: vertical; }
+
+    .btn {
+      border: none;
+      cursor: pointer;
+      padding: 14px 18px;
+      border-radius: 16px;
+      font-weight: 800;
+      font-size: 15px;
+      color: white;
+      background: linear-gradient(135deg, var(--sr-charcoal) 0%, #2e2e2e 100%);
+      box-shadow: 0 16px 34px rgba(18, 18, 18, 0.18);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+    }
+
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 18px 40px rgba(18, 18, 18, 0.22); }
+    .btn.secondary {
+      color: var(--sr-charcoal);
+      background: linear-gradient(135deg, #fff 0%, #f4efe7 100%);
+      border: 1px solid var(--line);
+      box-shadow: none;
+    }
+
+    .helper {
+      margin-top: 12px;
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .journey { margin-top: 18px; display: grid; gap: 14px; }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 4px;
+    }
+
+    .section-title h2 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -0.03em;
+    }
+
+    .section-title .meta { color: var(--muted); font-size: 14px; }
+    .step-list { display: grid; gap: 10px; }
+
+    .step {
+      display: grid;
+      grid-template-columns: 18px 1fr auto;
+      gap: 12px;
+      align-items: center;
+      background: rgba(255,255,255,0.84);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px 16px;
+    }
+
+    .dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--sr-plum) 0%, var(--sr-coral) 100%);
+      box-shadow: 0 0 0 5px rgba(122, 62, 240, 0.10);
+    }
+
+    .step h3 { margin: 0 0 4px; font-size: 15px; }
+    .step p { margin: 0; font-size: 13px; color: var(--muted); line-height: 1.45; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 88px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 800;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      background: #f5f7fb;
+      white-space: nowrap;
+    }
+
+    .badge.high { color: #b31237; background: rgba(255, 107, 93, 0.12); border-color: rgba(255, 107, 93, 0.18); }
+    .badge.medium { color: #8a5900; background: rgba(242, 184, 75, 0.14); border-color: rgba(242, 184, 75, 0.18); }
+    .badge.done { color: var(--sr-mint); background: rgba(47, 191, 143, 0.12); border-color: rgba(47, 191, 143, 0.18); }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .stat {
+      background: rgba(255,255,255,0.86);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 22px;
+      letter-spacing: -0.04em;
+      margin-bottom: 6px;
+    }
+
+    .stat span { font-size: 13px; color: var(--muted); line-height: 1.4; }
+
+    .footer-note {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .note {
+      padding: 18px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.72);
+      border: 1px solid var(--line);
+    }
+
+    .note strong { display: block; margin-bottom: 6px; font-size: 15px; }
+    .note p { margin: 0; font-size: 14px; color: var(--muted); line-height: 1.5; }
+
+    .path {
+      margin-top: 20px;
+      padding: 22px;
+    }
+
+    .path-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .path-card {
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.88);
+      padding: 18px;
+    }
+
+    .path-card .num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 10px;
+      background: rgba(122, 62, 240, 0.10);
+      color: var(--sr-plum);
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .path-card h3 { margin: 0 0 8px; font-size: 16px; }
+    .path-card p { margin: 0; color: var(--muted); line-height: 1.55; font-size: 14px; }
+    .anchored {
+      display: inline-flex;
+      margin-top: 12px;
+      color: var(--sr-charcoal);
+      font-weight: 800;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(18, 18, 18, 0.2);
+      padding-bottom: 2px;
+    }
+
+    .client-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(122, 62, 240, 0.08);
+      color: var(--sr-charcoal);
+      font-weight: 700;
+      border: 1px solid rgba(122, 62, 240, 0.12);
+      margin-bottom: 14px;
+    }
+
+    .alert {
+      border-radius: 18px;
+      border: 1px solid rgba(255, 107, 93, 0.20);
+      background: rgba(255, 107, 93, 0.08);
+      padding: 14px 16px;
+      margin-bottom: 14px;
+      color: #8a1f1f;
+      line-height: 1.5;
+      display: none;
+    }
+
+    .hidden { display: none !important; }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.95em;
+      background: rgba(18,18,18,0.05);
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+
+    @media (max-width: 980px) {
+      .hero { grid-template-columns: 1fr; }
+      .footer-note, .path-grid { grid-template-columns: 1fr; }
+      .stat-grid { grid-template-columns: 1fr; }
+      .topbar { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
 </head>
-
 <body>
-  <div class="container">
-    <h1 id="title">Loading...</h1>
-    <p class="subtle" id="lead"></p>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true"></div>
+        <div>
+          SevenRooms
+          <small>Secure onboarding invite</small>
+        </div>
+      </div>
+      <div class="pill" id="topPill">Invite link · ready</div>
+    </header>
 
-    <div class="chip" id="clientMode">Client mode: loading</div>
+    <main class="hero">
+      <section class="panel panel-main">
+        <div class="eyebrow">Invite-only onboarding experience</div>
+        <h1 id="pageTitle">Open your onboarding invite.</h1>
+        <p class="lead" id="pageLead">
+          Enter your invite token to load your saved onboarding journey. The same invite can be used to return later and continue where you left off.
+        </p>
 
-    <div class="input-row">
-      <input id="clientInput" placeholder="Enter venue name" />
-      <button onclick="start()">Start</button>
-    </div>
+        <div class="alert" id="errorBox"></div>
 
-    <div class="card" id="steps"></div>
+        <div class="search-card" id="inviteGate">
+          <div class="search-label">Step 1 · enter your invite token</div>
+          <div class="search-row">
+            <input id="inviteInput" type="text" placeholder="Paste invite token or open a magic link" />
+            <button class="btn" id="openInviteBtn" type="button">Open invite</button>
+            <button class="btn secondary" id="resumeBtn" type="button">Resume saved invite</button>
+          </div>
+          <div class="helper">
+            Example link format: <code>?invite=8f3Kq91Lm</code>. In production, the token should map to a venue, a user, and the saved onboarding state.
+          </div>
+        </div>
+
+        <div class="form-card hidden" id="onboardingCard">
+          <div class="card-label">Your onboarding details</div>
+
+          <div class="field">
+            <label for="venueName">Venue name</label>
+            <input id="venueName" type="text" />
+          </div>
+
+          <div class="field">
+            <label for="mainContact">Main contact</label>
+            <input id="mainContact" type="text" />
+          </div>
+
+          <div class="field">
+            <label for="launchDate">Launch date</label>
+            <input id="launchDate" type="text" placeholder="YYYY-MM-DD" />
+          </div>
+
+          <div class="field">
+            <label for="notes">Notes</label>
+            <textarea id="notes" placeholder="Anything the client needs to remember..."></textarea>
+          </div>
+
+          <div class="search-row" style="margin-top:14px;">
+            <button class="btn" id="saveBtn" type="button">Save progress</button>
+            <button class="btn secondary" id="copyBtn" type="button">Copy resume link</button>
+          </div>
+
+          <div class="helper" id="saveMeta">Nothing saved yet.</div>
+        </div>
+
+        <div class="journey hidden" id="journeySection">
+          <div class="section-title">
+            <h2>Suggested journey structure</h2>
+            <div class="meta" id="journeyMeta">Rendered from invite data</div>
+          </div>
+          <div class="step-list" id="stepList"></div>
+        </div>
+      </section>
+
+      <aside class="panel panel-side">
+        <div class="section-title">
+          <h2>Invite snapshot</h2>
+          <div class="meta">Session-aware</div>
+        </div>
+
+        <div class="stat-grid">
+          <div class="stat">
+            <strong id="phaseCount">--</strong>
+            <span>Onboarding phases</span>
+          </div>
+          <div class="stat">
+            <strong id="taskCount">--</strong>
+            <span>Key tasks</span>
+          </div>
+          <div class="stat">
+            <strong id="guideCount">--</strong>
+            <span>Relevant guides</span>
+          </div>
+        </div>
+
+        <div class="journey">
+          <div class="section-title">
+            <h2>What the client gets</h2>
+          </div>
+          <div class="step-list">
+            <div class="step">
+              <div class="dot"></div>
+              <div>
+                <h3>Invite-only access</h3>
+                <p>Only users with a valid token can open the portal.</p>
+              </div>
+              <span class="badge done">Secure</span>
+            </div>
+            <div class="step">
+              <div class="dot"></div>
+              <div>
+                <h3>Saved progress</h3>
+                <p>The same invite token can be used to return later.</p>
+              </div>
+              <span class="badge medium">Persistent</span>
+            </div>
+            <div class="step">
+              <div class="dot"></div>
+              <div>
+                <h3>Editable onboarding</h3>
+                <p>Venue details, notes, and step state can be updated over time.</p>
+              </div>
+              <span class="badge high">Editable</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <section class="panel path">
+      <div class="section-title">
+        <h2>How the secure invite flow works</h2>
+        <div class="meta">Front end + backend contract</div>
+      </div>
+      <div class="path-grid">
+        <div class="path-card">
+          <div class="num">1</div>
+          <h3>Client opens a magic link</h3>
+          <p>The link contains a random token such as <code>?invite=8f3Kq91Lm</code>. No venue names are exposed in the URL.</p>
+        </div>
+        <div class="path-card">
+          <div class="num">2</div>
+          <h3>Backend validates the token</h3>
+          <p>The page calls an API to confirm the invite exists, is active, and belongs to the correct venue and user.</p>
+        </div>
+        <div class="path-card">
+          <div class="num">3</div>
+          <h3>Progress is saved and resumed</h3>
+          <p>Edits are written to storage, so the same invite can reopen the same onboarding state later.</p>
+        </div>
+      </div>
+      <a class="anchored" href="#step-1" id="jumpLink">Jump to invite flow</a>
+    </section>
+
+    <section class="footer-note">
+      <div class="note">
+        <strong>Monday stays behind the scenes</strong>
+        <p>Use Monday as the internal source of truth while the client sees a polished onboarding portal.</p>
+      </div>
+      <div class="note">
+        <strong>One page, many invites</strong>
+        <p>The HTML stays the same. Only the invite token changes between clients or users.</p>
+      </div>
+      <div class="note">
+        <strong>Easy to move to Supabase or Firebase</strong>
+        <p>The data model here is ready to connect to a real backend when you are ready.</p>
+      </div>
+    </section>
   </div>
 
   <script>
-    const CLIENTS = {
-      demo: {
-        name: "Demo Venue",
-        title: "Welcome to your onboarding journey.",
-        lead: "This is a demo client.",
+    const MOCK_INVITES = {
+      "8f3Kq91Lm": {
+        invite: "8f3Kq91Lm",
+        venueId: "sr_1029",
+        venueName: "Sandys",
+        mainContact: "Operations Team",
+        launchDate: "2026-05-01",
+        notes: "Priority: POS and payments. Training planned for next week.",
+        phases: 5,
+        tasks: 12,
+        guides: 4,
         steps: [
-          { title: "Confirm details", body: "Check launch date", tone: "done" },
-          { title: "Setup integrations", body: "POS + payments", tone: "high" },
-          { title: "Import data", body: "Upload guests", tone: "high" }
-        ]
-      },
-
-      sandys: {
-        name: "Sandys",
-        title: "Welcome, Sandys.",
-        lead: "Your onboarding journey is ready. Follow the steps below to get set up for launch.",
-        steps: [
-          {
-            title: "Confirm launch details",
-            body: "Review launch date and main contact.",
-            tone: "done"
-          },
-          {
-            title: "Set up integrations",
-            body: "POS, payments, and required systems.",
-            tone: "high"
-          },
-          {
-            title: "Upload guest data",
-            body: "Provide your database and reservations.",
-            tone: "high"
-          },
-          {
-            title: "Training & testing",
-            body: "Complete staff training and test bookings.",
-            tone: "medium"
-          }
+          { title: "Confirm launch details", body: "Review launch date, venue name, and the main contact.", tone: "done", status: "Ready" },
+          { title: "Set up integrations", body: "POS, payments, and any required systems for this site.", tone: "high", status: "High priority" },
+          { title: "Upload guest data", body: "Provide your database and reservations securely.", tone: "high", status: "High priority" },
+          { title: "Training & testing", body: "Complete staff training and test bookings.", tone: "medium", status: "In progress" },
+          { title: "Go live", body: "Final checks before launching your booking journey.", tone: "high", status: "Launch gate" }
         ]
       }
     };
 
-    function getClient() {
+    const els = {
+      pageTitle: document.getElementById('pageTitle'),
+      pageLead: document.getElementById('pageLead'),
+      topPill: document.getElementById('topPill'),
+      errorBox: document.getElementById('errorBox'),
+      inviteGate: document.getElementById('inviteGate'),
+      onboardingCard: document.getElementById('onboardingCard'),
+      journeySection: document.getElementById('journeySection'),
+      inviteInput: document.getElementById('inviteInput'),
+      openInviteBtn: document.getElementById('openInviteBtn'),
+      resumeBtn: document.getElementById('resumeBtn'),
+      saveBtn: document.getElementById('saveBtn'),
+      copyBtn: document.getElementById('copyBtn'),
+      venueName: document.getElementById('venueName'),
+      mainContact: document.getElementById('mainContact'),
+      launchDate: document.getElementById('launchDate'),
+      notes: document.getElementById('notes'),
+      saveMeta: document.getElementById('saveMeta'),
+      phaseCount: document.getElementById('phaseCount'),
+      taskCount: document.getElementById('taskCount'),
+      guideCount: document.getElementById('guideCount'),
+      stepList: document.getElementById('stepList'),
+      journeyMeta: document.getElementById('journeyMeta'),
+      jumpLink: document.getElementById('jumpLink')
+    };
+
+    let currentInvite = null;
+    let currentRecord = null;
+
+    function getInviteFromUrl() {
       const params = new URLSearchParams(window.location.search);
-      return (params.get("client") || "demo").trim().toLowerCase();
+      return (params.get('invite') || '').trim();
     }
 
-    function render(clientKey) {
-      const client = CLIENTS[clientKey] || CLIENTS.demo;
+    function storageKey(invite) {
+      return `onboarding_invite_${invite}`;
+    }
 
-      document.getElementById("title").innerText = client.title;
-      document.getElementById("lead").innerText = client.lead;
-      document.getElementById("clientMode").innerText = "Client mode: " + client.name;
+    function loadSavedState(invite) {
+      try {
+        const raw = localStorage.getItem(storageKey(invite));
+        return raw ? JSON.parse(raw) : null;
+      } catch {
+        return null;
+      }
+    }
 
-      const stepsHTML = client.steps.map(step => `
+    function saveState(invite, record) {
+      localStorage.setItem(storageKey(invite), JSON.stringify(record));
+    }
+
+    function showError(message) {
+      els.errorBox.textContent = message;
+      els.errorBox.style.display = 'block';
+    }
+
+    function clearError() {
+      els.errorBox.textContent = '';
+      els.errorBox.style.display = 'none';
+    }
+
+    function renderSteps(record) {
+      els.stepList.innerHTML = record.steps.map((step, index) => `
         <div class="step">
-          <span class="badge ${step.tone}">${step.tone}</span>
-          <strong>${step.title}</strong>
-          <p>${step.body}</p>
+          <div class="dot"></div>
+          <div>
+            <h3>${index + 1}. ${step.title}</h3>
+            <p>${step.body}</p>
+          </div>
+          <span class="badge ${step.tone}">${step.status}</span>
         </div>
-      `).join("");
-
-      document.getElementById("steps").innerHTML = stepsHTML;
+      `).join('');
     }
 
-    function slugify(text) {
-      return text
-        .trim()
-        .toLowerCase()
-        .replace(/['’]/g, "")
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, "");
+    function hydrateForm(record) {
+      els.venueName.value = record.venueName || '';
+      els.mainContact.value = record.mainContact || '';
+      els.launchDate.value = record.launchDate || '';
+      els.notes.value = record.notes || '';
+      els.phaseCount.textContent = String(record.phases || 0).padStart(2, '0');
+      els.taskCount.textContent = String(record.tasks || 0).padStart(2, '0');
+      els.guideCount.textContent = String(record.guides || 0).padStart(2, '0');
+      els.journeyMeta.textContent = `Invite ${record.invite} · Venue ${record.venueId}`;
+      renderSteps(record);
     }
 
-    function start() {
-      const value = document.getElementById("clientInput").value.trim();
-      const slug = value ? slugify(value) : "demo";
-      window.location.href = "?client=" + encodeURIComponent(slug) + "#step-1";
+    function setAppState(open) {
+      els.inviteGate.classList.toggle('hidden', open);
+      els.onboardingCard.classList.toggle('hidden', !open);
+      els.journeySection.classList.toggle('hidden', !open);
+      els.topPill.textContent = open ? `Active invite · ${currentInvite}` : 'Invite link · ready';
     }
 
-    render(getClient());
+    function openInvite(invite) {
+      clearError();
+      const token = invite.trim();
+      if (!token) {
+        showError('Enter an invite token or use the magic link from your email.');
+        return;
+      }
+
+      const initial = MOCK_INVITES[token];
+      const saved = loadSavedState(token);
+      const record = saved || initial;
+
+      if (!record) {
+        currentInvite = null;
+        currentRecord = null;
+        setAppState(false);
+        showError('That invite token was not recognised. Check the link or ask for a new invite.');
+        els.pageTitle.textContent = 'Invite not found.';
+        els.pageLead.textContent = 'The onboarding portal only opens for a valid invite token.';
+        return;
+      }
+
+      currentInvite = token;
+      currentRecord = {
+        ...initial,
+        ...record,
+        invite: token,
+        steps: (record.steps || initial.steps || []).map((step, idx) => ({
+          ...step,
+          status: step.status || (initial.steps && initial.steps[idx] ? initial.steps[idx].status : 'Pending'),
+          tone: step.tone || (initial.steps && initial.steps[idx] ? initial.steps[idx].tone : 'medium')
+        }))
+      };
+
+      window.history.replaceState({}, '', `${window.location.pathname}?invite=${encodeURIComponent(token)}#step-1`);
+      els.pageTitle.textContent = `Welcome, ${currentRecord.venueName}.`;
+      els.pageLead.textContent = 'This onboarding guide is saved against your invite token. You can exit and return later using the same link.';
+      setAppState(true);
+      hydrateForm(currentRecord);
+      els.saveMeta.textContent = saved ? 'Saved progress loaded from this browser.' : 'Loaded invite record. Make edits and save progress.';
+      document.getElementById('step-1').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function captureForm() {
+      if (!currentRecord) return null;
+      return {
+        ...currentRecord,
+        venueName: els.venueName.value.trim(),
+        mainContact: els.mainContact.value.trim(),
+        launchDate: els.launchDate.value.trim(),
+        notes: els.notes.value.trim()
+      };
+    }
+
+    function persistCurrent() {
+      if (!currentInvite || !currentRecord) {
+        showError('Open a valid invite first.');
+        return;
+      }
+      const updated = captureForm();
+      saveState(currentInvite, updated);
+      currentRecord = updated;
+      hydrateForm(updated);
+      els.saveMeta.textContent = `Saved at ${new Date().toLocaleString()}`;
+      clearError();
+    }
+
+    async function copyResumeLink() {
+      if (!currentInvite) {
+        showError('Open a valid invite first.');
+        return;
+      }
+      const link = `${window.location.origin}${window.location.pathname}?invite=${encodeURIComponent(currentInvite)}`;
+      try {
+        await navigator.clipboard.writeText(link);
+        els.copyBtn.textContent = 'Copied';
+        setTimeout(() => (els.copyBtn.textContent = 'Copy resume link'), 1200);
+      } catch {
+        prompt('Copy this resume link:', link);
+      }
+    }
+
+    function resumeSavedInvite() {
+      const invite = getInviteFromUrl();
+      if (!invite) {
+        showError('No invite token is present in the URL. Use a magic link or paste one into the field.');
+        return;
+      }
+      openInvite(invite);
+    }
+
+    function initFromUrl() {
+      const invite = getInviteFromUrl();
+      if (invite) {
+        els.inviteInput.value = invite;
+        openInvite(invite);
+      } else {
+        setAppState(false);
+      }
+    }
+
+    els.openInviteBtn.addEventListener('click', () => openInvite(els.inviteInput.value));
+    els.resumeBtn.addEventListener('click', resumeSavedInvite);
+    els.saveBtn.addEventListener('click', persistCurrent);
+    els.copyBtn.addEventListener('click', copyResumeLink);
+    els.inviteInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') openInvite(els.inviteInput.value);
+    });
+
+    initFromUrl();
   </script>
 </body>
 </html>
