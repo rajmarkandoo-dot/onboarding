@@ -1,700 +1,157 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SevenRooms | Client Onboarding</title>
-  <style>
-    :root {
-      --bg: #f6f5f2;
-      --surface: rgba(255, 255, 255, 0.86);
-      --surface-strong: #ffffff;
-      --text: #1f2937;
-      --muted: #667085;
-      --line: rgba(31, 41, 55, 0.10);
-      --sr-charcoal: #121212;
-      --sr-sand: #f3efe7;
-      --sr-cream: #fffdf8;
-      --sr-plum: #7a3ef0;
-      --sr-coral: #ff6b5d;
-      --sr-mint: #2fbf8f;
-      --sr-gold: #f2b84b;
-      --sr-sky: #5aa9ff;
-      --shadow: 0 22px 60px rgba(17, 24, 39, 0.09);
-      --radius: 26px;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SevenRooms | Client Onboarding</title>
 
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body {
-      margin: 0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(circle at top left, rgba(122, 62, 240, 0.14), transparent 24%),
-        radial-gradient(circle at top right, rgba(255, 107, 93, 0.13), transparent 22%),
-        linear-gradient(180deg, #fffefb 0%, var(--bg) 100%);
-    }
-
-    .shell {
-      min-height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 28px 20px 44px;
-    }
-
-    .topbar, .hero, .footer-note, .path {
-      width: min(1180px, 100%);
-    }
-
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 22px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-    }
-
-    .brand-mark {
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
-      background: linear-gradient(135deg, var(--sr-plum) 0%, var(--sr-coral) 50%, var(--sr-gold) 100%);
-      box-shadow: 0 10px 30px rgba(122, 62, 240, 0.25);
-    }
-
-    .brand small {
-      display: block;
-      font-weight: 600;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 14px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.72);
-      border: 1px solid var(--line);
-      color: var(--muted);
-      box-shadow: 0 8px 26px rgba(16, 24, 40, 0.04);
-      backdrop-filter: blur(12px);
-    }
-
-    .hero {
-      display: grid;
-      grid-template-columns: 1.08fr 0.92fr;
-      gap: 22px;
-      align-items: stretch;
-    }
-
-    .panel {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(16px);
-    }
-
-    .panel-main { padding: 30px; }
-    .panel-side { padding: 22px; display: grid; gap: 14px; align-content: start; }
-
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--sr-charcoal);
-      background: rgba(18, 18, 18, 0.06);
-      border: 1px solid rgba(18, 18, 18, 0.08);
-      padding: 8px 12px;
-      border-radius: 999px;
-      font-size: 14px;
-      font-weight: 800;
-      margin-bottom: 18px;
-    }
-
-    h1 {
-      margin: 0 0 12px;
-      font-size: clamp(34px, 5vw, 56px);
-      line-height: 1.02;
-      letter-spacing: -0.05em;
-    }
-
-    .lead {
-      margin: 0 0 24px;
-      max-width: 62ch;
-      color: var(--muted);
-      font-size: 17px;
-      line-height: 1.6;
-    }
-
-    .search-card {
-      background: var(--surface-strong);
-      border: 1px solid var(--line);
-      border-radius: 22px;
-      padding: 16px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
-    }
-
-    .search-label {
-      font-size: 13px;
-      font-weight: 800;
-      color: var(--muted);
-      margin-bottom: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    .search-row {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .search-row input {
-      flex: 1 1 320px;
-      border: 1px solid var(--line);
-      background: #faf8f4;
-      color: var(--text);
-      padding: 16px 18px;
-      border-radius: 16px;
-      font-size: 16px;
-      outline: none;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .search-row input:focus {
-      border-color: rgba(122, 62, 240, 0.45);
-      box-shadow: 0 0 0 4px rgba(122, 62, 240, 0.12);
-    }
-
-    .btn {
-      border: none;
-      cursor: pointer;
-      padding: 16px 20px;
-      border-radius: 16px;
-      font-weight: 800;
-      font-size: 16px;
-      color: white;
-      background: linear-gradient(135deg, var(--sr-charcoal) 0%, #2e2e2e 100%);
-      box-shadow: 0 16px 34px rgba(18, 18, 18, 0.18);
-      transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
-    }
-
-    .btn:hover { transform: translateY(-1px); box-shadow: 0 18px 40px rgba(18, 18, 18, 0.22); }
-    .btn.secondary {
-      color: var(--sr-charcoal);
-      background: linear-gradient(135deg, #fff 0%, #f4efe7 100%);
-      border: 1px solid var(--line);
-      box-shadow: none;
-    }
-
-    .helper {
-      margin-top: 12px;
-      font-size: 14px;
-      color: var(--muted);
-    }
-
-    .journey {
-      margin-top: 18px;
-      display: grid;
-      gap: 14px;
-    }
-
-    .section-title {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 4px;
-    }
-
-    .section-title h2 {
-      margin: 0;
-      font-size: 18px;
-      letter-spacing: -0.03em;
-    }
-
-    .section-title .meta {
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .step-list { display: grid; gap: 10px; }
-
-    .step {
-      display: grid;
-      grid-template-columns: 18px 1fr auto;
-      gap: 12px;
-      align-items: center;
-      background: rgba(255,255,255,0.84);
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 14px 16px;
-    }
-
-    .dot {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--sr-plum) 0%, var(--sr-coral) 100%);
-      box-shadow: 0 0 0 5px rgba(122, 62, 240, 0.10);
-    }
-
-    .step h3 {
-      margin: 0 0 4px;
-      font-size: 15px;
-    }
-
-    .step p {
-      margin: 0;
-      font-size: 13px;
-      color: var(--muted);
-      line-height: 1.45;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 88px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      font-size: 13px;
-      font-weight: 800;
-      border: 1px solid var(--line);
-      color: var(--muted);
-      background: #f5f7fb;
-      white-space: nowrap;
-    }
-
-    .badge.high { color: #b31237; background: rgba(255, 107, 93, 0.12); border-color: rgba(255, 107, 93, 0.18); }
-    .badge.medium { color: #8a5900; background: rgba(242, 184, 75, 0.14); border-color: rgba(242, 184, 75, 0.18); }
-    .badge.done { color: var(--sr-mint); background: rgba(47, 191, 143, 0.12); border-color: rgba(47, 191, 143, 0.18); }
-
-    .stat-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .stat {
-      background: rgba(255,255,255,0.86);
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 16px;
-    }
-
-    .stat strong {
-      display: block;
-      font-size: 22px;
-      letter-spacing: -0.04em;
-      margin-bottom: 6px;
-    }
-
-    .stat span {
-      font-size: 13px;
-      color: var(--muted);
-      line-height: 1.4;
-    }
-
-    .footer-note {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
-      margin-top: 18px;
-    }
-
-    .note {
-      padding: 18px;
-      border-radius: 20px;
-      background: rgba(255,255,255,0.72);
-      border: 1px solid var(--line);
-    }
-
-    .note strong {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 15px;
-    }
-
-    .note p {
-      margin: 0;
-      font-size: 14px;
-      color: var(--muted);
-      line-height: 1.5;
-    }
-
-    .path {
-      margin-top: 20px;
-      padding: 22px;
-    }
-
-    .path-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 14px;
-    }
-
-    .path-card {
-      border-radius: 20px;
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,0.88);
-      padding: 18px;
-    }
-
-    .path-card .num {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 30px;
-      height: 30px;
-      border-radius: 10px;
-      background: rgba(122, 62, 240, 0.10);
-      color: var(--sr-plum);
-      font-weight: 800;
-      margin-bottom: 12px;
-    }
-
-    .path-card h3 { margin: 0 0 8px; font-size: 16px; }
-    .path-card p { margin: 0; color: var(--muted); line-height: 1.55; font-size: 14px; }
-    .anchored {
-      display: inline-flex;
-      margin-top: 12px;
-      color: var(--sr-charcoal);
-      font-weight: 800;
-      text-decoration: none;
-      border-bottom: 1px solid rgba(18, 18, 18, 0.2);
-      padding-bottom: 2px;
-    }
-
-    .client-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 14px;
-      border-radius: 999px;
-      background: rgba(122, 62, 240, 0.08);
-      color: var(--sr-charcoal);
-      font-weight: 700;
-      border: 1px solid rgba(122, 62, 240, 0.12);
-      margin-bottom: 14px;
-    }
-
-    code {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 0.95em;
-      background: rgba(18,18,18,0.05);
-      padding: 2px 6px;
-      border-radius: 6px;
-    }
-
-    @media (max-width: 980px) {
-      .hero { grid-template-columns: 1fr; }
-      .footer-note, .path-grid { grid-template-columns: 1fr; }
-      .stat-grid { grid-template-columns: 1fr; }
-      .topbar { flex-direction: column; align-items: flex-start; }
-    }
-  </style>
-</head>
-<body>
-  <div class="shell">
-    <header class="topbar">
-      <div class="brand">
-        <div class="brand-mark" aria-hidden="true"></div>
-        <div>
-          SevenRooms
-          <small>Client onboarding guide</small>
-        </div>
-      </div>
-      <div class="pill">GitHub Pages ready · one reusable page</div>
-    </header>
-
-    <main class="hero">
-      <section class="panel panel-main">
-        <div class="eyebrow">Brand-aligned onboarding experience</div>
-        <h1 id="pageTitle">Welcome to your onboarding journey.</h1>
-        <p class="lead" id="pageLead">
-          This single-page template can be hosted on GitHub Pages and reused for every venue. The client enters a venue name or uses a unique link, and the page loads the correct onboarding flow.
-        </p>
-
-        <div class="client-chip" id="clientChip">Client mode: Demo</div>
-
-        <div class="search-card">
-          <div class="search-label">Step 1 · open the correct client journey</div>
-          <div class="search-row">
-            <input id="clientInput" type="text" placeholder="Enter venue name or client ID" />
-            <button class="btn" id="startBtn">Start onboarding</button>
-            <button class="btn secondary" id="copyLinkBtn" type="button">Copy client link</button>
-          </div>
-          <div class="helper">
-            Recommended URL pattern: <code>?client=the-grand-hotel</code> or <code>/onboarding/the-grand-hotel</code>.
-            In production, this should map to Monday.com data and prefill the guide.
-          </div>
-        </div>
-
-        <div class="journey" id="step-1">
-          <div class="section-title">
-            <h2>Suggested journey structure</h2>
-            <div class="meta">Rendered from reusable client data</div>
-          </div>
-
-          <div class="step-list" id="stepList"></div>
-        </div>
-      </section>
-
-      <aside class="panel panel-side">
-        <div class="section-title">
-          <h2>Client snapshot</h2>
-          <div class="meta">Dynamic per account</div>
-        </div>
-
-        <div class="stat-grid">
-          <div class="stat">
-            <strong id="phaseCount">05</strong>
-            <span>Onboarding phases</span>
-          </div>
-          <div class="stat">
-            <strong id="taskCount">14</strong>
-            <span>Key tasks</span>
-          </div>
-          <div class="stat">
-            <strong id="guideCount">03</strong>
-            <span>Relevant guides</span>
-          </div>
-        </div>
-
-        <div class="journey">
-          <div class="section-title">
-            <h2>What the client sees</h2>
-          </div>
-          <div class="step-list">
-            <div class="step">
-              <div class="dot"></div>
-              <div>
-                <h3>Clear next action</h3>
-                <p>One task at a time, with context and no board clutter.</p>
-              </div>
-              <span class="badge done">Focused</span>
-            </div>
-            <div class="step">
-              <div class="dot"></div>
-              <div>
-                <h3>Embedded guidance</h3>
-                <p>Deck content becomes page content, not a separate PDF experience.</p>
-              </div>
-              <span class="badge medium">Guided</span>
-            </div>
-            <div class="step">
-              <div class="dot"></div>
-              <div>
-                <h3>Progress visibility</h3>
-                <p>Completion status and readiness are easy to understand at a glance.</p>
-              </div>
-              <span class="badge high">Visible</span>
-            </div>
-          </div>
-        </div>
-      </aside>
-    </main>
-
-    <section class="panel path">
-      <div class="section-title">
-        <h2>How to link the first click-through</h2>
-        <div class="meta">Simple implementation path</div>
-      </div>
-      <div class="path-grid">
-        <div class="path-card">
-          <div class="num">1</div>
-          <h3>Make the button the entry point</h3>
-          <p>The primary CTA should open the client’s first onboarding step, not a generic dashboard.</p>
-        </div>
-        <div class="path-card">
-          <div class="num">2</div>
-          <h3>Use a client identifier in the URL</h3>
-          <p>For GitHub Pages, the simplest pattern is <code>?client=the-grand-hotel</code>. The page reads that value and loads the matching content.</p>
-        </div>
-        <div class="path-card">
-          <div class="num">3</div>
-          <h3>Map the identifier to Monday.com</h3>
-          <p>That ID becomes the lookup key for Monday board items, tasks, and the correct pitch-deck content.</p>
-        </div>
-      </div>
-      <a class="anchored" href="#step-1">Jump to Step 1 in this prototype</a>
-    </section>
-
-    <section class="footer-note">
-      <div class="note">
-        <strong>One page, many clients</strong>
-        <p>A single HTML file can power every venue by swapping the client data behind the scenes.</p>
-      </div>
-      <div class="note">
-        <strong>Monday stays behind the scenes</strong>
-        <p>Use Monday as the operational source of truth while the client sees a polished front end.</p>
-      </div>
-      <div class="note">
-        <strong>Pitch deck content becomes embedded guidance</strong>
-        <p>The explanation, why-it-matters copy, and support links all live inside the journey.</p>
-      </div>
-    </section>
-  </div>
-
-  <script>
-    const CLIENTS = {
-      demo: {
-        name: 'Demo Venue',
-        title: 'Welcome to your onboarding journey.',
-        lead: 'This reusable template can be hosted on GitHub Pages and cloned for every client. It reads a client ID from the URL, then renders the matching onboarding flow.',
-        phases: 5,
-        tasks: 14,
-        guides: 3,
-        steps: [
-          { title: 'Confirm your account details', body: 'Launch date, venue name, main contact, and the one thing the client should do next.', status: 'Ready', tone: 'done' },
-          { title: 'Set up systems & integrations', body: 'Show only the relevant items: POS, payments, SMS, WhatsApp, hardware, and other add-ons.', status: 'High priority', tone: 'high' },
-          { title: 'Import your data', body: 'Guest data, future reservations, and historic reservations with upload prompts and examples.', status: 'High priority', tone: 'high' },
-          { title: 'Complete training & testing', body: 'Training links, guided checklists, and internal booking test reservations in one place.', status: 'In progress', tone: 'medium' },
-          { title: 'Go live', body: 'Reservation widget publish, booking channel changes, and launch readiness checks.', status: 'Launch gate', tone: 'high' }
-        ]
-      },
-      'the-grand-hotel': {
-        name: 'The Grand Hotel',
-        title: 'Welcome, The Grand Hotel.',
-        lead: 'Your onboarding guide is ready. Follow each step in order, with the setup items relevant to this venue already selected.',
-        phases: 5,
-        tasks: 12,
-        guides: 4,
-        steps: [
-          { title: 'Confirm launch details', body: 'Review launch date, venue contact, and booking approach for this location.', status: 'Ready', tone: 'done' },
-          { title: 'Activate required integrations', body: 'Only the relevant systems appear here based on the client profile.', status: 'High priority', tone: 'high' },
-          { title: 'Upload guest data', body: 'Import client database, future reservations, and historical reservation data.', status: 'High priority', tone: 'high' },
-          { title: 'Complete training & validation', body: 'Testing the guest journey, internal journey, and training materials.', status: 'In progress', tone: 'medium' },
-          { title: 'Launch', body: 'Final checks before going live on the booking channels.', status: 'Launch gate', tone: 'high' }
-        ]
-      }
-    };
-    sandys: {
-  name: 'Sandys',
-  title: 'Welcome, Sandys.',
-  lead: 'Your onboarding journey is ready. Follow the steps below to get set up for launch.',
-  phases: 5,
-  tasks: 10,
-  guides: 3,
-  steps: [
-    {
-      title: 'Confirm launch details',
-      body: 'Review launch date and main contact.',
-      status: 'Ready',
-      tone: 'done'
-    },
-    {
-      title: 'Set up integrations',
-      body: 'POS, payments, and any required systems.',
-      status: 'High priority',
-      tone: 'high'
-    },
-    {
-      title: 'Upload guest data',
-      body: 'Provide your client database and reservations.',
-      status: 'High priority',
-      tone: 'high'
-    }
-  ]
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f6f5f2;
+  margin: 0;
+  padding: 40px;
 }
 
-    const els = {
-      clientInput: document.getElementById('clientInput'),
-      startBtn: document.getElementById('startBtn'),
-      copyLinkBtn: document.getElementById('copyLinkBtn'),
-      pageTitle: document.getElementById('pageTitle'),
-      pageLead: document.getElementById('pageLead'),
-      clientChip: document.getElementById('clientChip'),
-      stepList: document.getElementById('stepList'),
-      phaseCount: document.getElementById('phaseCount'),
-      taskCount: document.getElementById('taskCount'),
-      guideCount: document.getElementById('guideCount')
-    };
+.container {
+  max-width: 900px;
+  margin: auto;
+}
 
-    function getClientKey() {
-      const params = new URLSearchParams(window.location.search);
-      return (params.get('client') || 'demo').toLowerCase();
-    }
+h1 {
+  margin-bottom: 10px;
+}
 
-    function renderClient(key) {
-      const client = CLIENTS[key] || CLIENTS.demo;
-      els.pageTitle.textContent = client.title;
-      els.pageLead.textContent = client.lead;
-      els.clientChip.textContent = `Client mode: ${client.name}`;
-      els.phaseCount.textContent = String(client.phases).padStart(2, '0');
-      els.taskCount.textContent = String(client.tasks).padStart(2, '0');
-      els.guideCount.textContent = String(client.guides).padStart(2, '0');
-      els.clientInput.value = client.name === 'Demo Venue' ? '' : client.name;
-      els.stepList.innerHTML = client.steps.map((step, index) => `
-        <div class="step">
-          <div class="dot"></div>
-          <div>
-            <h3>${index + 1}. ${step.title}</h3>
-            <p>${step.body}</p>
-          </div>
-          <span class="badge ${step.tone}">${step.status}</span>
-        </div>
-      `).join('');
-    }
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  margin-top: 20px;
+  border: 1px solid #ddd;
+}
 
-    function slugify(value) {
-      return value
-        .trim()
-        .toLowerCase()
-        .replace(/['’]/g, '')
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '');
-    }
+.step {
+  border-bottom: 1px solid #eee;
+  padding: 10px 0;
+}
 
-    function startJourney() {
-      const value = els.clientInput.value.trim();
-      const slug = value ? slugify(value) : 'demo';
-      const newUrl = `${window.location.pathname}?client=${encodeURIComponent(slug)}#step-1`;
-      window.history.replaceState({}, '', newUrl);
-      renderClient(slug);
-      document.getElementById('step-1').scrollIntoView({ behavior: 'smooth', block: 'start' });
-      document.getElementById('step-1').style.outline = '4px solid rgba(122, 62, 240, 0.14)';
-      document.getElementById('step-1').style.outlineOffset = '6px';
-      setTimeout(() => {
-        document.getElementById('step-1').style.outline = 'none';
-        document.getElementById('step-1').style.outlineOffset = '0';
-      }, 1600);
-    }
+.badge {
+  float: right;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
 
-    async function copyClientLink() {
-      const value = els.clientInput.value.trim();
-      const slug = value ? slugify(value) : 'demo';
-      const link = `${window.location.origin}${window.location.pathname}?client=${encodeURIComponent(slug)}`;
-      try {
-        await navigator.clipboard.writeText(link);
-        els.copyLinkBtn.textContent = 'Copied';
-        setTimeout(() => (els.copyLinkBtn.textContent = 'Copy client link'), 1200);
-      } catch {
-        prompt('Copy this client link:', link);
+.done { background: #d1fae5; }
+.high { background: #fee2e2; }
+.medium { background: #fef3c7; }
+
+input {
+  padding: 10px;
+  width: 60%;
+}
+
+button {
+  padding: 10px;
+  background: black;
+  color: white;
+  border: none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1 id="title">Loading...</h1>
+<p id="lead"></p>
+
+<input id="clientInput" placeholder="Enter venue name" />
+<button onclick="start()">Start</button>
+
+<div class="card" id="steps"></div>
+
+</div>
+
+<script>
+const CLIENTS = {
+
+  demo: {
+    name: "Demo Venue",
+    title: "Welcome to your onboarding journey.",
+    lead: "This is a demo client.",
+    steps: [
+      {title: "Confirm details", body: "Check launch date", tone: "done"},
+      {title: "Setup integrations", body: "POS + payments", tone: "high"},
+      {title: "Import data", body: "Upload guests", tone: "high"}
+    ]
+  },
+
+  sandys: {
+    name: "Sandys",
+    title: "Welcome, Sandys.",
+    lead: "Your onboarding journey is ready. Follow the steps below to get set up for launch.",
+    steps: [
+      {
+        title: "Confirm launch details",
+        body: "Review launch date and main contact.",
+        tone: "done"
+      },
+      {
+        title: "Set up integrations",
+        body: "POS, payments, and required systems.",
+        tone: "high"
+      },
+      {
+        title: "Upload guest data",
+        body: "Provide your database and reservations.",
+        tone: "high"
+      },
+      {
+        title: "Training & testing",
+        body: "Complete staff training and test bookings.",
+        tone: "medium"
       }
-    }
+    ]
+  }
 
-    els.startBtn.addEventListener('click', startJourney);
-    els.copyLinkBtn.addEventListener('click', copyClientLink);
-    els.clientInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') startJourney(); });
+};
 
-    renderClient(getClientKey());
-  </script>
+function getClient() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("client") || "demo";
+}
+
+function render(clientKey) {
+  const client = CLIENTS[clientKey] || CLIENTS["demo"];
+
+  document.getElementById("title").innerText = client.title;
+  document.getElementById("lead").innerText = client.lead;
+
+  const stepsHTML = client.steps.map(step => `
+    <div class="step">
+      <strong>${step.title}</strong>
+      <span class="badge ${step.tone}">${step.tone}</span>
+      <p>${step.body}</p>
+    </div>
+  `).join("");
+
+  document.getElementById("steps").innerHTML = stepsHTML;
+}
+
+function slugify(text) {
+  return text.toLowerCase().replace(/\s+/g, "-");
+}
+
+function start() {
+  const value = document.getElementById("clientInput").value;
+  const slug = slugify(value);
+  window.location.href = "?client=" + slug;
+}
+
+render(getClient());
+</script>
+
 </body>
 </html>
