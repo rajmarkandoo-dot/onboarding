@@ -484,7 +484,8 @@
           <div class="search-row">
             <div class="field" style="flex: 1 1 220px; margin-top: 0;">
               <label for="launchDate">Launch date</label>
-              <input id="launchDate" type="text" placeholder="YYYY-MM-DD" />
+              <div class="field-hint" style="margin: 0 0 8px;">UK format: DD/MM/YYYY</div>
+              <input id="launchDate" type="date" lang="en-GB" />
             </div>
             <div class="field" style="flex: 1 1 220px; margin-top: 0;">
               <label for="mainContact">Main contact</label>
@@ -692,6 +693,13 @@
       return CLIENTS[raw] ? raw : 'demo';
     }
 
+    function formatUKDate(value) {
+      if (!value) return '';
+      const date = new Date(value + 'T00:00:00');
+      if (Number.isNaN(date.getTime())) return value;
+      return date.toLocaleDateString('en-GB');
+    }
+
     function renderStepList(record, activeStep = 1, targetElement = els.stepList) {
       targetElement.innerHTML = record.steps.map((step, index) => `
         <div class="step ${index + 1 === activeStep ? 'active' : ''}">
@@ -742,7 +750,7 @@
 
       els.clientChip.textContent = `Client mode: ${currentRecord.venueName}`;
       els.pageTitle.textContent = currentRecord.title;
-      els.saveMeta.textContent = `Saved locally at ${new Date().toLocaleString()}.`;
+      els.saveMeta.textContent = `Saved locally at ${new Date().toLocaleString('en-GB')}. Launch date: ${formatUKDate(currentRecord.launchDate)}.`;
       renderStepList(currentRecord, currentRecord.currentStep, els.stepList);
       renderStepList(currentRecord, currentRecord.currentStep, els.summaryList);
     }
