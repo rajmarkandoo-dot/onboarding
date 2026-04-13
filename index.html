@@ -502,7 +502,7 @@
         </div>
 
         <div class="notice">
-          The flow below is the next part of the client journey. Step 1 is about confirming the setup. Step 2 and onward can then branch into integrations, data, training, and launch.
+          The flow below is the next part of the client journey. Step 1 is about confirming the setup. Step 2 and onward can then branch into integrations, setup, training, then data right before launch.
         </div>
 
         <div class="progress">
@@ -513,8 +513,8 @@
         <div class="subnav" aria-label="Journey sections">
           <button class="active" data-step="1">1. Details</button>
           <button data-step="2">2. Integrations</button>
-          <button data-step="3">3. Data</button>
-          <button data-step="4">4. Training</button>
+          <button data-step="3">3. Setup</button>
+          <button data-step="4">4. Data</button>
           <button data-step="5">5. Launch</button>
         </div>
 
@@ -575,8 +575,8 @@
         </div>
         <div class="path-card">
           <div class="num">3</div>
-          <h3>Step 3: Data and training</h3>
-          <p>Move them through uploads, testing, and training so the experience feels like a guided product flow.</p>
+          <h3>Step 3: Setup before data</h3>
+          <p>Configuration and training happen before data. Data becomes the final pre-launch gate, which we will add next.</p>
         </div>
       </div>
     </section>
@@ -588,11 +588,11 @@
       </div>
       <div class="note">
         <strong>Make Step 1 obvious</strong>
-        <p>The form is now visually signposted with a heading, helper text, and field labels so users know exactly what to do first.</p>
+        <p>The form is visually signposted with a heading, helper text, and field labels so users know exactly what to do first.</p>
       </div>
       <div class="note">
-        <strong>Permissions can come later</strong>
-        <p>Once the journey feels right, we can layer in invites, tokens, saving, and access control without changing this layout much.</p>
+        <strong>Next expansion</strong>
+        <p>Step 2, Step 3, and a data gate before launch can be layered in without changing the page structure.</p>
       </div>
     </section>
   </div>
@@ -614,8 +614,8 @@
         steps: [
           { title: "Confirm onboarding details", body: "Venue name, launch date, and main contact.", tone: "done", status: "Open" },
           { title: "Set up integrations", body: "POS, payments, and relevant systems.", tone: "high", status: "Next" },
-          { title: "Upload guest data", body: "Guest database and reservation imports.", tone: "high", status: "Next" },
-          { title: "Training and testing", body: "Staff training and booking flow checks.", tone: "medium", status: "Later" },
+          { title: "Complete setup and training", body: "Configuration, booking rules, and staff training.", tone: "medium", status: "Next" },
+          { title: "Upload guest data", body: "Guest database and reservation imports.", tone: "high", status: "Later" },
           { title: "Go live", body: "Final checks before launch.", tone: "high", status: "Launch gate" }
         ]
       },
@@ -634,8 +634,8 @@
         steps: [
           { title: "Confirm onboarding details", body: "Review venue name, launch date, and main contact.", tone: "done", status: "Open" },
           { title: "Set up integrations", body: "POS, payments, and any required systems for Sandys.", tone: "high", status: "Next" },
-          { title: "Upload guest data", body: "Provide guest database and reservation imports.", tone: "high", status: "Next" },
-          { title: "Training and testing", body: "Complete staff training and test the booking flow.", tone: "medium", status: "Later" },
+          { title: "Complete setup and training", body: "Configuration, booking rules, and staff training.", tone: "medium", status: "Next" },
+          { title: "Upload guest data", body: "Provide guest database and reservation imports.", tone: "high", status: "Later" },
           { title: "Go live", body: "Final checks before launching the booking journey.", tone: "high", status: "Launch gate" }
         ]
       },
@@ -654,12 +654,14 @@
         steps: [
           { title: "Confirm onboarding details", body: "Check the core client details and launch date.", tone: "done", status: "Open" },
           { title: "Set up integrations", body: "Show the systems that matter for this test record.", tone: "high", status: "Next" },
-          { title: "Upload guest data", body: "Verify the upload and save paths.", tone: "high", status: "Next" },
-          { title: "Training and testing", body: "Use this client to check the journey logic.", tone: "medium", status: "Later" },
+          { title: "Complete setup and training", body: "Configuration, booking rules, and staff training.", tone: "medium", status: "Next" },
+          { title: "Upload guest data", body: "Verify the upload and save paths.", tone: "high", status: "Later" },
           { title: "Go live", body: "Final launch step for this flow.", tone: "high", status: "Launch gate" }
         ]
       }
     };
+
+    const STORAGE_PREFIX = 'onboarding_flow_';
 
     const els = {
       pageTitle: document.getElementById('pageTitle'),
@@ -693,11 +695,28 @@
       return CLIENTS[raw] ? raw : 'demo';
     }
 
+    function storageKey(clientKey) {
+      return `${STORAGE_PREFIX}${clientKey}`;
+    }
+
     function formatUKDate(value) {
       if (!value) return '';
       const date = new Date(value + 'T00:00:00');
       if (Number.isNaN(date.getTime())) return value;
       return date.toLocaleDateString('en-GB');
+    }
+
+    function loadSavedRecord(clientKey) {
+      try {
+        const raw = localStorage.getItem(storageKey(clientKey));
+        return raw ? JSON.parse(raw) : null;
+      } catch {
+        return null;
+      }
+    }
+
+    function saveRecord(clientKey, record) {
+      localStorage.setItem(storageKey(clientKey), JSON.stringify(record));
     }
 
     function renderStepList(record, activeStep = 1, targetElement = els.stepList) {
@@ -739,47 +758,57 @@
       });
     }
 
-   function saveStep1() {
-  if (!currentRecord) return;
+    function persistCurrentRecord() {
+      if (!currentRecord) return;
+      saveRecord(currentClientKey, currentRecord);
+      els.saveMeta.textContent = `Saved locally at ${new Date().toLocaleString('en-GB')}.`;
+    }
 
-  currentRecord = {
-    ...currentRecord,
-    venueName: els.venueName.value.trim() || currentRecord.venueName,
-    mainContact: els.mainContact.value.trim() || currentRecord.mainContact,
-    launchDate: els.launchDate.value.trim() || currentRecord.launchDate,
-    currentStep: 2, // 👈 move to step 2
-    progress: 40    // 👈 update progress
-  };
+    function saveStep1() {
+      if (!currentRecord) return;
 
-  // Update UI
-  els.clientChip.textContent = `Client mode: ${currentRecord.venueName}`;
-  els.pageTitle.textContent = currentRecord.title;
+      currentRecord = {
+        ...currentRecord,
+        venueName: els.venueName.value.trim() || currentRecord.venueName,
+        mainContact: els.mainContact.value.trim() || currentRecord.mainContact,
+        launchDate: els.launchDate.value.trim() || currentRecord.launchDate,
+        currentStep: 2,
+        progress: 40
+      };
 
-  els.saveMeta.textContent =
-    `Step 1 saved. Moving to Step 2 → Integrations`;
+      persistCurrentRecord();
+      hydrate(currentRecord);
+      document.getElementById('step-1').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 
-  // Re-render everything
-  hydrate(currentRecord);
+    function completeStep2() {
+      if (!currentRecord) return;
 
-  // Scroll to journey
-  document.getElementById("step-1").scrollIntoView({
-    behavior: "smooth"
-  });
-}
-    <div class="search-card" id="step2Card" style="margin-top:16px;">
-  <div class="section-label">Step 2 · integrations</div>
-  <div class="field-hint">
-    Select the systems you use. This will tailor your onboarding setup.
-  </div>
+      currentRecord = {
+        ...currentRecord,
+        currentStep: 3,
+        progress: 60
+      };
 
-  <div class="field">
-    <label><input type="checkbox"> POS System</label>
-    <label><input type="checkbox"> Payments</label>
-    <label><input type="checkbox"> SMS / WhatsApp</label>
-  </div>
+      persistCurrentRecord();
+      hydrate(currentRecord);
+      document.getElementById('step-1').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 
-  <button class="btn" onclick="completeStep2()">Complete step 2</button>
-</div>
+    function completeStep3() {
+      if (!currentRecord) return;
+
+      currentRecord = {
+        ...currentRecord,
+        currentStep: 4,
+        progress: 80
+      };
+
+      persistCurrentRecord();
+      hydrate(currentRecord);
+      els.saveMeta.textContent = 'Step 3 complete. Data becomes the final pre-launch gate next.';
+      document.getElementById('step-1').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 
     function copyCurrentLink() {
       const url = new URL(window.location.href);
@@ -792,16 +821,100 @@
         prompt('Copy this link:', url.toString());
       });
     }
-function completeStep2() {
-  currentRecord.currentStep = 3;
-  currentRecord.progress = 60;
 
-  hydrate(currentRecord);
+    function renderStep3Panel() {
+      const existing = document.getElementById('step3Card');
+      if (existing) return;
 
-  document.getElementById("step-1").scrollIntoView({
-    behavior: "smooth"
-  });
-}
+      const card = document.createElement('div');
+      card.className = 'search-card';
+      card.id = 'step3Card';
+      card.style.marginTop = '16px';
+      card.innerHTML = `
+        <div class="section-label">Step 3 · setup and training</div>
+        <div class="field-hint">This is the stage after integrations. It covers configuration, booking rules, and staff training before data is added later.</div>
+
+        <div class="field">
+          <label for="bookingRules">Booking rules</label>
+          <select id="bookingRules">
+            <option>Choose one</option>
+            <option>Standard</option>
+            <option>Premium</option>
+            <option>High turnover</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="trainingOwner">Training owner</label>
+          <input id="trainingOwner" type="text" placeholder="Who is responsible for training?" />
+        </div>
+
+        <div class="field">
+          <label for="trainingNotes">Training notes</label>
+          <textarea id="trainingNotes" placeholder="Anything to capture before we move to data and launch..."></textarea>
+        </div>
+
+        <div class="search-row" style="margin-top:12px;">
+          <button class="btn" type="button" id="completeStep3Btn">Complete step 3</button>
+        </div>
+      `;
+
+      const step2Card = document.getElementById('step2Card');
+      if (step2Card && step2Card.parentNode) {
+        step2Card.insertAdjacentElement('afterend', card);
+      } else {
+        els.stepList.parentNode.insertBefore(card, els.stepList);
+      }
+
+      card.querySelector('#completeStep3Btn').addEventListener('click', completeStep3);
+    }
+
+    function renderStep2Panel() {
+      const existing = document.getElementById('step2Card');
+      if (existing) return;
+
+      const card = document.createElement('div');
+      card.className = 'search-card';
+      card.id = 'step2Card';
+      card.style.marginTop = '16px';
+      card.innerHTML = `
+        <div class="section-label">Step 2 · integrations</div>
+        <div class="field-hint">Choose the systems used by this venue. Only the relevant options need to be completed.</div>
+
+        <div class="field">
+          <label for="posSystem">POS system</label>
+          <select id="posSystem">
+            <option>Select POS</option>
+            <option>Lightspeed</option>
+            <option>Square</option>
+            <option>Toast</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="paymentProvider">Payment provider</label>
+          <select id="paymentProvider">
+            <option>Select provider</option>
+            <option>Stripe</option>
+            <option>Adyen</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Messaging channels</label>
+          <label><input type="checkbox" /> SMS</label><br />
+          <label><input type="checkbox" /> WhatsApp</label>
+        </div>
+
+        <div class="search-row" style="margin-top:12px;">
+          <button class="btn" type="button" id="completeStep2Btn">Complete step 2</button>
+        </div>
+      `;
+
+      els.stepList.parentNode.insertBefore(card, els.stepList);
+      card.querySelector('#completeStep2Btn').addEventListener('click', completeStep2);
+    }
+
     els.saveBtn.addEventListener('click', saveStep1);
     els.copyBtn.addEventListener('click', copyCurrentLink);
 
@@ -816,7 +929,20 @@ function completeStep2() {
       });
     });
 
-    hydrate(CLIENTS[getClientKey()]);
+    (function init() {
+      const key = getClientKey();
+      const saved = loadSavedRecord(key);
+      const base = saved || CLIENTS[key];
+      hydrate(base);
+
+      if (currentRecord.currentStep >= 2) renderStep2Panel();
+      if (currentRecord.currentStep >= 3) renderStep3Panel();
+
+      // Keep the flow visible as the user advances.
+      if (currentRecord.currentStep >= 4) {
+        els.saveMeta.textContent = 'Setup is complete. Data will be the next pre-launch gate.';
+      }
+    })();
   </script>
 </body>
 </html>
