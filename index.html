@@ -766,6 +766,20 @@
     behavior: "smooth"
   });
 }
+    <div class="search-card" id="step2Card" style="margin-top:16px;">
+  <div class="section-label">Step 2 · integrations</div>
+  <div class="field-hint">
+    Select the systems you use. This will tailor your onboarding setup.
+  </div>
+
+  <div class="field">
+    <label><input type="checkbox"> POS System</label>
+    <label><input type="checkbox"> Payments</label>
+    <label><input type="checkbox"> SMS / WhatsApp</label>
+  </div>
+
+  <button class="btn" onclick="completeStep2()">Complete step 2</button>
+</div>
 
     function copyCurrentLink() {
       const url = new URL(window.location.href);
@@ -778,7 +792,16 @@
         prompt('Copy this link:', url.toString());
       });
     }
+function completeStep2() {
+  currentRecord.currentStep = 3;
+  currentRecord.progress = 60;
 
+  hydrate(currentRecord);
+
+  document.getElementById("step-1").scrollIntoView({
+    behavior: "smooth"
+  });
+}
     els.saveBtn.addEventListener('click', saveStep1);
     els.copyBtn.addEventListener('click', copyCurrentLink);
 
