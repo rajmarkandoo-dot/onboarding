@@ -1981,9 +1981,11 @@
     const sidebarEmail = document.getElementById("sidebarEmail");
 
     const urlParams = new URLSearchParams(window.location.search);
-    let currentItemId = urlParams.get("itemId") || localStorage.getItem("currentItemId") || "";
+    const urlItemId = urlParams.get("itemId") || "";
+    let currentItemId = urlItemId || localStorage.getItem("currentItemId") || "";
     let inviteToken = urlParams.get("invite") || "";
     const clientMode = Boolean(urlParams.get("invite"));
+    const internalEditMode = Boolean(urlItemId && !clientMode);
     const DEMO_MODE = window.location.hostname.endsWith("github.io") || window.location.search.includes("demo=true");
     const DEMO_ONBOARDERS = {
       EMEA: ["Raj Markandoo"],
@@ -2843,7 +2845,7 @@
 
     if (clientMode) {
       showClientMode();
-    } else if (currentItemId) {
+    } else if (internalEditMode) {
       showInternalEditMode();
     }
   </script>
