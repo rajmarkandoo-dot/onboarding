@@ -1971,7 +1971,7 @@
     let currentItemId = urlParams.get("itemId") || localStorage.getItem("currentItemId") || "";
     let inviteToken = urlParams.get("invite") || "";
     const clientMode = Boolean(urlParams.get("invite"));
-    const DEMO_MODE = window.location.hostname !== "localhost";
+    const DEMO_MODE = window.location.hostname.endsWith("github.io") || window.location.search.includes("demo=true");
     const DEMO_ONBOARDERS = {
       EMEA: ["Raj Markandoo"],
       APAC: ["Raj Markandoo"],
