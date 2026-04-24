@@ -268,11 +268,43 @@ app.post('/save-intake', async (req, res) => {
   }
 });
 
+function findAccessLinkColumn(columns, mode) {
+  if (mode === 'internal') {
+    return (
+      findColumn(columns, [
+        'Internal link',
+        'Internal Link',
+        'OB Link',
+        'OB link',
+        'Edit Link',
+        'Edit URL',
+        'Internal URL'
+      ]) ||
+      findColumnByContains(columns, ['internal', 'link']) ||
+      findColumnByContains(columns, ['ob', 'link']) ||
+      findColumnByContains(columns, ['edit', 'link']) ||
+      findColumnByContains(columns, ['internal', 'url'])
+    );
+  }
+
+  return (
+    findColumn(columns, [
+      'Invite link',
+      'Invite Link',
+      'Client Invite Link',
+      'Client link',
+      'Invite URL',
+      'Client URL'
+    ]) ||
+    findColumnByContains(columns, ['invite']) ||
+    findColumnByContains(columns, ['client', 'link']) ||
+    findColumnByContains(columns, ['invite', 'url']) ||
+    findColumnByContains(columns, ['client', 'url'])
+  );
+}
+
 app.post('/save-invite-link', async (req, res) => {
-  const {
-    itemId,
-    inviteUrl
-  } = req.body || {};
+  const { itemId, inviteUrl } = req.body || {};
 
   if (!itemId || !inviteUrl) {
     return res.status(400).json({ error: 'Missing itemId or inviteUrl' });
@@ -298,19 +330,7 @@ app.post('/save-invite-link', async (req, res) => {
       return res.status(500).json({ error: 'Onboarding board not found' });
     }
 
-    const inviteColumn =
-      findColumn(board.columns, [
-        'Invite link',
-        'Invite Link',
-        'Client Invite Link',
-        'Client link',
-        'Invite URL',
-        'Client URL'
-      ]) ||
-      findColumnByContains(board.columns, ['invite']) ||
-      findColumnByContains(board.columns, ['client', 'link']) ||
-      findColumnByContains(board.columns, ['invite', 'url']) ||
-      findColumnByContains(board.columns, ['client', 'url']);
+    const inviteColumn = findAccessLinkColumn(board.columns, 'invite');
 
     if (!inviteColumn) {
       return res.status(404).json({
@@ -350,6 +370,76 @@ app.post('/save-invite-link', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: error.message || 'Failed to save invite link' });
+  }
+});
+
+app.post('/save-internal-link', async (req, res) => {
+  const { itemId, internalUrl } = req.body || {};
+
+  if (!itemId || !internalUrl) {
+    return res.status(400).json({ error: 'Missing itemId or internalUrl' });
+  }
+
+  try {
+    const boardQuery = `
+      query {
+        boards(ids: ${ONBOARDING_BOARD_ID}) {
+          columns {
+            id
+            title
+            type
+          }
+        }
+      }
+    `;
+
+    const boardResult = await mondayRequest(boardQuery);
+    const board = boardResult.data?.boards?.[0];
+
+    if (!board) {
+      return res.status(500).json({ error: 'Onboarding board not found' });
+    }
+
+    const internalColumn = findAccessLinkColumn(board.columns, 'internal');
+
+    if (!internalColumn) {
+      return res.status(404).json({
+        error: 'Internal link column not found',
+        columns: board.columns.map((col) => ({ id: col.id, title: col.title, type: col.type }))
+      });
+    }
+
+    const columnValues = {
+      [internalColumn.id]: internalColumn.type === 'link'
+        ? { url: internalUrl, text: 'Open internal edit' }
+        : internalUrl
+    };
+
+    const mutation = `
+      mutation {
+        change_multiple_column_values(
+          board_id: ${ONBOARDING_BOARD_ID},
+          item_id: ${itemId},
+          column_values: "${escapeColumnValues(columnValues)}"
+        ) {
+          id
+        }
+      }
+    `;
+
+    const result = await mondayRequest(mutation);
+
+    res.json({
+      ok: true,
+      itemId,
+      internalUrl,
+      columnId: internalColumn.id,
+      columnTitle: internalColumn.title,
+      updated: result.data
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message || 'Failed to save internal link' });
   }
 });
 

@@ -2073,6 +2073,15 @@
         return Promise.resolve({ ok: true, columnTitle: "Invite Link" });
       }
 
+      if (url.pathname === "/save-internal-link") {
+        const internalData = {
+          ...(getLocalIntakeData(body.itemId) || {}),
+          internalUrl: body.internalUrl || ""
+        };
+        localStorage.setItem(`intake_${body.itemId}`, JSON.stringify(internalData));
+        return Promise.resolve({ ok: true, columnTitle: "Internal Link" });
+      }
+
       if (url.pathname === "/update-step2") {
         localStorage.setItem(`step2_${body.itemId}`, JSON.stringify({ ...body }));
         return Promise.resolve({ ok: true });
@@ -2613,9 +2622,29 @@
             setStep2Status(`Couldn't load saved details: ${err.message}`, 'warn');
           });
       }
+    }
 
-      window.location.hash = "#step-2";
-      els.step2Card.scrollIntoView({ behavior: "smooth", block: "start" });
+    function showInternalEditMode() {
+      els.step1Section.style.display = "block";
+      els.step2Card.style.display = "block";
+      els.step3JourneyCard.style.display = "block";
+      els.step3Card.style.display = "block";
+      els.step5Card.style.display = "block";
+      els.step2Heading.textContent = "Onboarding Card Information";
+      els.step2Lead.textContent = "Capture the onboarding details the team will use throughout implementation and launch.";
+      els.modePill.textContent = "Internal edit";
+      setStatus("Internal onboarding link loaded.", "good");
+
+      loadOnboardingItem(currentItemId)
+        .then((item) => {
+          applyOnboardingItem(item);
+          setButtonsState(true);
+          setStep2Status("Loaded saved onboarding details.", "good");
+        })
+        .catch((err) => {
+          console.error('Internal hydration failed:', err);
+          setStep2Status(`Couldn't load saved details: ${err.message}`, 'warn');
+        });
     }
 
     checklistSections.forEach((section) => {
@@ -2745,16 +2774,35 @@
         });
     }
 
+    function createInternalEditLink() {
+      if (!currentItemId) {
+        return Promise.reject(new Error('Missing item id'));
+      }
+
+      const internalUrl = `${window.location.origin}${window.location.pathname}?itemId=${encodeURIComponent(currentItemId)}`;
+
+      return requestJson('/save-internal-link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ itemId: currentItemId, internalUrl })
+      })
+        .then((data) => ({ internalUrl, data }))
+        .catch((err) => {
+          console.error('Internal link save failed:', err);
+          throw new Error(`Internal edit link save failed: ${err.message}`);
+        });
+    }
+
     els.nextBtn.addEventListener("click", () => {
       saveStep1()
-        .then(() => createInviteLink())
-        .then(({ data }) => {
+        .then(() => Promise.all([createInviteLink(), createInternalEditLink()]))
+        .then(([inviteResult, internalResult]) => {
           els.step2Heading.textContent = "Onboarding Card Information";
           els.step2Lead.textContent = "Capture the onboarding details the team will use throughout implementation and launch.";
           els.step2Card.style.display = "block";
           els.step3JourneyCard.style.display = "block";
           els.step2Card.scrollIntoView({ behavior: "smooth", block: "start" });
-          setStatus(`Saved, invite ready, and linked to Monday (${data.columnTitle}) ✅`, "good");
+          setStatus(`Saved, invite and internal edit links linked to Monday (${inviteResult.data.columnTitle}; ${internalResult.data.columnTitle}) ✅`, "good");
           els.modePill.textContent = "Onboarding card";
         })
         .catch((err) => {
@@ -2795,6 +2843,8 @@
 
     if (clientMode) {
       showClientMode();
+    } else if (currentItemId) {
+      showInternalEditMode();
     }
   </script>
 </body>
