@@ -358,8 +358,6 @@ app.post('/update-step2', async (req, res) => {
     itemId,
     launchDate,
     spendPerHead,
-    additionalUsers,
-    additionalUsersText,
     posSystem,
     reservationSystem,
     prepayments,
@@ -411,18 +409,9 @@ app.post('/update-step2', async (req, res) => {
     const reservationColumn = findColumn(board.columns, ['Reservation System', 'Reservation syst']);
     const prepaymentsColumn = findColumn(board.columns, ['PrePayments', 'PrePayments / Card Holds']);
     const ipadColumn = findColumn(board.columns, ['iPad', 'iPads available', 'iPads']);
-    const smsColumn = findColumn(board.columns, ['SMS']);
+    const smsColumn = findColumn(board.columns, ['SMS', 'SMS required', 'Sms']);
     const textColumn = findColumn(board.columns, ['Text']);
     const otherIntegrationsColumn = findColumn(board.columns, ['Other Integrations', 'Other integrations / book channels required']);
-
-    const normalizedAdditionalUsersText =
-      typeof additionalUsersText === 'string' && additionalUsersText.trim()
-        ? additionalUsersText.trim()
-        : Array.isArray(additionalUsers) && additionalUsers.length
-          ? additionalUsers
-              .map((u) => `- ${u.name || ''}${u.email ? ` <${u.email}>` : ''}`.trim())
-              .join('\n')
-          : '';
 
     const prepaymentsSummary = prepayments === 'Yes'
       ? [
