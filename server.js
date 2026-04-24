@@ -55,6 +55,34 @@ function escapeColumnValues(valueObj) {
     .replace(/"/g, '\\"');
 }
 
+
+function escapeRegex(value) {
+  return String(value || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function extractNotesBlock(notes, label, nextLabels = []) {
+  if (!notes) return '';
+
+  const lookahead = nextLabels.length
+    ? `(?=\n\n(?:${nextLabels.map((next) => escapeRegex(next)).join('|')}):|$)`
+    : '$';
+
+  const pattern = new RegExp(`${escapeRegex(label)}:\n([\s\S]*?)${lookahead}`, 'i');
+  const match = notes.match(pattern);
+  return match?.[1]?.trim() || '';
+}
+
+function extractInlineValue(text, label) {
+  if (!text) return '';
+  const pattern = new RegExp(`${escapeRegex(label)}:\s*([^\n|]+)`, 'i');
+  return text.match(pattern)?.[1]?.trim() || '';
+}
+
+function extractLineValue(text, label) {
+  if (!text) return '';
+  const pattern = new RegExp(`${escapeRegex(label)}:\s*([^\n]+)`, 'i');
+  return text.match(pattern)?.[1]?.trim() || '';
+}
 async function mondayRequest(query) {
   const token = process.env.MONDAY_API_TOKEN;
 
