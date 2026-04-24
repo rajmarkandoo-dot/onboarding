@@ -37,6 +37,48 @@ function findColumnByContains(columns, fragments) {
   });
 }
 
+function resolveStep2Columns(columns) {
+  return {
+    launchDateColumn:
+      findColumn(columns, ['Launch date', 'Launch Date']) ||
+      findColumnByContains(columns, ['launch', 'date']),
+    spendPerHeadColumn:
+      findColumn(columns, ['Spend per head', 'Spend Per Head']) ||
+      findColumnByContains(columns, ['spend', 'head']) ||
+      findColumnByContains(columns, ['spend']),
+    posColumn:
+      findColumn(columns, ['POS', 'POS system']) ||
+      findColumnByContains(columns, ['pos']) ||
+      findColumnByContains(columns, ['point', 'sale']),
+    reservationColumn:
+      findColumn(columns, ['Reservation System', 'Reservation syst']) ||
+      findColumnByContains(columns, ['reservation', 'system']) ||
+      findColumnByContains(columns, ['reservation']),
+    prepaymentsColumn:
+      findColumn(columns, ['PrePayments', 'PrePayments / Card Holds']) ||
+      findColumnByContains(columns, ['prepayment']) ||
+      findColumnByContains(columns, ['card', 'hold']) ||
+      findColumnByContains(columns, ['payment']),
+    ipadColumn:
+      findColumn(columns, ['iPad', 'iPads available', 'iPads']) ||
+      findColumnByContains(columns, ['ipad']) ||
+      findColumnByContains(columns, ['apple', 'device']),
+    smsColumn:
+      findColumn(columns, ['SMS', 'SMS required', 'Sms']) ||
+      findColumnByContains(columns, ['sms']) ||
+      findColumnByContains(columns, ['text', 'message']),
+    textColumn:
+      findColumn(columns, ['Text']) ||
+      findColumnByContains(columns, ['notes']) ||
+      findColumnByContains(columns, ['details']),
+    otherIntegrationsColumn:
+      findColumn(columns, ['Other Integrations', 'Other integrations / book channels required']) ||
+      findColumnByContains(columns, ['other', 'integration']) ||
+      findColumnByContains(columns, ['book', 'channel']) ||
+      findColumnByContains(columns, ['integration'])
+  };
+}
+
 
 function getStep3SectionColumnAliases() {
   return {
@@ -493,15 +535,17 @@ app.post('/update-step2', async (req, res) => {
       return res.status(500).json({ error: 'Onboarding board not found' });
     }
 
-    const launchDateColumn = findColumn(board.columns, ['Launch date', 'Launch Date']);
-    const spendPerHeadColumn = findColumn(board.columns, ['Spend per head', 'Spend Per Head']);
-    const posColumn = findColumn(board.columns, ['POS', 'POS system']);
-    const reservationColumn = findColumn(board.columns, ['Reservation System', 'Reservation syst']);
-    const prepaymentsColumn = findColumn(board.columns, ['PrePayments', 'PrePayments / Card Holds']);
-    const ipadColumn = findColumn(board.columns, ['iPad', 'iPads available', 'iPads']);
-    const smsColumn = findColumn(board.columns, ['SMS', 'SMS required', 'Sms']);
-    const textColumn = findColumn(board.columns, ['Text']);
-    const otherIntegrationsColumn = findColumn(board.columns, ['Other Integrations', 'Other integrations / book channels required']);
+    const {
+      launchDateColumn,
+      spendPerHeadColumn,
+      posColumn,
+      reservationColumn,
+      prepaymentsColumn,
+      ipadColumn,
+      smsColumn,
+      textColumn,
+      otherIntegrationsColumn
+    } = resolveStep2Columns(board.columns);
 
     const prepaymentsSummary = prepayments === 'Yes'
       ? [
@@ -610,14 +654,18 @@ app.get('/onboarding-item', async (req, res) => {
       return res.status(404).json({ error: 'Onboarding item not found' });
     }
 
-    const getText = (aliases) => {
-      const column = findColumn(board.columns, aliases);
+    const getText = (aliases, containsFragments = []) => {
+      const column =
+        findColumn(board.columns, aliases) ||
+        (containsFragments.length ? findColumnByContains(board.columns, containsFragments) : null);
       if (!column) return '';
       return item.column_values.find((value) => value.id === column.id)?.text?.trim() || '';
     };
 
-    const getValue = (aliases) => {
-      const column = findColumn(board.columns, aliases);
+    const getValue = (aliases, containsFragments = []) => {
+      const column =
+        findColumn(board.columns, aliases) ||
+        (containsFragments.length ? findColumnByContains(board.columns, containsFragments) : null);
       if (!column) return null;
       const raw = item.column_values.find((value) => value.id === column.id)?.value;
       if (!raw) return null;
@@ -628,13 +676,19 @@ app.get('/onboarding-item', async (req, res) => {
       }
     };
 
-    const notes = getText(['Text']);
-    const prepaymentsText = getText(['PrePayments', 'PrePayments / Card Holds']);
-    const smsText = getText(['SMS']);
+    const step2Columns = resolveStep2Columns(board.columns);
+    const getTextByColumn = (column) => {
+      if (!column) return '';
+      return item.column_values.find((value) => value.id === column.id)?.text?.trim() || '';
+    };
+
+    const notes = getTextByColumn(step2Columns.textColumn);
+    const prepaymentsText = getTextByColumn(step2Columns.prepaymentsColumn);
+    const smsText = getTextByColumn(step2Columns.smsColumn);
     const prepaymentsBlock = extractNotesBlock(notes, 'PrePayments details', ['SMS details']);
     const smsBlock = extractNotesBlock(notes, 'SMS details');
-    const launchDateValue = getValue(['Launch date', 'Launch Date']);
-    const launchDateText = getText(['Launch date', 'Launch Date']) || extractLineValue(notes, 'Launch date');
+    const launchDateValue = getValue(['Launch date', 'Launch Date'], ['launch', 'date']);
+    const launchDateText = getText(['Launch date', 'Launch Date'], ['launch', 'date']) || extractLineValue(notes, 'Launch date');
 
     const step3Statuses = Object.entries(getStep3SectionColumnAliases()).reduce((acc, [sectionName, aliases]) => {
       acc[sectionName] = getText(aliases);
@@ -649,16 +703,16 @@ app.get('/onboarding-item', async (req, res) => {
       clientName: getText(['Client name']),
       clientEmail: getText(['Client email']),
       launchDate: launchDateValue?.date || launchDateText || '',
-      spendPerHead: getText(['Spend per head', 'Spend Per Head']),
+      spendPerHead: getText(['Spend per head', 'Spend Per Head'], ['spend']),
       additionalUsersText: extractNotesBlock(notes, 'Additional users', ['PrePayments details', 'SMS details']),
-      posSystem: getText(['POS', 'POS system']),
-      reservationSystem: getText(['Reservation System', 'Reservation syst']),
+      posSystem: getText(['POS', 'POS system'], ['pos']),
+      reservationSystem: getText(['Reservation System', 'Reservation syst'], ['reservation']),
       prepayments: /^yes/i.test(prepaymentsText || prepaymentsBlock) ? 'Yes' : (/^no/i.test(prepaymentsText || prepaymentsBlock) ? 'No' : ''),
       prepaymentType: extractInlineValue(prepaymentsBlock || prepaymentsText, 'Type'),
       cancellationPeriod: extractInlineValue(prepaymentsBlock || prepaymentsText, 'Cancellation period'),
       chargeModel: extractInlineValue(prepaymentsBlock || prepaymentsText, 'Charge model'),
       localCurrencyAmount: extractInlineValue(prepaymentsBlock || prepaymentsText, 'Amount'),
-      iPads: getText(['iPad', 'iPads available', 'iPads']),
+      iPads: getText(['iPad', 'iPads available', 'iPads'], ['ipad']),
       smsRequired: /^yes/i.test(smsText) ? 'Yes' : (/^no/i.test(smsText) ? 'No' : ''),
       companyName: extractLineValue(smsBlock, 'Company name'),
       businessName: extractLineValue(smsBlock, 'Business Name'),
@@ -669,7 +723,7 @@ app.get('/onboarding-item', async (req, res) => {
       repLastName: extractLineValue(smsBlock, 'Authorized Representative Last Name'),
       repPhone: extractLineValue(smsBlock, 'Authorized Representative Phone Number'),
       repEmail: extractLineValue(smsBlock, 'Authorized Representative Email Address'),
-      otherIntegrations: getText(['Other Integrations', 'Other integrations / book channels required']),
+      otherIntegrations: getText(['Other Integrations', 'Other integrations / book channels required'], ['integration']),
       step3Statuses
     };
 
