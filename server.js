@@ -772,7 +772,13 @@ app.get('/monday-resource-link', async (req, res) => {
       return res.status(404).json({ error: 'Link not found for resource' });
     }
 
-    const labelPrefix = type === 'reservation' ? 'Reservation' : 'POS';
+    const labelPrefixes = {
+      reservation: 'Reservation',
+      payment: 'Payment',
+      integration: 'Integration',
+      pos: 'POS'
+    };
+    const labelPrefix = labelPrefixes[type] || 'Resource';
 
     res.json({
       url,
@@ -784,6 +790,8 @@ app.get('/monday-resource-link', async (req, res) => {
   }
 });
 
-app.listen(3000, () => {
-  console.log('Server running on http://localhost:3000');
+const PORT = Number(process.env.PORT || 3000);
+
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
 });

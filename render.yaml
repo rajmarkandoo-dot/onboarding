@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: onboarding-live
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    autoDeploy: true
+    envVars:
+      - key: MONDAY_API_TOKEN
+        sync: false
