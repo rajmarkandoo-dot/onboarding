@@ -271,6 +271,11 @@
       padding-top: 16px;
     }
 
+    .step2-journey-stage {
+      display: none;
+      margin-bottom: 18px;
+    }
+
     .step-card {
       border: 1px solid #ddddda;
       border-radius: 24px;
@@ -589,7 +594,7 @@
       text-underline-offset: 3px;
       font-size: 15px;
       line-height: 1.45;
-      font-weight: 700;
+      font-weight: 500;
     }
 
     .dashboard-links a {
@@ -686,12 +691,6 @@
       line-height: 1.35;
       word-break: break-word;
       overflow-wrap: anywhere;
-    }
-
-    .sidebar-progress-count {
-      font-size: 24px;
-      font-weight: 800;
-      letter-spacing: -0.04em;
     }
 
     .sidebar-progress-percent {
@@ -1500,6 +1499,51 @@
           </div>
 
           <div class="step2" id="step2Card">
+          <div class="step2-journey-stage" id="step3JourneyCard">
+            <div class="step-card">
+              <div class="eyebrow">Implementation</div>
+              <h3>Implementation Steps</h3>
+              <p>Use these milestones to guide the working plan before moving into the launch checklist.</p>
+
+              <div class="implementation-stage-grid">
+                <article class="implementation-card configuration">
+                  <div class="implementation-badge">Configuration</div>
+                  <p>To be completed on account set up call:</p>
+                  <ul class="implementation-list">
+                    <li>Review Floorplan</li>
+                    <li>Table Capacities &amp; Combinations</li>
+                    <li>Internal &amp; Online availability</li>
+                    <li>Testing guest &amp; internal booking journey</li>
+                    <li>Booking channel and integration strategy</li>
+                  </ul>
+                </article>
+
+                <article class="implementation-card integrations">
+                  <div class="implementation-badge">Integrations &amp; Data Imports</div>
+                  <p>To be completed post-account set up call:</p>
+                  <ul class="implementation-list">
+                    <li>Reservation Widget Customisation</li>
+                    <li>Complete POS Integration steps</li>
+                    <li>Complete Payment Integration steps</li>
+                    <li>Share Client Database</li>
+                    <li>Share Future &amp; Historical Reservation data</li>
+                  </ul>
+                </article>
+
+                <article class="implementation-card completion">
+                  <div class="implementation-badge">Onboarding Completion</div>
+                  <p>Before launch, make sure these are complete:</p>
+                  <ul class="implementation-list">
+                    <li>Booking Journey</li>
+                    <li>Data Imports</li>
+                    <li>Required Integrations</li>
+                    <li>Business Ready</li>
+                  </ul>
+                </article>
+              </div>
+            </div>
+          </div>
+
             <div class="step2-layout">
               <div class="step2-main">
                 <div class="step-card">
@@ -1668,8 +1712,7 @@
                     <div class="summary-row"><span>Email</span><strong id="summaryClientEmail">—</strong></div>
                   </div>
                   <div class="dashboard-divider"></div>
-                  <div class="sidebar-label">Progress</div>
-                  <div class="sidebar-progress-count"><span id="overallDone">0</span> / <span id="overallTotal">6</span> complete</div>
+                  <div class="sidebar-label">Configuration Progress</div>
                   <div class="sidebar-progress-percent" id="overallPercent">0%</div>
                   <div class="progress-bar">
                     <div class="progress-fill" id="overallProgressFill"></div>
@@ -1693,51 +1736,6 @@
                   </ul>
                 </div>
               </aside>
-            </div>
-          </div>
-
-          <div class="step3" id="step3JourneyCard">
-            <div class="step-card">
-              <div class="eyebrow">Implementation</div>
-              <h3>Implementation Steps</h3>
-              <p>Use these milestones to guide the working plan before moving into the launch checklist.</p>
-
-              <div class="implementation-stage-grid">
-                <article class="implementation-card configuration">
-                  <div class="implementation-badge">Configuration</div>
-                  <p>To be completed on account set up call:</p>
-                  <ul class="implementation-list">
-                    <li>Review Floorplan</li>
-                    <li>Table Capacities &amp; Combinations</li>
-                    <li>Internal &amp; Online availability</li>
-                    <li>Testing guest &amp; internal booking journey</li>
-                    <li>Booking channel and integration strategy</li>
-                  </ul>
-                </article>
-
-                <article class="implementation-card integrations">
-                  <div class="implementation-badge">Integrations &amp; Data Imports</div>
-                  <p>To be completed post-account set up call:</p>
-                  <ul class="implementation-list">
-                    <li>Reservation Widget Customisation</li>
-                    <li>Complete POS Integration steps</li>
-                    <li>Complete Payment Integration steps</li>
-                    <li>Share Client Database</li>
-                    <li>Share Future &amp; Historical Reservation data</li>
-                  </ul>
-                </article>
-
-                <article class="implementation-card completion">
-                  <div class="implementation-badge">Onboarding Completion</div>
-                  <p>Before launch, make sure these are complete:</p>
-                  <ul class="implementation-list">
-                    <li>Booking Journey</li>
-                    <li>Data Imports</li>
-                    <li>Required Integrations</li>
-                    <li>Business Ready</li>
-                  </ul>
-                </article>
-              </div>
             </div>
           </div>
 
@@ -1976,8 +1974,6 @@
 
     const sectionChecks = document.querySelectorAll(".section-check");
     const checklistSections = document.querySelectorAll(".checklist-section");
-    const overallDoneEl = document.getElementById("overallDone");
-    const overallTotalEl = document.getElementById("overallTotal");
     const overallPercentEl = document.getElementById("overallPercent");
     const overallProgressFill = document.getElementById("overallProgressFill");
     const sidebarAvatar = document.getElementById("sidebarAvatar");
@@ -2355,8 +2351,6 @@
       const done = Array.from(sectionChecks).filter((check) => check.checked).length;
       const percent = total ? Math.round((done / total) * 100) : 0;
 
-      overallDoneEl.textContent = done;
-      overallTotalEl.textContent = total;
       overallPercentEl.textContent = `${percent}%`;
       overallProgressFill.style.width = `${percent}%`;
       overallProgressFill.classList.remove('is-empty', 'is-active', 'is-complete');
@@ -2508,6 +2502,14 @@
 
     function updateGlossary() {
       const cards = [];
+
+      if (clientMode) {
+        cards.push(renderGlossaryCard('Implementation Steps', 'Key milestones for the onboarding journey.', [
+          'Configuration: review floorplan, capacities, availability, and booking journey.',
+          'Integrations & Data Imports: complete widget, POS, payment, and data-share setup.',
+          'Onboarding Completion: booking journey, data imports, required integrations, and business readiness.'
+        ], ''));
+      }
       const posValue = els.posSystem.value;
       const reservationValue = els.reservationSystem.value;
       const otherIntegrationValue = els.otherIntegrations.value;
@@ -2593,6 +2595,8 @@
     function showClientMode() {
       els.step1Section.style.display = "none";
       els.step2Card.style.display = "block";
+      els.step3JourneyCard.style.display = "none";
+      els.step5Card.style.display = "block";
       els.step2Heading.textContent = "Your setup details";
       els.step2Lead.textContent = "Complete the details below so we can finish configuring your onboarding and launch plan.";
       els.modePill.textContent = "Client view";
@@ -2748,6 +2752,7 @@
           els.step2Heading.textContent = "Onboarding Card Information";
           els.step2Lead.textContent = "Capture the onboarding details the team will use throughout implementation and launch.";
           els.step2Card.style.display = "block";
+          els.step3JourneyCard.style.display = "block";
           els.step2Card.scrollIntoView({ behavior: "smooth", block: "start" });
           setStatus(`Saved, invite ready, and linked to Monday (${data.columnTitle}) ✅`, "good");
           els.modePill.textContent = "Onboarding card";
