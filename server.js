@@ -530,7 +530,6 @@ app.post('/update-step2', async (req, res) => {
 
     const notes = [
       launchDate ? `Launch date: ${launchDate}` : null,
-      normalizedAdditionalUsersText ? `Additional users:\n${normalizedAdditionalUsersText}` : null,
       prepayments === 'Yes' ? `PrePayments details:\n${prepaymentsSummary}` : null,
       smsRequired === 'Yes' ? `SMS details:\n${smsSummary}` : null
     ].filter(Boolean).join('\n\n');
