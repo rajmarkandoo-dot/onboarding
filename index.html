@@ -1,0 +1,2777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SevenRooms | OB Interactive Configuration</title>
+  <style>
+    :root {
+      --bg: #f7f7f5;
+      --surface: #ffffff;
+      --surface-soft: #fbfbfa;
+      --text: #111111;
+      --muted: #666666;
+      --line: #e6e6e3;
+      --line-strong: #cfcfc8;
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.06);
+      --accent: #111111;
+      --accent-soft: #f1f1ee;
+      --good: #1a7f37;
+      --warn: #8a5b00;
+      --sr-purple: #7a3ef0;
+      --sr-coral: #ff6b5d;
+      --sr-gold: #f2b84b;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg, #ffffff 0%, var(--bg) 100%);
+      color: var(--text);
+    }
+
+    .page {
+      min-height: 100%;
+      display: flex;
+      justify-content: center;
+      padding: 28px 20px 48px;
+    }
+
+    .shell {
+      width: min(1120px, 100%);
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .brand-full {
+      gap: 18px;
+    }
+
+    .brand-logo {
+      width: 160px;
+      height: auto;
+      display: block;
+    }
+
+    .brand small {
+      display: block;
+      font-weight: 600;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.86);
+      color: var(--muted);
+      box-shadow: var(--shadow);
+      white-space: nowrap;
+      font-size: 14px;
+    }
+
+    .hero {
+      background: var(--surface);
+      border: 1px solid #d9d9d4;
+      border-radius: 36px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+    }
+
+    .hero-head {
+      padding: 32px 32px 26px;
+      border-bottom: 1px solid #ecece8;
+      background: linear-gradient(180deg, #ffffff 0%, #fafaf8 100%);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      background: rgba(18, 18, 18, 0.05);
+      border: 1px solid rgba(18, 18, 18, 0.08);
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(26px, 4vw, 40px);
+      letter-spacing: -0.04em;
+    }
+
+    .lead {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 15px;
+    }
+
+    .panel {
+      padding: 28px 32px 32px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin: 12px 0;
+    }
+
+    .section-title h2 {
+      margin: 0;
+      font-size: 17px;
+      letter-spacing: -0.02em;
+    }
+
+    .section-title .meta {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .required::after {
+      content: " *";
+      color: #b42318;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid #d7d7d2;
+      border-radius: 18px;
+      padding: 14px 15px;
+      background: #fff;
+      color: var(--text);
+      font: inherit;
+      outline: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: #111;
+      box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08);
+    }
+
+    textarea {
+      min-height: 90px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 16px;
+      padding: 13px 16px;
+      font-weight: 800;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .btn.primary {
+      background: #3f81b6;
+      color: #fff;
+      box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.12);
+    }
+
+    .btn.secondary {
+      background: #fff;
+      border: 2px solid #3f81b6;
+      color: #3f81b6;
+    }
+
+    .btn.ghost {
+      background: #fff;
+      border: 1px solid var(--line);
+      color: var(--text);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .status {
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .status.good { color: var(--good); }
+    .status.warn { color: var(--warn); }
+
+    .invite-box {
+      margin-top: 10px;
+      border: 1px dashed rgba(63, 129, 182, 0.32);
+      background: rgba(63, 129, 182, 0.06);
+      border-radius: 18px;
+      padding: 10px 12px;
+      display: none;
+    }
+
+    .invite-link {
+      word-break: break-all;
+      color: #3f81b6;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(63, 129, 182, 0.28);
+      font-weight: 700;
+    }
+
+    .step2, .step3, .step5 {
+      display: none;
+      margin-top: 16px;
+      border-top: 1px solid var(--line);
+      padding-top: 16px;
+    }
+
+    .step-card {
+      border: 1px solid #ddddda;
+      border-radius: 24px;
+      background: var(--surface-soft);
+      padding: 18px;
+    }
+
+    .step-card h3 {
+      margin: 0 0 6px;
+      font-size: 15px;
+    }
+
+    .step-card p {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .subsection {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      background: #fff;
+      margin-bottom: 12px;
+    }
+
+    .subsection-title {
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .subsection-hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .step2-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 300px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .step2-main {
+      min-width: 0;
+    }
+
+    .step2-sidebar {
+      position: sticky;
+      top: 20px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .summary-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .summary-row {
+      display: grid;
+      gap: 4px;
+    }
+
+    .summary-row span {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .summary-row strong {
+      font-size: 16px;
+      letter-spacing: -0.02em;
+      line-height: 1.3;
+    }
+
+
+    .inline-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .inline-grid.three-up {
+      grid-template-columns: 110px 1fr 1fr;
+    }
+
+    .ob-dashboard-card {
+      display: grid;
+      gap: 14px;
+    }
+
+    .ob-profile-head {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .profile-avatar-round {
+      width: 84px;
+      height: 84px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #202020 0%, #111111 100%);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.14);
+      overflow: hidden;
+    }
+
+    .dashboard-action {
+      width: 100%;
+    }
+
+    .dashboard-divider {
+      height: 1px;
+      background: rgba(17, 17, 17, 0.08);
+    }
+
+    .implementation-stage-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 14px;
+    }
+
+    .implementation-card {
+      border: 1px solid #d8d8d2;
+      border-radius: 22px;
+      padding: 22px 20px 24px;
+      background: linear-gradient(180deg, #fcfcfb 0%, #f6f5f0 100%);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.04);
+    }
+
+    .implementation-card.configuration {
+      background: linear-gradient(180deg, #eef4fb 0%, #dde9f6 100%);
+    }
+
+    .implementation-card.integrations {
+      background: linear-gradient(180deg, #f8f3e8 0%, #efe6d4 100%);
+    }
+
+    .implementation-card.completion {
+      background: linear-gradient(180deg, #edf3fb 0%, #dce8f7 100%);
+    }
+
+    .implementation-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid rgba(17, 17, 17, 0.12);
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+
+    .implementation-card p {
+      margin: 0 0 14px;
+      font-size: 14px;
+      color: rgba(17, 17, 17, 0.72);
+      line-height: 1.45;
+    }
+
+    .implementation-list,
+    .glossary-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 10px;
+    }
+
+    .implementation-list li,
+    .glossary-list li {
+      position: relative;
+      padding-left: 18px;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .implementation-list li::before,
+    .glossary-list li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 8px;
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(17, 17, 17, 0.55);
+    }
+
+    .glossary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .glossary-card {
+      border: 1px solid #d8d8d2;
+      border-radius: 20px;
+      padding: 18px;
+      background: linear-gradient(180deg, #fcfcfb 0%, #f6f5f0 100%);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.04);
+    }
+
+    .glossary-card h4 {
+      margin: 0 0 8px;
+      font-size: 16px;
+      letter-spacing: -0.02em;
+    }
+
+    .glossary-card p {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .glossary-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 0 14px;
+      border-radius: 10px;
+      border: 1px solid #3f81b6;
+      color: #3f81b6;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+      background: #fff;
+    }
+
+    .glossary-empty {
+      margin-top: 14px;
+      border: 1px dashed #d3d3ce;
+      border-radius: 16px;
+      padding: 16px;
+      color: var(--muted);
+      background: #fafaf8;
+      font-size: 14px;
+    }
+
+    .step2-journey {
+      margin: 18px 0 22px;
+      border: 1px solid #d8d8d2;
+      border-radius: 22px;
+      overflow: hidden;
+      background: #f8f5ee;
+    }
+
+    .step2-journey-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .step2-journey .journey-column {
+      padding: 24px 20px 26px;
+    }
+
+    .step2-journey .journey-arrow {
+      min-height: 72px;
+      margin-bottom: 18px;
+      font-size: clamp(18px, 2vw, 24px);
+    }
+
+    .step2-journey .journey-lead,
+    .step2-journey .journey-list li,
+    .step2-journey .journey-share-list li {
+      font-size: 14px;
+    }
+
+    .dashboard-card {
+      border: 1px solid #d8d8d2;
+      border-radius: 22px;
+      background: linear-gradient(180deg, #fcfcfb 0%, #f5f5f1 100%);
+      padding: 16px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.04);
+    }
+
+    .dashboard-card + .dashboard-card {
+      margin-top: 12px;
+    }
+
+    .dashboard-card h4 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+    }
+
+    .dashboard-card p {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .dashboard-links,
+    .dashboard-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 10px;
+    }
+
+    .dashboard-links a,
+    .dashboard-list li {
+      color: var(--text);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .dashboard-links a {
+      display: inline-block;
+    }
+
+    .step3-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 290px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .step3-card {
+      border-radius: 26px;
+      border: 1px solid #d8d8d2;
+      background:
+        radial-gradient(circle at top right, rgba(17, 17, 17, 0.04), transparent 26%),
+        linear-gradient(180deg, #fcfcfb 0%, #f5f5f1 100%);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.05);
+    }
+
+    .step3-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: end;
+      margin-bottom: 14px;
+    }
+
+    .step3-lead {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .step3-sidebar {
+      position: sticky;
+      top: 20px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .sidebar-card {
+      border: 1px solid #d8d8d2;
+      border-radius: 22px;
+      background: linear-gradient(180deg, #fcfcfb 0%, #f5f5f1 100%);
+      padding: 16px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.04);
+    }
+
+    .sidebar-label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+    }
+
+    .sidebar-profile {
+      display: grid;
+      gap: 12px;
+    }
+
+    .profile-avatar {
+      width: 96px;
+      height: 96px;
+      border-radius: 22px;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 30px;
+      letter-spacing: -0.03em;
+      color: #fff;
+      background: linear-gradient(180deg, #2a2a2a 0%, #111111 100%);
+      box-shadow: 0 16px 34px rgba(0, 0, 0, 0.16);
+    }
+
+    .sidebar-profile-copy {
+      display: grid;
+      gap: 4px;
+    }
+
+    .sidebar-profile-copy strong {
+      font-size: 16px;
+      letter-spacing: -0.02em;
+    }
+
+    .sidebar-profile-copy span {
+      color: var(--muted);
+      font-size: 14px;
+      word-break: break-word;
+    }
+
+    .sidebar-progress-count {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+    }
+
+    .sidebar-progress-percent {
+      margin: 8px 0 12px;
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      color: #111111;
+    }
+
+    .status-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid var(--line);
+      font-size: 13px;
+      align-items: center;
+    }
+
+    .status-row strong {
+      font-size: 12px;
+      padding: 5px 8px;
+      border-radius: 999px;
+      letter-spacing: 0.04em;
+    }
+
+    .status-row.status-not-started strong {
+      background: #efefeb;
+      color: #666666;
+    }
+
+    .status-row.status-in-progress strong {
+      background: #fff3d6;
+      color: #8a5b00;
+    }
+
+    .status-row.status-complete strong {
+      background: #e7f6ec;
+      color: #1a7f37;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: #e6e6e1;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #111111 0%, #535353 100%);
+      transition: width 180ms ease;
+    }
+
+    .checklist-sections {
+      display: grid;
+      gap: 12px;
+    }
+
+    .checklist-section {
+      border: 1px solid #ddddda;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.72);
+      overflow: hidden;
+    }
+
+    .section-toggle {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 18px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .section-title-wrap {
+      display: grid;
+      grid-template-columns: 6px auto 1fr;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .section-title-wrap h4 {
+      margin: 0 0 4px;
+      font-size: 16px;
+      letter-spacing: -0.02em;
+    }
+
+    .section-meta {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .section-accent {
+      width: 6px;
+      align-self: stretch;
+      min-height: 42px;
+      border-radius: 999px;
+    }
+
+    .accent-venue { background: #575757; }
+    .accent-marketing { background: #8a8a8a; }
+    .accent-it { background: #1f6b53; }
+    .accent-imports { background: #c8a326; }
+    .accent-golive { background: #cf7d22; }
+    .accent-addons { background: #2f6d4e; }
+
+    .section-check {
+      width: 18px;
+      height: 18px;
+      margin: 0;
+    }
+
+    .chevron {
+      font-size: 20px;
+      color: var(--muted);
+      transition: transform 180ms ease;
+    }
+
+    .checklist-section.is-open .chevron {
+      transform: rotate(180deg);
+    }
+
+    .section-body {
+      display: none;
+      padding: 0 18px 18px;
+      gap: 10px;
+    }
+
+    .checklist-section.is-open .section-body {
+      display: grid;
+    }
+
+    .task-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 12px;
+      align-items: center;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: #fff;
+    }
+
+    .task-row.is-muted {
+      background: #fafaf8;
+    }
+
+    .task-copy {
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .task-tag {
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: #efefeb;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .resource-btn {
+      border: 1px solid #3f81b6;
+      background: #fff;
+      color: #3f81b6;
+      border-radius: 12px;
+      padding: 9px 11px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .resource-btn:hover {
+      background: #eaf3fb;
+    }
+
+
+    .step4 {
+      display: none;
+      margin-top: 16px;
+      border-top: 1px solid var(--line);
+      padding-top: 16px;
+    }
+
+    .stage-journey {
+      overflow: hidden;
+      border: 1px solid #d8d8d2;
+      border-radius: 28px;
+      background: #f7f4ed;
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.05);
+    }
+
+    .stage-journey-head {
+      padding: 26px 28px;
+      background: #1f1a17;
+      color: #fff;
+      text-align: center;
+    }
+
+    .stage-journey-head h3 {
+      margin: 0;
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: clamp(34px, 5vw, 56px);
+      font-weight: 500;
+      letter-spacing: -0.04em;
+    }
+
+    .stage-journey-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .journey-column {
+      padding: 32px 28px 36px;
+      min-height: 100%;
+    }
+
+    .journey-column + .journey-column {
+      border-left: 1px solid rgba(17, 17, 17, 0.08);
+    }
+
+    .journey-column.configuration {
+      background: #fcfbf8;
+    }
+
+    .journey-column.integrations {
+      background: #eee5d1;
+    }
+
+    .journey-column.completion {
+      background: #dce6f2;
+    }
+
+    .journey-arrow {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 86px;
+      width: min(100%, 420px);
+      padding: 16px 44px 16px 34px;
+      margin: 0 auto 26px;
+      border: 2px solid #3c3531;
+      border-right: none;
+      background: rgba(255, 255, 255, 0.8);
+      font-size: clamp(20px, 2.2vw, 28px);
+      font-weight: 800;
+      line-height: 1.1;
+      text-align: center;
+      box-sizing: border-box;
+    }
+
+    .journey-arrow::after {
+      content: '';
+      position: absolute;
+      top: -2px;
+      right: -42px;
+      width: 84px;
+      height: calc(100% + 4px);
+      background: inherit;
+      border-top: 2px solid #3c3531;
+      border-right: 2px solid #3c3531;
+      border-bottom: 2px solid #3c3531;
+      transform: skewX(-38deg);
+      transform-origin: center;
+      box-sizing: border-box;
+    }
+
+    .journey-arrow span {
+      position: relative;
+      z-index: 1;
+      display: inline-block;
+    }
+
+    .journey-column.configuration .journey-arrow {
+      background: #d8e4f1;
+    }
+
+    .journey-column.integrations .journey-arrow {
+      background: #fffdf8;
+    }
+
+    .journey-column.completion .journey-arrow {
+      background: #f1e7cf;
+    }
+
+    .journey-lead {
+      margin: 0 0 18px;
+      font-size: 16px;
+      line-height: 1.4;
+    }
+
+    .journey-list,
+    .journey-share-list,
+    .support-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 12px;
+    }
+
+    .journey-list li,
+    .journey-share-list li,
+    .support-list li {
+      position: relative;
+      padding-left: 28px;
+      font-size: 16px;
+      line-height: 1.35;
+    }
+
+    .journey-list li::before,
+    .journey-share-list li::before,
+    .support-list li::before {
+      content: "☐";
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: #2a2521;
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .journey-share {
+      margin-top: 26px;
+    }
+
+    .journey-share h4 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .handoff-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      margin-top: 18px;
+      border: 1px solid #d8d8d2;
+      border-radius: 28px;
+      overflow: hidden;
+      background: linear-gradient(180deg, #fcfcfb 0%, #f5f5f1 100%);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.05);
+    }
+
+    .handoff-panel {
+      padding: 44px 36px;
+      text-align: center;
+      min-height: 100%;
+    }
+
+    .handoff-panel + .handoff-panel {
+      border-left: 1px solid rgba(17, 17, 17, 0.1);
+    }
+
+    .handoff-panel h3 {
+      margin: 0 0 12px;
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: clamp(34px, 4vw, 52px);
+      font-weight: 600;
+      letter-spacing: -0.04em;
+    }
+
+    .handoff-intro {
+      margin: 0 0 22px;
+      font-size: 18px;
+      line-height: 1.4;
+    }
+
+    .support-link {
+      color: var(--text);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+    }
+
+    .support-list {
+      justify-items: center;
+    }
+
+    .support-list li {
+      padding-left: 0;
+    }
+
+
+    .vms-preview {
+      margin-top: 18px;
+      border: 1px solid #d8d8d2;
+      border-radius: 28px;
+      overflow: hidden;
+      background: #ffffff;
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.05);
+    }
+
+    .vms-toolbar {
+      padding: 30px 30px 22px;
+      border-bottom: 1px solid #e2e2df;
+      background: #fff;
+    }
+
+    .vms-toolbar-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    .vms-title {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 42px);
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+    }
+
+    .vms-actions {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .vms-btn,
+    .update-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      min-height: 58px;
+      padding: 0 26px;
+      font-size: 18px;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .vms-btn.link {
+      color: #3779b2;
+      background: transparent;
+      border: none;
+      padding: 0 6px;
+      min-height: auto;
+    }
+
+    .vms-btn.outline {
+      color: #3779b2;
+      background: #fff;
+      border: 2px solid #3779b2;
+    }
+
+    .vms-btn.disabled {
+      color: #fff;
+      background: #d1d1d1;
+      border: none;
+      pointer-events: none;
+    }
+
+    .vms-tabs {
+      display: flex;
+      gap: 56px;
+      border-bottom: 4px solid #d7d7d2;
+      padding-bottom: 0;
+      overflow-x: auto;
+    }
+
+    .vms-tab {
+      position: relative;
+      padding-bottom: 16px;
+      font-size: 20px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .vms-tab.active {
+      font-weight: 800;
+    }
+
+    .vms-tab.active::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -4px;
+      height: 4px;
+      background: #111111;
+    }
+
+    .vms-body {
+      padding: 28px 30px 34px;
+      background: #fcfcfb;
+    }
+
+    .vms-payment-card {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: center;
+      border: 1px solid #dbe8f5;
+      border-radius: 14px;
+      background: #dceaf7;
+      padding: 30px;
+      margin-bottom: 24px;
+    }
+
+    .vms-payment-copy {
+      display: flex;
+      gap: 22px;
+      align-items: center;
+    }
+
+    .vms-icon {
+      width: 110px;
+      height: 110px;
+      border-radius: 999px;
+      background: #fff;
+      display: grid;
+      place-items: center;
+      color: #3779b2;
+      font-size: 44px;
+      box-shadow: inset 0 0 0 1px rgba(55, 121, 178, 0.12);
+    }
+
+    .vms-payment-copy h4 {
+      margin: 0 0 8px;
+      font-size: clamp(26px, 3vw, 34px);
+      letter-spacing: -0.03em;
+    }
+
+    .vms-payment-copy p {
+      margin: 0;
+      font-size: 18px;
+      color: #5f6b77;
+      line-height: 1.4;
+    }
+
+    .vms-btn.primary,
+    .update-btn {
+      color: #fff;
+      background: #3f81b6;
+      border: none;
+      box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.12);
+    }
+
+    .update-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 28px;
+    }
+
+    .update-btn {
+      width: min(100%, 400px);
+      min-height: 78px;
+      border-radius: 8px;
+      font-size: 28px;
+      font-weight: 500;
+    }
+
+    .schedule-preview {
+      border: 1px solid #d9d9d6;
+      border-radius: 18px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .schedule-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      min-height: 560px;
+    }
+
+    .schedule-day {
+      position: relative;
+      padding-top: 22px;
+      background-image: linear-gradient(to bottom, transparent 0 46px, rgba(135, 135, 135, 0.45) 46px 48px, transparent 48px 94px);
+      background-size: 100% 96px;
+    }
+
+    .schedule-day + .schedule-day {
+      border-left: 1px solid #d6d6d3;
+    }
+
+    .shift-block {
+      position: absolute;
+      left: 4px;
+      right: 4px;
+      border-radius: 3px;
+      background: #a8c0f6;
+      box-shadow: inset 0 0 0 1px rgba(78, 120, 185, 0.28);
+      padding: 8px 10px;
+      font-size: 16px;
+      line-height: 1.2;
+      font-weight: 700;
+    }
+
+    .shift-block small {
+      display: block;
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .shift-lunch {
+      top: 230px;
+      height: 160px;
+    }
+
+    .shift-dinner {
+      top: 430px;
+      height: 170px;
+    }
+
+    .support-list li::before {
+      display: none;
+    }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 980px) {
+      .step2-layout,
+      .step3-layout,
+      .implementation-stage-grid,
+      .glossary-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .step2-sidebar,
+      .step3-sidebar {
+        position: static;
+      }
+
+      .stage-journey-grid,
+      .step2-journey-grid,
+      .handoff-grid,
+      .schedule-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .journey-column + .journey-column,
+      .handoff-panel + .handoff-panel {
+        border-left: none;
+        border-top: 1px solid rgba(17, 17, 17, 0.08);
+      }
+
+      .schedule-day + .schedule-day {
+        border-left: none;
+        border-top: 1px solid #d6d6d3;
+      }
+    }
+
+    @media (max-width: 860px) {
+      .vms-toolbar,
+      .vms-body {
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+
+      .vms-toolbar-top,
+      .vms-payment-card,
+      .vms-payment-copy {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .vms-actions {
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .vms-btn.outline,
+      .vms-btn.disabled,
+      .vms-btn.primary,
+      .update-btn {
+        width: 100%;
+      }
+
+      .journey-column,
+      .handoff-panel {
+        padding: 24px 20px 28px;
+      }
+
+      .stage-journey-head {
+        padding: 22px 20px;
+      }
+
+      .topbar { flex-direction: column; align-items: flex-start; }
+      .brand-full { align-items: flex-start; flex-direction: column; }
+      .brand-logo { width: 140px; }
+      .hero-head, .panel { padding-left: 20px; padding-right: 20px; }
+      .actions { flex-direction: column; }
+      .actions .btn { width: 100%; }
+
+      .task-row {
+        grid-template-columns: 1fr;
+      }
+
+      .resource-btn,
+      .task-tag {
+        justify-self: start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="shell">
+      <div class="topbar">
+        <div class="brand brand-full">
+          <img class="brand-logo" src="/images/7R_DD_STACKED_BLACK_1.png" alt="SevenRooms" />
+        </div>
+        <div class="pill" id="modePill">Welcome</div>
+      </div>
+
+      <section class="hero">
+        <div class="hero-head">
+          <h1>Welcome to Onboarding</h1>
+        </div>
+
+        <div class="panel">
+          <div id="step1Section">
+            <div class="section-title">
+              <h2>Setup</h2>
+              <div class="meta">Internal only</div>
+            </div>
+
+            <div class="field">
+              <label class="required" for="region">Region</label>
+              <select id="region">
+                <option value="">Select region</option>
+                <option>EMEA</option>
+                <option>APAC</option>
+                <option>NAM</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label class="required" for="onboarder">Onboarder</label>
+              <select id="onboarder" disabled>
+                <option value="">Select region first</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label class="required" for="venueName">Venue name</label>
+              <input id="venueName" type="text" />
+            </div>
+
+            <div class="field">
+              <label class="required" for="clientName">Client name</label>
+              <input id="clientName" type="text" />
+            </div>
+
+            <div class="field">
+              <label class="required" for="clientEmail">Client email</label>
+              <input id="clientEmail" type="email" />
+            </div>
+
+            <div class="actions">
+              <button class="btn primary" id="nextBtn" type="button">Next</button>
+            </div>
+
+            <div id="status" class="status">Waiting for details</div>
+            <div id="inviteBox" class="invite-box">
+              <a id="inviteLink" class="invite-link" href="#" target="_blank" rel="noopener"></a>
+            </div>
+          </div>
+
+          <div class="step2" id="step2Card">
+            <div class="step2-layout">
+              <div class="step2-main">
+                <div class="step-card">
+                  <h3 id="step2Heading">Onboarding Card Information</h3>
+                  <p id="step2Lead">Capture the onboarding details the team will use throughout implementation and launch.</p>
+
+                  <div class="field">
+                    <label class="required" for="launchDate">Launch date</label>
+                    <input id="launchDate" type="date" />
+                    <div class="hint">Saves to Monday as a date field.</div>
+                  </div>
+
+                  <div class="field">
+                    <label for="spendPerHead">Spend per head (local currency)</label>
+                    <input id="spendPerHead" type="number" step="0.01" min="0" placeholder="e.g. 25.00" />
+                    <div class="hint">Saves to Monday as local currency text/number, depending on your column setup.</div>
+                  </div>
+
+                  <div class="field">
+                    <label for="additionalUsersText">Additional users</label>
+                    <textarea id="additionalUsersText" placeholder="Name, role, email, access notes..."></textarea>
+                    <div class="hint">Saves to Monday as text.</div>
+                  </div>
+
+                  <div class="field">
+                    <label class="required" for="posSystem">POS system</label>
+                    <select id="posSystem">
+                      <option value="">Select POS system</option>
+                      <option>Toast</option>
+                      <option>Lightspeed K</option>
+                      <option>Blinq</option>
+                    </select>
+
+                    <div id="posResourceWrap" class="invite-box hidden">
+                      <a id="posResourceBtn" class="invite-link" href="#" target="_blank" rel="noopener">Open POS resource</a>
+                    </div>
+                  </div>
+
+                  <div class="field">
+                    <label for="reservationSystem">Reservation system</label>
+                    <select id="reservationSystem">
+                      <option value="">Select reservation system</option>
+                      <option>OpenTable</option>
+                      <option>Res Diary</option>
+                      <option>Resy</option>
+                    </select>
+
+                    <div id="reservationResourceWrap" class="invite-box hidden">
+                      <a id="reservationResourceBtn" class="invite-link" href="#" target="_blank" rel="noopener">Open reservation resource</a>
+                    </div>
+                  </div>
+
+                  <div class="field">
+                    <label class="required" for="prepayments">PrePayments / Card Holds</label>
+                    <select id="prepayments">
+                      <option value="">Select yes or no</option>
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                    </select>
+                  </div>
+
+                  <div id="prepaymentDetailsWrap" class="subsection hidden">
+                    <div class="subsection-title">PrePayments details</div>
+                    <div class="subsection-hint">Complete only if PrePayments = Yes</div>
+
+                    <div class="field">
+                      <label for="prepaymentType">Payment processor type</label>
+                      <select id="prepaymentType">
+                        <option value="">Select type</option>
+                        <option>Stripe</option>
+                        <option>Freedom Pay</option>
+                      </select>
+
+                      <div id="paymentResourceWrap" class="invite-box hidden">
+                        <a id="paymentResourceBtn" class="invite-link" href="#" target="_blank" rel="noopener">Open payment resource</a>
+                      </div>
+                    </div>
+
+                    <div class="field">
+                      <label for="cancellationValue">Cancellation period</label>
+                      <div class="inline-grid three-up">
+                        <input id="cancellationValue" type="number" min="0" step="1" placeholder="e.g. 24" />
+                        <select id="cancellationUnit">
+                          <option value="">Unit</option>
+                          <option>Hours</option>
+                          <option>Days</option>
+                          <option>Weeks</option>
+                        </select>
+                        <select id="chargeModel">
+                          <option value="">Charge basis</option>
+                          <option>Per guest</option>
+                          <option>Per reservation</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="field">
+                      <label for="localCurrencyAmount">Amount in local currency</label>
+                      <input id="localCurrencyAmount" type="text" placeholder="e.g. 20 or 25.00" />
+                    </div>
+                  </div>
+
+                  <div class="field">
+                    <label for="iPads">iPads available</label>
+                    <select id="iPads">
+                      <option value="">Select yes or no</option>
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                    </select>
+                  </div>
+
+                  <div class="field">
+                    <label for="smsRequired">SMS required</label>
+                    <select id="smsRequired">
+                      <option value="">Select yes or no</option>
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                    </select>
+                  </div>
+
+                  <div id="smsDetailsWrap" class="subsection hidden">
+                    <div class="subsection-title">SMS details</div>
+                    <div class="subsection-hint">Required if SMS enabled</div>
+
+                    <div class="field"><label for="companyName">Company name</label><input id="companyName" type="text" /></div>
+                    <div class="field"><label for="businessName">Business name</label><input id="businessName" type="text" /></div>
+                    <div class="field"><label for="businessRegistrationNumber">Business registration number</label><input id="businessRegistrationNumber" type="text" /></div>
+                    <div class="field"><label for="businessWebsite">Business website</label><input id="businessWebsite" type="text" /></div>
+                    <div class="field"><label for="businessAddress">Business address</label><textarea id="businessAddress"></textarea></div>
+                    <div class="field"><label for="repFirstName">Authorized representative first name</label><input id="repFirstName" type="text" /></div>
+                    <div class="field"><label for="repLastName">Authorized representative last name</label><input id="repLastName" type="text" /></div>
+                    <div class="field"><label for="repPhone">Authorized representative phone number</label><input id="repPhone" type="text" /></div>
+                    <div class="field"><label for="repEmail">Authorized representative email address</label><input id="repEmail" type="email" /></div>
+                  </div>
+
+                  <div class="field">
+                    <label for="otherIntegrations">Other integrations / book channels required</label>
+                    <select id="otherIntegrations">
+                      <option value="">Select option</option>
+                      <option>The Fork</option>
+                      <option>First Table</option>
+                      <option>Triple Seat</option>
+                    </select>
+
+                    <div id="integrationResourceWrap" class="invite-box hidden">
+                      <a id="integrationResourceBtn" class="invite-link" href="#" target="_blank" rel="noopener">Open integration resource</a>
+                    </div>
+                  </div>
+
+                  <div class="actions">
+                    <button class="btn primary" id="nextStep2Btn" type="button">Next</button>
+                  </div>
+
+                  <div id="step2Status" class="status">Waiting for Step 2 details</div>
+                </div>
+              </div>
+
+              <aside class="step2-sidebar">
+                <div class="sidebar-card ob-dashboard-card">
+                  <div class="sidebar-label">OB Profile</div>
+                  <div class="ob-profile-head">
+                    <div id="sidebarAvatar" class="profile-avatar profile-avatar-round">SR</div>
+                    <div class="sidebar-profile-copy">
+                      <strong id="sidebarName">—</strong>
+                      <span id="sidebarEmail">—</span>
+                    </div>
+                  </div>
+                  <button class="btn secondary dashboard-action" id="watchCallBtn" type="button">Watch Call Recording</button>
+                  <div class="summary-grid">
+                    <div class="summary-row"><span>Venue</span><strong id="summaryVenue">—</strong></div>
+                    <div class="summary-row"><span>Client</span><strong id="summaryClient">—</strong></div>
+                    <div class="summary-row"><span>Email</span><strong id="summaryClientEmail">—</strong></div>
+                    <div class="summary-row"><span>Onboarder</span><strong id="summaryOnboarder">—</strong></div>
+                    <div class="summary-row"><span>Region</span><strong id="summaryRegion">—</strong></div>
+                  </div>
+                  <div class="dashboard-divider"></div>
+                  <div class="sidebar-label">Progress</div>
+                  <div class="sidebar-progress-count"><span id="overallDone">0</span> / <span id="overallTotal">6</span> complete</div>
+                  <div class="sidebar-progress-percent" id="overallPercent">0%</div>
+                  <div class="progress-bar">
+                    <div class="progress-fill" id="overallProgressFill"></div>
+                  </div>
+                  <div class="dashboard-divider"></div>
+                  <div class="sidebar-label">Customer Success</div>
+                  <ul class="dashboard-list">
+                    <li>Main point of contact after launch</li>
+                    <li>Strategy</li>
+                    <li>Optimization</li>
+                    <li>Adoption</li>
+                    <li>Business Reviews</li>
+                    <li>Success Plans</li>
+                  </ul>
+                  <div class="dashboard-divider"></div>
+                  <div class="sidebar-label">SevenRooms Support</div>
+                  <ul class="dashboard-links">
+                    <li><a href="mailto:support@sevenrooms.com">support@sevenrooms.com</a></li>
+                    <li><a href="https://help.sevenrooms.com/hc/en-us" target="_blank" rel="noopener">help.sevenrooms.com/hc/en-us</a></li>
+                    <li><a href="#">Live Chat</a></li>
+                  </ul>
+                </div>
+              </aside>
+            </div>
+          </div>
+
+          <div class="step3" id="step3JourneyCard">
+            <div class="step-card">
+              <div class="eyebrow">Implementation</div>
+              <h3>Implementation Steps</h3>
+              <p>Use these milestones to guide the working plan before moving into the launch checklist.</p>
+
+              <div class="implementation-stage-grid">
+                <article class="implementation-card configuration">
+                  <div class="implementation-badge">Configuration</div>
+                  <p>To be completed on account set up call:</p>
+                  <ul class="implementation-list">
+                    <li>Review Floorplan</li>
+                    <li>Table Capacities &amp; Combinations</li>
+                    <li>Internal &amp; Online availability</li>
+                    <li>Testing guest &amp; internal booking journey</li>
+                    <li>Booking channel and integration strategy</li>
+                  </ul>
+                </article>
+
+                <article class="implementation-card integrations">
+                  <div class="implementation-badge">Integrations &amp; Data Imports</div>
+                  <p>To be completed post-account set up call:</p>
+                  <ul class="implementation-list">
+                    <li>Reservation Widget Customisation</li>
+                    <li>Complete POS Integration steps</li>
+                    <li>Complete Payment Integration steps</li>
+                    <li>Share Client Database</li>
+                    <li>Share Future &amp; Historical Reservation data</li>
+                  </ul>
+                </article>
+
+                <article class="implementation-card completion">
+                  <div class="implementation-badge">Onboarding Completion</div>
+                  <p>Before launch, make sure these are complete:</p>
+                  <ul class="implementation-list">
+                    <li>Booking Journey</li>
+                    <li>Data Imports</li>
+                    <li>Required Integrations</li>
+                    <li>Business Ready</li>
+                  </ul>
+                </article>
+              </div>
+            </div>
+          </div>
+
+          <div class="step3" id="step3Card">
+            <div class="step3-layout">
+              <div class="step3-main">
+                <div class="step-card step3-card">
+                  <div class="step3-head">
+                    <div>
+                      <div class="eyebrow">Launch</div>
+                      <h3>Build &amp; launch checklist</h3>
+                      <p class="step3-lead">Track launch readiness and sync completion back to Monday.</p>
+                    </div>
+                  </div>
+<div class="checklist-sections" id="checklistSections">
+                    <article class="checklist-section is-open" data-section-name="Venue Configuration">
+                      <button class="section-toggle" type="button">
+                        <div class="section-title-wrap">
+                          <span class="section-accent accent-venue"></span>
+                          <input type="checkbox" class="section-check" />
+                          <div>
+                            <h4>Venue Configuration</h4>
+                            <div class="section-meta">8 guidance items</div>
+                          </div>
+                        </div>
+                        <span class="chevron">⌄</span>
+                      </button>
+                      <div class="section-body">
+                        <div class="task-row"><span class="task-copy">Add users</span><button class="resource-btn" type="button">Open resource</button></div>
+                        <div class="task-row"><span class="task-copy">Floorplan, tables, table combos, seating areas</span><button class="resource-btn" type="button">Open resource</button></div>
+                        <div class="task-row"><span class="task-copy">Availability: Shifts &amp; Access Rules</span><button class="resource-btn" type="button">Open resource</button></div>
+                        <div class="task-row"><span class="task-copy">Reservation Widget</span><button class="resource-btn" type="button">Open resource</button></div>
+                        <div class="task-row is-muted"><span class="task-copy">Reservation Widget (Legacy)</span><span class="task-tag">Legacy</span><button class="resource-btn" type="button">Open resource</button></div>
+                        <div class="task-row"><span class="task-copy">Venue Settings (Guest &amp; Internal Emails)</span><button class="resource-btn" type="button">Open resource</button></div>
+                        <div class="task-row"><span class="task-copy">Booking &amp; Cancellation Policy</span><button class="resource-btn" type="button">Open resource</button></div>
+                        <div class="task-row"><span class="task-copy">Payments</span><button class="resource-btn" type="button">Open resource</button></div>
+                      </div>
+                    </article>
+
+                    <article class="checklist-section" data-section-name="Marketing Configuration">
+                      <button class="section-toggle" type="button">
+                        <div class="section-title-wrap">
+                          <span class="section-accent accent-marketing"></span>
+                          <input type="checkbox" class="section-check" />
+                          <div>
+                            <h4>Marketing Configuration</h4>
+                            <div class="section-meta">5 guidance items</div>
+                          </div>
+                        </div>
+                        <span class="chevron">⌄</span>
+                      </button>
+                      <div class="section-body">
+                        <div class="task-row"><span class="task-copy">Getting Started with Marketing (8-minute training)</span><button class="resource-btn" type="button">Open resource</button></div>
+                        <div class="task-row"><span class="task-copy">Offers: Experiences &amp; Events</span><button class="resource-btn" type="button">Open resource</button></div>
+                        <div class="task-row"><span class="task-copy">Upgrades</span><button class="resource-btn" type="button">Open resource</button></div>
+                        <div class="task-row"><span class="task-copy">Reservation Widget</span><button class="resource-btn" type="button">Open resource</button></div>
+                        <div class="task-row is-muted"><span class="task-copy">Reservation Widget (Legacy)</span><span class="task-tag">Legacy</span><button class="resource-btn" type="button">Open resource</button></div>
+                      </div>
+                    </article>
+
+                    <article class="checklist-section" data-section-name="IT Setup">
+                      <button class="section-toggle" type="button">
+                        <div class="section-title-wrap">
+                          <span class="section-accent accent-it"></span>
+                          <input type="checkbox" class="section-check" />
+                          <div>
+                            <h4>IT Setup</h4>
+                            <div class="section-meta">4 guidance items</div>
+                          </div>
+                        </div>
+                        <span class="chevron">⌄</span>
+                      </button>
+                      <div class="section-body">
+                        <div class="task-row"><span class="task-copy">Purchase Hardware (iPad)</span></div>
+                        <div class="task-row"><span class="task-copy">POS</span><button class="resource-btn" type="button">Open resource</button></div>
+                        <div class="task-row"><span class="task-copy">Payment Processor</span><button class="resource-btn" type="button">Open resource</button></div>
+                        <div class="task-row is-muted"><span class="task-copy">SMS (if applicable)</span><span class="task-tag">Optional</span></div>
+                      </div>
+                    </article>
+
+                    <article class="checklist-section" data-section-name="Data Imports">
+                      <button class="section-toggle" type="button">
+                        <div class="section-title-wrap">
+                          <span class="section-accent accent-imports"></span>
+                          <input type="checkbox" class="section-check" />
+                          <div>
+                            <h4>Data Imports</h4>
+                            <div class="section-meta">3 guidance items</div>
+                          </div>
+                        </div>
+                        <span class="chevron">⌄</span>
+                      </button>
+                      <div class="section-body">
+                        <div class="task-row"><span class="task-copy">Share Guest Data with Implementation Partner</span></div>
+                        <div class="task-row"><span class="task-copy">Share Future Reservation Data with Implementation Partner</span></div>
+                        <div class="task-row"><span class="task-copy">Share Historic Reservation Data with Implementation Partner</span></div>
+                      </div>
+                    </article>
+
+                    <article class="checklist-section" data-section-name="Go Live">
+                      <button class="section-toggle" type="button">
+                        <div class="section-title-wrap">
+                          <span class="section-accent accent-golive"></span>
+                          <input type="checkbox" class="section-check" />
+                          <div>
+                            <h4>Go Live</h4>
+                            <div class="section-meta">4 guidance items</div>
+                          </div>
+                        </div>
+                        <span class="chevron">⌄</span>
+                      </button>
+                      <div class="section-body">
+                        <div class="task-row"><span class="task-copy">Make sure iPad is onsite with SevenRooms OS app logged in</span></div>
+                        <div class="task-row"><span class="task-copy">Disable bookings from previous booking system(s)</span><button class="resource-btn" type="button">Open resource</button></div>
+                        <div class="task-row"><span class="task-copy">Publish reservation widget on website</span></div>
+                        <div class="task-row"><span class="task-copy">Publish availability on social media</span></div>
+                      </div>
+                    </article>
+
+                    <article class="checklist-section" data-section-name="Add-ons">
+                      <button class="section-toggle" type="button">
+                        <div class="section-title-wrap">
+                          <span class="section-accent accent-addons"></span>
+                          <input type="checkbox" class="section-check" />
+                          <div>
+                            <h4>Add-ons</h4>
+                            <div class="section-meta">4 guidance items</div>
+                          </div>
+                        </div>
+                        <span class="chevron">⌄</span>
+                      </button>
+                      <div class="section-body">
+                        <div class="task-row is-muted"><span class="task-copy">Email Marketing (if applicable)</span><span class="task-tag">Optional</span></div>
+                        <div class="task-row is-muted"><span class="task-copy">WhatsApp (if applicable)</span><span class="task-tag">Optional</span></div>
+                        <div class="task-row is-muted"><span class="task-copy">Event Management (if applicable)</span><span class="task-tag">Optional</span></div>
+                        <div class="task-row is-muted"><span class="task-copy">Voice AI (if applicable)</span><span class="task-tag">Optional</span></div>
+                      </div>
+                    </article>
+                  </div>
+                </div>
+              </div>
+
+              <aside class="step3-sidebar">
+                <div class="sidebar-card">
+                  <div class="sidebar-label">Status</div>
+                  <div class="status-list" id="statusList">
+                    <div class="status-row" data-status-name="Venue Configuration"><span>Venue Configuration</span><strong>Not started</strong></div>
+                    <div class="status-row" data-status-name="Marketing Configuration"><span>Marketing Configuration</span><strong>Not started</strong></div>
+                    <div class="status-row" data-status-name="IT Setup"><span>IT Setup</span><strong>Not started</strong></div>
+                    <div class="status-row" data-status-name="Data Imports"><span>Data Imports</span><strong>Not started</strong></div>
+                    <div class="status-row" data-status-name="Go Live"><span>Go Live</span><strong>Not started</strong></div>
+                    <div class="status-row" data-status-name="Add-ons"><span>Add-ons</span><strong>Not started</strong></div>
+                  </div>
+                </div>
+
+              </aside>
+            </div>          </div>
+
+          <div class="step5" id="step5Card">
+            <div class="step-card">
+              <div class="eyebrow">Resources</div>
+              <h3>Resource Glossary</h3>
+              <p>Reference links and notes are generated from the selections made throughout the onboarding form.</p>
+              <div class="glossary-grid" id="glossaryGrid"></div>
+              <div class="glossary-empty" id="glossaryEmpty">Select systems and options above to build the resource glossary automatically.</div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const BOARD_ID = 18408762899;
+
+    const els = {
+      region: document.getElementById("region"),
+      onboarder: document.getElementById("onboarder"),
+      venueName: document.getElementById("venueName"),
+      clientName: document.getElementById("clientName"),
+      clientEmail: document.getElementById("clientEmail"),
+      nextBtn: document.getElementById("nextBtn"),
+      status: document.getElementById("status"),
+      inviteBox: document.getElementById("inviteBox"),
+      inviteLink: document.getElementById("inviteLink"),
+      step1Section: document.getElementById("step1Section"),
+      step2Card: document.getElementById("step2Card"),
+      step2Heading: document.getElementById("step2Heading"),
+      step2Lead: document.getElementById("step2Lead"),
+      step3JourneyCard: document.getElementById("step3JourneyCard"),
+      step3Card: document.getElementById("step3Card"),
+      step5Card: document.getElementById("step5Card"),
+      modePill: document.getElementById("modePill"),
+      summaryVenue: document.getElementById("summaryVenue"),
+      summaryClient: document.getElementById("summaryClient"),
+      summaryClientEmail: document.getElementById("summaryClientEmail"),
+      summaryOnboarder: document.getElementById("summaryOnboarder"),
+      summaryRegion: document.getElementById("summaryRegion"),
+      glossaryGrid: document.getElementById("glossaryGrid"),
+      glossaryEmpty: document.getElementById("glossaryEmpty"),
+      launchDate: document.getElementById("launchDate"),
+      spendPerHead: document.getElementById("spendPerHead"),
+      additionalUsersText: document.getElementById("additionalUsersText"),
+      posSystem: document.getElementById("posSystem"),
+      reservationSystem: document.getElementById("reservationSystem"),
+      prepayments: document.getElementById("prepayments"),
+      prepaymentDetailsWrap: document.getElementById("prepaymentDetailsWrap"),
+      prepaymentType: document.getElementById("prepaymentType"),
+      paymentResourceWrap: document.getElementById("paymentResourceWrap"),
+      paymentResourceBtn: document.getElementById("paymentResourceBtn"),
+      cancellationValue: document.getElementById("cancellationValue"),
+      cancellationUnit: document.getElementById("cancellationUnit"),
+      chargeModel: document.getElementById("chargeModel"),
+      localCurrencyAmount: document.getElementById("localCurrencyAmount"),
+      iPads: document.getElementById("iPads"),
+      smsRequired: document.getElementById("smsRequired"),
+      smsDetailsWrap: document.getElementById("smsDetailsWrap"),
+      companyName: document.getElementById("companyName"),
+      businessName: document.getElementById("businessName"),
+      businessRegistrationNumber: document.getElementById("businessRegistrationNumber"),
+      businessWebsite: document.getElementById("businessWebsite"),
+      businessAddress: document.getElementById("businessAddress"),
+      repFirstName: document.getElementById("repFirstName"),
+      repLastName: document.getElementById("repLastName"),
+      repPhone: document.getElementById("repPhone"),
+      repEmail: document.getElementById("repEmail"),
+      otherIntegrations: document.getElementById("otherIntegrations"),
+      integrationResourceWrap: document.getElementById("integrationResourceWrap"),
+      integrationResourceBtn: document.getElementById("integrationResourceBtn"),
+      watchCallBtn: document.getElementById("watchCallBtn"),
+      nextStep2Btn: document.getElementById("nextStep2Btn"),
+      step2Status: document.getElementById("step2Status"),
+      posResourceWrap: document.getElementById("posResourceWrap"),
+      posResourceBtn: document.getElementById("posResourceBtn"),
+      reservationResourceWrap: document.getElementById("reservationResourceWrap"),
+      reservationResourceBtn: document.getElementById("reservationResourceBtn")
+    };
+
+    const sectionChecks = document.querySelectorAll(".section-check");
+    const checklistSections = document.querySelectorAll(".checklist-section");
+    const overallDoneEl = document.getElementById("overallDone");
+    const overallTotalEl = document.getElementById("overallTotal");
+    const overallPercentEl = document.getElementById("overallPercent");
+    const overallProgressFill = document.getElementById("overallProgressFill");
+    const sidebarAvatar = document.getElementById("sidebarAvatar");
+    const sidebarName = document.getElementById("sidebarName");
+    const sidebarEmail = document.getElementById("sidebarEmail");
+
+    const urlParams = new URLSearchParams(window.location.search);
+    let currentItemId = urlParams.get("itemId") || localStorage.getItem("currentItemId") || "";
+    let inviteToken = urlParams.get("invite") || "";
+    const clientMode = Boolean(urlParams.get("invite"));
+    const DEMO_MODE = window.location.hostname !== "localhost";
+    const DEMO_ONBOARDERS = {
+      EMEA: ["Raj Markandoo"],
+      APAC: ["Raj Markandoo"],
+      NAM: ["Raj Markandoo"]
+    };
+    const DEMO_PROFILES = {
+      "raj markandoo": {
+        name: "Raj Markandoo",
+        email: "raj.markandoo@sevenrooms.com",
+        photoUrl: ""
+      }
+    };
+    const DEMO_RESOURCES = {
+      pos: {
+        Toast: "https://help.sevenrooms.com/hc/en-us",
+        "Lightspeed K": "https://help.sevenrooms.com/hc/en-us",
+        Blinq: "https://help.sevenrooms.com/hc/en-us"
+      },
+      reservation: {
+        OpenTable: "https://help.sevenrooms.com/hc/en-us",
+        "Res Diary": "https://help.sevenrooms.com/hc/en-us",
+        Resy: "https://help.sevenrooms.com/hc/en-us"
+      },
+      payment: {
+        Stripe: "https://help.sevenrooms.com/hc/en-us",
+        "Freedom Pay": "https://help.sevenrooms.com/hc/en-us"
+      },
+      integration: {
+        "The Fork": "https://help.sevenrooms.com/hc/en-us",
+        "First Table": "https://help.sevenrooms.com/hc/en-us",
+        "Triple Seat": "https://help.sevenrooms.com/hc/en-us"
+      }
+    };
+
+    function getDemoItem(itemId) {
+      return {
+        ...getLocalIntakeData(itemId),
+        ...getLocalStep2Data(itemId),
+        step3Statuses: getLocalStep3Data(itemId),
+        itemId
+      };
+    }
+
+    function requestJson(path, options = {}) {
+      if (!DEMO_MODE) {
+        return fetch(`${window.location.origin}${path}`, options)
+          .then(async (res) => {
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+            return data;
+          });
+      }
+
+      const url = new URL(path, "https://demo.local");
+      const body = options.body ? JSON.parse(options.body) : {};
+
+      if (url.pathname === "/onboarders") {
+        return Promise.resolve({ onboarders: DEMO_ONBOARDERS[url.searchParams.get("region")] || [] });
+      }
+
+      if (url.pathname === "/monday-team-profile") {
+        const name = String(url.searchParams.get("name") || "").trim().toLowerCase();
+        return Promise.resolve(DEMO_PROFILES[name] || { name: url.searchParams.get("name") || "", email: "", photoUrl: "" });
+      }
+
+      if (url.pathname === "/monday-resource-link") {
+        const type = String(url.searchParams.get("type") || "").toLowerCase();
+        const value = String(url.searchParams.get("value") || "");
+        const urlValue = DEMO_RESOURCES[type]?.[value] || "https://help.sevenrooms.com/hc/en-us";
+        return Promise.resolve({ url: urlValue, label: `${value} resource` });
+      }
+
+      if (url.pathname === "/save-intake") {
+        const itemId = body.itemId || `demo_${Date.now()}`;
+        localStorage.setItem("currentItemId", itemId);
+        localStorage.setItem(`intake_${itemId}`, JSON.stringify(body));
+        return Promise.resolve({ ok: true, itemId });
+      }
+
+      if (url.pathname === "/save-invite-link") {
+        const inviteData = {
+          ...(getLocalIntakeData(body.itemId) || {}),
+          inviteUrl: body.inviteUrl || ""
+        };
+        localStorage.setItem(`intake_${body.itemId}`, JSON.stringify(inviteData));
+        return Promise.resolve({ ok: true, columnTitle: "Invite Link" });
+      }
+
+      if (url.pathname === "/update-step2") {
+        localStorage.setItem(`step2_${body.itemId}`, JSON.stringify({ ...body }));
+        return Promise.resolve({ ok: true });
+      }
+
+      if (url.pathname === "/onboarding-item") {
+        const itemId = String(url.searchParams.get("itemId") || "");
+        const item = getDemoItem(itemId);
+        return Promise.resolve({ ok: true, item });
+      }
+
+      if (url.pathname === "/update-step3") {
+        const statuses = {
+          ...getLocalStep3Data(body.itemId),
+          [body.section]: body.completed ? "Complete" : "Not Started"
+        };
+        localStorage.setItem(`step3_${body.itemId}`, JSON.stringify(statuses));
+        return Promise.resolve({ ok: true, statusLabel: statuses[body.section], columnTitle: body.section });
+      }
+
+      return Promise.reject(new Error(`Unsupported demo route: ${url.pathname}`));
+    }
+
+    function setStatus(text, type = "") {
+      els.status.className = `status ${type}`.trim();
+      els.status.textContent = text;
+    }
+
+    function setStep2Status(text, type = "") {
+      els.step2Status.className = `status ${type}`.trim();
+      els.step2Status.textContent = text;
+    }
+
+    function setButtonsState(saved) {
+      els.nextBtn.disabled = false;
+      if (!saved) {
+        els.nextBtn.textContent = "Next";
+      }
+    }
+
+    function slugify(value) {
+      return String(value || "")
+        .trim()
+        .toLowerCase()
+        .replace(/['’]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+    }
+
+    function getInitials(name) {
+      return String(name || "")
+        .trim()
+        .split(/\s+/)
+        .slice(0, 2)
+        .map((part) => part[0] || "")
+        .join("")
+        .toUpperCase() || "SR";
+    }
+
+    function syncSidebarProfile(name = "", email = "") {
+      sidebarAvatar.textContent = getInitials(name);
+      sidebarName.textContent = name || "—";
+      sidebarEmail.textContent = email || "—";
+    }
+
+    function populateOnboarders(region) {
+      if (!region) {
+        els.onboarder.innerHTML = '<option value="">Select region first</option>';
+        els.onboarder.disabled = true;
+        syncSidebarProfile();
+        return;
+      }
+
+      els.onboarder.disabled = true;
+      els.onboarder.innerHTML = "<option>Loading onboarders...</option>";
+
+      requestJson(`/onboarders?region=${encodeURIComponent(region)}`)
+        .then((data) => {
+          const names = data.onboarders || [];
+          els.onboarder.innerHTML =
+            '<option value="">Select onboarder</option>' +
+            names.map((name) => `<option value="${name}">${name}</option>`).join("");
+          els.onboarder.disabled = false;
+        })
+        .catch((err) => {
+          console.error("Onboarder load failed:", err);
+          els.onboarder.innerHTML = `<option>${err.message}</option>`;
+          els.onboarder.disabled = true;
+        });
+    }
+
+    function loadOnboarderProfile(name) {
+      if (!name) {
+        syncSidebarProfile();
+        return;
+      }
+
+      requestJson(`/monday-team-profile?boardId=${BOARD_ID}&group=Team&column=photos&name=${encodeURIComponent(name)}`)
+        .then((data) => {
+          syncSidebarProfile(data.name, data.email);
+        })
+        .catch((err) => {
+          console.error("Profile load failed:", err);
+          syncSidebarProfile(name, "");
+        });
+    }
+
+    function updateResourceButtons() {
+      const mappings = [
+        {
+          value: els.posSystem.value,
+          wrap: els.posResourceWrap,
+          button: els.posResourceBtn,
+          type: "pos",
+          label: "POS"
+        },
+        {
+          value: els.reservationSystem.value,
+          wrap: els.reservationResourceWrap,
+          button: els.reservationResourceBtn,
+          type: "reservation",
+          label: "reservation"
+        },
+        {
+          value: els.prepaymentType.value,
+          wrap: els.paymentResourceWrap,
+          button: els.paymentResourceBtn,
+          type: "payment",
+          label: "payment"
+        },
+        {
+          value: els.otherIntegrations.value,
+          wrap: els.integrationResourceWrap,
+          button: els.integrationResourceBtn,
+          type: "integration",
+          label: "integration"
+        }
+      ];
+
+      mappings.forEach(({ value, wrap, button, type, label }) => {
+        if (!value) {
+          wrap.style.display = "none";
+          wrap.classList.add("hidden");
+          button.href = "#";
+          button.textContent = `Open ${label} resource`;
+          updateGlossary();
+          return;
+        }
+
+        wrap.style.display = "block";
+        wrap.classList.remove("hidden");
+        button.textContent = `Loading ${label} resource for ${value}...`;
+
+        requestJson(`/monday-resource-link?boardId=${BOARD_ID}&group=Resource&column=link&type=${type}&value=${encodeURIComponent(value)}`)
+          .then((data) => {
+            button.href = data.url || "#";
+            button.textContent = data.label || `Open ${label} resource`;
+            updateGlossary();
+          })
+          .catch((err) => {
+            console.error(err);
+            button.href = "#";
+            button.textContent = `${label.charAt(0).toUpperCase() + label.slice(1)} resource unavailable`;
+            updateGlossary();
+          });
+      });
+    }
+
+    function showPrepaymentDetails() {
+      const visible = els.prepayments.value === "Yes";
+      els.prepaymentDetailsWrap.classList.toggle("hidden", !visible);
+      if (!visible) {
+        els.prepaymentType.value = "";
+        els.cancellationValue.value = "";
+        els.cancellationUnit.value = "";
+        els.chargeModel.value = "";
+        els.localCurrencyAmount.value = "";
+      }
+    }
+
+    function showSmsDetails() {
+      const visible = els.smsRequired.value === "Yes";
+      els.smsDetailsWrap.classList.toggle("hidden", !visible);
+      if (!visible) {
+        els.companyName.value = "";
+        els.businessName.value = "";
+        els.businessRegistrationNumber.value = "";
+        els.businessWebsite.value = "";
+        els.businessAddress.value = "";
+        els.repFirstName.value = "";
+        els.repLastName.value = "";
+        els.repPhone.value = "";
+        els.repEmail.value = "";
+      }
+    }
+
+    function collectStep2Data() {
+      return {
+        launchDate: els.launchDate.value,
+        spendPerHead: els.spendPerHead.value.trim(),
+        additionalUsersText: els.additionalUsersText.value.trim(),
+        posSystem: els.posSystem.value,
+        reservationSystem: els.reservationSystem.value,
+        prepayments: els.prepayments.value,
+        prepaymentType: els.prepaymentType.value,
+        cancellationPeriod: [els.cancellationValue.value, els.cancellationUnit.value].filter(Boolean).join(' '),
+        chargeModel: els.chargeModel.value,
+        localCurrencyAmount: els.localCurrencyAmount.value.trim(),
+        iPads: els.iPads.value,
+        smsRequired: els.smsRequired.value,
+        companyName: els.companyName.value.trim(),
+        businessName: els.businessName.value.trim(),
+        businessRegistrationNumber: els.businessRegistrationNumber.value.trim(),
+        businessWebsite: els.businessWebsite.value.trim(),
+        businessAddress: els.businessAddress.value.trim(),
+        repFirstName: els.repFirstName.value.trim(),
+        repLastName: els.repLastName.value.trim(),
+        repPhone: els.repPhone.value.trim(),
+        repEmail: els.repEmail.value.trim(),
+        otherIntegrations: els.otherIntegrations.value
+      };
+    }
+
+    function getLocalIntakeData(itemId) {
+      if (!itemId) return {};
+      try {
+        return JSON.parse(localStorage.getItem(`intake_${itemId}`) || '{}');
+      } catch (error) {
+        return {};
+      }
+    }
+
+    function getLocalStep2Data(itemId) {
+      if (!itemId) return {};
+      try {
+        return JSON.parse(localStorage.getItem(`step2_${itemId}`) || '{}');
+      } catch (error) {
+        return {};
+      }
+    }
+
+    function getLocalStep3Data(itemId) {
+      if (!itemId) return {};
+      try {
+        return JSON.parse(localStorage.getItem(`step3_${itemId}`) || '{}');
+      } catch (error) {
+        return {};
+      }
+    }
+
+    function saveStep2() {
+      if (!currentItemId) {
+        setStep2Status("Save Step 1 first.", "warn");
+        return Promise.reject(new Error("Missing item id"));
+      }
+
+      const payload = { itemId: currentItemId, ...collectStep2Data() };
+
+      return requestJson("/update-step2", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+        .then(() => {
+          localStorage.setItem(`step2_${currentItemId}`, JSON.stringify(collectStep2Data()));
+          setStep2Status("Step 2 saved ✅", "good");
+        })
+        .catch((err) => {
+          console.error(err);
+          localStorage.setItem(`step2_${currentItemId}`, JSON.stringify(collectStep2Data()));
+          setStep2Status("Step 2 saved locally (backend route to wire next).", "warn");
+        });
+    }
+
+    function updateChecklistProgress() {
+      const total = sectionChecks.length;
+      const done = Array.from(sectionChecks).filter((check) => check.checked).length;
+      const percent = total ? Math.round((done / total) * 100) : 0;
+
+      overallDoneEl.textContent = done;
+      overallTotalEl.textContent = total;
+      overallPercentEl.textContent = `${percent}%`;
+      overallProgressFill.style.width = `${percent}%`;
+
+      checklistSections.forEach((section) => {
+        const sectionName = section.dataset.sectionName;
+        const checked = section.querySelector(".section-check").checked;
+        const open = section.classList.contains("is-open");
+        const row = document.querySelector(`[data-status-name="${sectionName}"]`);
+
+        if (!row) return;
+
+        row.classList.remove("status-not-started", "status-in-progress", "status-complete");
+
+        if (checked) {
+          row.querySelector("strong").textContent = "Complete";
+          row.classList.add("status-complete");
+        } else if (open) {
+          row.querySelector("strong").textContent = "In progress";
+          row.classList.add("status-in-progress");
+        } else {
+          row.querySelector("strong").textContent = "Not started";
+          row.classList.add("status-not-started");
+        }
+      });
+    }
+
+    function applyStep3Statuses(step3Statuses = {}) {
+      const mergedStatuses = {
+        ...getLocalStep3Data(currentItemId),
+        ...step3Statuses
+      };
+
+      checklistSections.forEach((section) => {
+        const sectionName = section.dataset.sectionName;
+        const statusText = String(mergedStatuses[sectionName] || '').trim().toLowerCase();
+        const check = section.querySelector('.section-check');
+        check.checked = statusText === 'complete';
+      });
+
+      updateChecklistProgress();
+    }
+
+    function updateStep2Summary() {
+      els.summaryVenue.textContent = els.venueName.value.trim() || '—';
+      els.summaryClient.textContent = els.clientName.value.trim() || '—';
+      els.summaryClientEmail.textContent = els.clientEmail.value.trim() || '—';
+      els.summaryOnboarder.textContent = els.onboarder.value || '—';
+      els.summaryRegion.textContent = els.region.value || '—';
+    }
+
+    function applyOnboardingItem(data) {
+      if (!data) return;
+
+      const combined = {
+        ...getLocalIntakeData(currentItemId),
+        ...getLocalStep2Data(currentItemId),
+        ...data,
+        step3Statuses: {
+          ...getLocalStep3Data(currentItemId),
+          ...(data.step3Statuses || {})
+        }
+      };
+
+      if (combined.venueName) els.venueName.value = combined.venueName;
+      if (combined.region) els.region.value = combined.region;
+      if (combined.onboarder) els.onboarder.value = combined.onboarder;
+      if (combined.clientName) els.clientName.value = combined.clientName;
+      if (combined.clientEmail) els.clientEmail.value = combined.clientEmail;
+
+      els.launchDate.value = combined.launchDate || '';
+      els.spendPerHead.value = combined.spendPerHead || '';
+      els.additionalUsersText.value = combined.additionalUsersText || '';
+      els.posSystem.value = combined.posSystem || '';
+      els.reservationSystem.value = combined.reservationSystem || '';
+      els.prepayments.value = combined.prepayments || '';
+      els.prepaymentType.value = combined.prepaymentType || '';
+      const cancellationText = combined.cancellationPeriod || '';
+      const cancellationMatch = cancellationText.match(/^(\d+)\s+(Hours|Days|Weeks)$/i);
+      els.cancellationValue.value = cancellationMatch ? cancellationMatch[1] : '';
+      els.cancellationUnit.value = cancellationMatch ? cancellationMatch[2].charAt(0).toUpperCase() + cancellationMatch[2].slice(1).toLowerCase() : '';
+      els.chargeModel.value = combined.chargeModel || '';
+      els.localCurrencyAmount.value = combined.localCurrencyAmount || '';
+      els.iPads.value = combined.iPads || '';
+      els.smsRequired.value = combined.smsRequired || '';
+      els.companyName.value = combined.companyName || '';
+      els.businessName.value = combined.businessName || '';
+      els.businessRegistrationNumber.value = combined.businessRegistrationNumber || '';
+      els.businessWebsite.value = combined.businessWebsite || '';
+      els.businessAddress.value = combined.businessAddress || '';
+      els.repFirstName.value = combined.repFirstName || '';
+      els.repLastName.value = combined.repLastName || '';
+      els.repPhone.value = combined.repPhone || '';
+      els.repEmail.value = combined.repEmail || '';
+      els.otherIntegrations.value = combined.otherIntegrations || '';
+
+      showPrepaymentDetails();
+      showSmsDetails();
+      applyStep3Statuses(combined.step3Statuses || {});
+      updateStep2Summary();
+      updateResourceButtons();
+      updateGlossary();
+      if (combined.onboarder) {
+        loadOnboarderProfile(combined.onboarder);
+      }
+      if (els.watchCallBtn) {
+        els.watchCallBtn.onclick = () => setStep2Status('Call recording link will be connected to Monday next.', 'warn');
+      }
+    }
+
+    function loadOnboardingItem(itemId) {
+      if (!itemId) {
+        return Promise.reject(new Error('Missing item id'));
+      }
+
+      return requestJson(`/onboarding-item?itemId=${encodeURIComponent(itemId)}`)
+        .then((data) => data.item || {})
+        .catch((err) => {
+          const localFallback = {
+            ...getLocalIntakeData(itemId),
+            ...getLocalStep2Data(itemId)
+          };
+          if (Object.keys(localFallback).length) {
+            return localFallback;
+          }
+          throw err;
+        });
+    }
+
+    function renderGlossaryCard(title, description, items, link) {
+      const bulletList = items.length
+        ? `<ul class="glossary-list">${items.map((item) => `<li>${item}</li>`).join('')}</ul>`
+        : '';
+      const action = link
+        ? `<a class="glossary-link" href="${link}" target="_blank" rel="noopener">Open resource</a>`
+        : '';
+
+      return `
+        <article class="glossary-card">
+          <h4>${title}</h4>
+          <p>${description}</p>
+          ${bulletList}
+          ${action}
+        </article>
+      `;
+    }
+
+    function updateGlossary() {
+      const cards = [];
+      const posValue = els.posSystem.value;
+      const reservationValue = els.reservationSystem.value;
+      const otherIntegrationValue = els.otherIntegrations.value;
+      const prepaymentValue = els.prepayments.value;
+      const smsValue = els.smsRequired.value;
+      const posLink = els.posResourceBtn?.href && els.posResourceBtn.href !== '#' ? els.posResourceBtn.href : '';
+      const reservationLink = els.reservationResourceBtn?.href && els.reservationResourceBtn.href !== '#' ? els.reservationResourceBtn.href : '';
+
+      if (posValue) {
+        cards.push(renderGlossaryCard('POS', `Selected system: ${posValue}`, ['Use this guide when completing the integration setup.'], posLink));
+      }
+
+      if (reservationValue) {
+        cards.push(renderGlossaryCard('Reservation System', `Selected system: ${reservationValue}`, ['Reference this when migrating booking logic or widget settings.'], reservationLink));
+      }
+
+      if (els.prepaymentType.value) {
+        const paymentLink = els.paymentResourceBtn?.href && els.paymentResourceBtn.href !== '#' ? els.paymentResourceBtn.href : '';
+        cards.push(renderGlossaryCard('Payment Processor', `Selected processor: ${els.prepaymentType.value}`, ['Use this guide when configuring payment collection.'], paymentLink));
+      }
+
+      if (prepaymentValue) {
+        const items = prepaymentValue === 'Yes'
+          ? [
+              `Type: ${els.prepaymentType.value || 'Pending'}`,
+              `Cancellation period: ${[els.cancellationValue.value, els.cancellationUnit.value].filter(Boolean).join(' ') || 'Pending'}`,
+              `Charge model: ${els.chargeModel.value || 'Pending'}`,
+              `Amount: ${els.localCurrencyAmount.value.trim() || 'Pending'}`
+            ]
+          : ['PrePayments / Card Holds not required.'];
+        cards.push(renderGlossaryCard('PrePayments', 'Payment collection setup summary.', items, ''));
+      }
+
+      if (smsValue) {
+        const items = smsValue === 'Yes'
+          ? [
+              `Company: ${els.companyName.value.trim() || 'Pending'}`,
+              `Business name: ${els.businessName.value.trim() || 'Pending'}`,
+              `Representative: ${[els.repFirstName.value.trim(), els.repLastName.value.trim()].filter(Boolean).join(' ') || 'Pending'}`
+            ]
+          : ['SMS is not required for this onboarding.'];
+        cards.push(renderGlossaryCard('SMS', 'Messaging setup summary.', items, ''));
+      }
+
+      if (otherIntegrationValue) {
+        const integrationLink = els.integrationResourceBtn?.href && els.integrationResourceBtn.href !== '#' ? els.integrationResourceBtn.href : '';
+        cards.push(renderGlossaryCard('Other Integrations', `Additional channel selected: ${otherIntegrationValue}`, ['Track this during implementation and launch planning.'], integrationLink));
+      }
+
+      els.glossaryGrid.innerHTML = cards.join('');
+      els.glossaryEmpty.style.display = cards.length ? 'none' : 'block';
+    }
+
+    function syncStep3Status(sectionName, completed) {
+      if (!currentItemId) {
+        setStep2Status('Save Step 1 first so Step 3 can sync to Monday.', 'warn');
+        return Promise.resolve();
+      }
+
+      return requestJson('/update-step3', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          itemId: currentItemId,
+          section: sectionName,
+          completed
+        })
+      })
+        .then((data) => {
+          const savedStatuses = {
+            ...getLocalStep3Data(currentItemId),
+            [sectionName]: data.statusLabel
+          };
+          localStorage.setItem(`step3_${currentItemId}`, JSON.stringify(savedStatuses));
+          setStep2Status(`${sectionName} synced to Monday as ${data.statusLabel}.`, 'good');
+        })
+        .catch((err) => {
+          console.error('Step 3 sync failed:', err);
+          setStep2Status(`Couldn't sync ${sectionName}: ${err.message}`, 'warn');
+        });
+    }
+
+    function showClientMode() {
+      els.step1Section.style.display = "none";
+      els.step2Card.style.display = "block";
+      els.step2Heading.textContent = "Your setup details";
+      els.step2Lead.textContent = "Complete the details below so we can finish configuring your onboarding and launch plan.";
+      els.modePill.textContent = "Client view";
+      setStatus("Client journey loaded.", "good");
+
+      if (currentItemId) {
+        loadOnboardingItem(currentItemId)
+          .then((item) => {
+            applyOnboardingItem(item);
+            setStep2Status("Loaded saved onboarding details.", "good");
+          })
+          .catch((err) => {
+            console.error('Invite hydration failed:', err);
+            setStep2Status(`Couldn't load saved details: ${err.message}`, 'warn');
+          });
+      }
+
+      window.location.hash = "#step-2";
+      els.step2Card.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    checklistSections.forEach((section) => {
+      const toggle = section.querySelector(".section-toggle");
+      const check = section.querySelector(".section-check");
+
+      toggle.addEventListener("click", (event) => {
+        if (event.target === check) return;
+        section.classList.toggle("is-open");
+        updateChecklistProgress();
+      });
+
+      check.addEventListener("change", () => {
+        updateChecklistProgress();
+        syncStep3Status(section.dataset.sectionName, check.checked);
+      });
+    });
+
+    els.region.addEventListener("change", () => {
+      populateOnboarders(els.region.value);
+      updateStep2Summary();
+    });
+
+    els.onboarder.addEventListener("change", () => {
+      loadOnboarderProfile(els.onboarder.value);
+      updateStep2Summary();
+    });
+
+    [els.venueName, els.clientName, els.clientEmail].forEach((input) => {
+      input.addEventListener("input", updateStep2Summary);
+    });
+
+    els.posSystem.addEventListener("change", () => {
+      updateResourceButtons();
+      updateGlossary();
+    });
+    els.reservationSystem.addEventListener("change", () => {
+      updateResourceButtons();
+      updateGlossary();
+    });
+    els.prepaymentType.addEventListener("change", () => {
+      updateResourceButtons();
+      updateGlossary();
+    });
+    els.otherIntegrations.addEventListener("change", () => {
+      updateResourceButtons();
+      updateGlossary();
+    });
+    els.prepayments.addEventListener("change", () => {
+      showPrepaymentDetails();
+      updateResourceButtons();
+      updateGlossary();
+    });
+    els.smsRequired.addEventListener("change", () => {
+      showSmsDetails();
+      updateGlossary();
+    });
+    [els.prepaymentType, els.cancellationValue, els.cancellationUnit, els.chargeModel, els.localCurrencyAmount, els.companyName, els.businessName, els.repFirstName, els.repLastName, els.otherIntegrations].forEach((input) => {
+      input.addEventListener("input", updateGlossary);
+      input.addEventListener("change", updateGlossary);
+    });
+
+    function saveStep1() {
+      const payload = {
+        region: els.region.value,
+        onboarder: els.onboarder.value,
+        venueName: els.venueName.value.trim(),
+        clientName: els.clientName.value.trim(),
+        clientEmail: els.clientEmail.value.trim()
+      };
+
+      if (!payload.region || !payload.onboarder || !payload.venueName || !payload.clientName || !payload.clientEmail) {
+        setStatus("Complete all fields first.", "warn");
+        return Promise.reject(new Error("Missing required fields"));
+      }
+
+      return requestJson("/save-intake", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+        .then((data) => {
+          currentItemId = data.itemId || "";
+          if (currentItemId) {
+            localStorage.setItem("currentItemId", currentItemId);
+            localStorage.setItem(`intake_${currentItemId}`, JSON.stringify(payload));
+          }
+          setButtonsState(true);
+          setStatus("Saved to Monday ✅", "good");
+          return data;
+        })
+        .catch((err) => {
+          console.error(err);
+          setStatus(err.message || "Error saving to Monday", "warn");
+          throw err;
+        });
+    }
+
+    function createInviteLink() {
+      if (!currentItemId) {
+        return Promise.reject(new Error('Missing item id'));
+      }
+
+      const clientEmail = els.clientEmail.value.trim();
+      const venue = els.venueName.value.trim();
+
+      if (!clientEmail || !venue) {
+        return Promise.reject(new Error('Add venue name and client email first.'));
+      }
+
+      inviteToken = `inv_${slugify(venue)}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+
+      const inviteUrl = `${window.location.origin}${window.location.pathname}?invite=${encodeURIComponent(inviteToken)}&itemId=${encodeURIComponent(currentItemId)}#step-2`;
+      els.inviteLink.href = inviteUrl;
+      els.inviteLink.textContent = inviteUrl;
+      els.inviteBox.style.display = "block";
+
+      return requestJson("/save-invite-link", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ itemId: currentItemId, inviteUrl })
+      })
+        .then((data) => ({ inviteUrl, data }))
+        .catch((err) => {
+          console.error('Invite link save failed:', err);
+          throw new Error(`Invite created, but Monday link save failed: ${err.message}`);
+        });
+    }
+
+    els.nextBtn.addEventListener("click", () => {
+      saveStep1()
+        .then(() => createInviteLink())
+        .then(({ data }) => {
+          els.step2Heading.textContent = "Onboarding Card Information";
+          els.step2Lead.textContent = "Capture the onboarding details the team will use throughout implementation and launch.";
+          els.step2Card.style.display = "block";
+          els.step2Card.scrollIntoView({ behavior: "smooth", block: "start" });
+          setStatus(`Saved, invite ready, and linked to Monday (${data.columnTitle}) ✅`, "good");
+          els.modePill.textContent = "Onboarding card";
+        })
+        .catch((err) => {
+          console.error(err);
+          if (err?.message) {
+            setStatus(err.message, "warn");
+          }
+        });
+    });
+
+    els.nextStep2Btn.addEventListener("click", () => {
+      saveStep2().then(() => {
+        setStep2Status("Step 2 complete. Ready for next stages.", "good");
+        els.step3JourneyCard.style.display = "block";
+        els.step3Card.style.display = "block";
+        els.step5Card.style.display = "block";
+        els.step3JourneyCard.scrollIntoView({ behavior: "smooth", block: "start" });
+        els.modePill.textContent = "Implementation";
+      });
+    });
+
+    els.iPads.addEventListener("change", () => {
+      if (els.iPads.value === "No") {
+        alert("SevenRooms OS is optimised to only run on Apple Products");
+      }
+    });
+
+    setButtonsState(Boolean(currentItemId));
+    els.inviteBox.style.display = clientMode ? "block" : "none";
+
+    showPrepaymentDetails();
+    showSmsDetails();
+    updateStep2Summary();
+    updateResourceButtons();
+    updateChecklistProgress();
+    syncSidebarProfile();
+    updateGlossary();
+
+    if (clientMode) {
+      showClientMode();
+    }
+  </script>
+</body>
+</html>
