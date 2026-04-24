@@ -482,15 +482,15 @@ app.get('/onboarding-item', async (req, res) => {
             title
             type
           }
-          items(ids: [${itemId}]) {
+        }
+        items(ids: [${itemId}]) {
+          id
+          name
+          column_values {
             id
-            name
-            column_values {
-              id
-              text
-              type
-              value
-            }
+            text
+            type
+            value
           }
         }
       }
@@ -498,7 +498,7 @@ app.get('/onboarding-item', async (req, res) => {
 
     const result = await mondayRequest(query);
     const board = result.data?.boards?.[0];
-    const item = board?.items?.[0];
+    const item = result.data?.items?.[0];
 
     if (!board || !item) {
       return res.status(404).json({ error: 'Onboarding item not found' });
