@@ -478,7 +478,7 @@ app.post('/update-step2', async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Failed to update step 2' });
+    res.status(500).json({ error: error.message || 'Failed to update step 2' });
   }
 });
 
