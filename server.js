@@ -37,6 +37,18 @@ function findColumnByContains(columns, fragments) {
   });
 }
 
+
+function getStep3SectionColumnAliases() {
+  return {
+    'Venue Configuration': ['Venue Configuration', 'Venue Config', 'Venue Configura...'],
+    'Marketing Configuration': ['Marketing Configuration', 'Marketing'],
+    'IT Setup': ['IT Setup', 'IT'],
+    'Data Imports': ['Data Imports', 'Data'],
+    'Go Live': ['Go Live'],
+    'Add-ons': ['Add-ons', 'Add ons', 'Addons']
+  };
+}
+
 function escapeColumnValues(valueObj) {
   return JSON.stringify(valueObj)
     .replace(/\\/g, '\\\\')
