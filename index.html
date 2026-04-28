@@ -2795,8 +2795,9 @@
       els.step1Section.style.display = "none";
       els.step2Card.style.display = "block";
       els.step3JourneyCard.style.display = "none";
+      els.step3Card.style.display = "block";
       els.step5Card.style.display = "block";
-      setStageExpanded(els.step2Card, true);
+      setStageExpanded(els.step2Card, false);
       setStageExpanded(els.step3Card, false);
       setStageExpanded(els.step5Card, false);
       els.step2Heading.textContent = "Your setup details";
@@ -2823,8 +2824,8 @@
       els.step3JourneyCard.style.display = "block";
       els.step3Card.style.display = "block";
       els.step5Card.style.display = "block";
-      setStageExpanded(els.step1Section, true);
-      setStageExpanded(els.step2Card, true);
+      setStageExpanded(els.step1Section, false);
+      setStageExpanded(els.step2Card, false);
       setStageExpanded(els.step3Card, false);
       setStageExpanded(els.step5Card, false);
       els.step2Heading.textContent = "Onboarding Card Information";
@@ -3007,8 +3008,12 @@
           els.step2Lead.textContent = "Capture the onboarding details the team will use throughout implementation and launch.";
           els.step2Card.style.display = "block";
           els.step3JourneyCard.style.display = "block";
+          els.step3Card.style.display = "block";
+          els.step5Card.style.display = "block";
           setStageExpanded(els.step1Section, false);
-          setStageExpanded(els.step2Card, true);
+          setStageExpanded(els.step2Card, false);
+          setStageExpanded(els.step3Card, false);
+          setStageExpanded(els.step5Card, false);
           els.step2Card.scrollIntoView({ behavior: "smooth", block: "start" });
           setStatus(`Saved, invite and internal edit links linked to Monday (${inviteResult.data.columnTitle}; ${internalResult.data.columnTitle}) ✅`, "good");
           els.modePill.textContent = "Onboarding card";
@@ -3028,7 +3033,7 @@
         els.step3Card.style.display = "block";
         els.step5Card.style.display = "block";
         setStageExpanded(els.step2Card, false);
-        setStageExpanded(els.step3Card, true);
+        setStageExpanded(els.step3Card, false);
         setStageExpanded(els.step5Card, false);
         els.step3JourneyCard.scrollIntoView({ behavior: "smooth", block: "start" });
         els.modePill.textContent = "Implementation";
