@@ -312,6 +312,28 @@
       transition: transform 180ms ease;
     }
 
+    .flow-stage-toggle-meta {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      flex: 0 0 auto;
+    }
+
+    .flow-stage-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 104px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(63, 129, 182, 0.24);
+      background: rgba(63, 129, 182, 0.08);
+      color: #3f81b6;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
     .flow-stage:not(.is-collapsed) .flow-stage-chevron {
       transform: rotate(180deg);
     }
@@ -1511,9 +1533,12 @@
             <button class="flow-stage-toggle" type="button" data-stage-toggle aria-expanded="true">
               <div class="flow-stage-copy">
                 <strong>Setup</strong>
-                <span>Internal setup details for the onboarding handoff.</span>
+                <span id="stage1Preview">Internal setup details for the onboarding handoff.</span>
               </div>
-              <span class="flow-stage-chevron">⌄</span>
+              <span class="flow-stage-toggle-meta">
+                <span class="flow-stage-action" id="stage1Action">Complete section</span>
+                <span class="flow-stage-chevron">⌄</span>
+              </span>
             </button>
             <div class="flow-stage-content">
             <div class="section-title">
@@ -1568,9 +1593,12 @@
             <button class="flow-stage-toggle" type="button" data-stage-toggle aria-expanded="false">
               <div class="flow-stage-copy">
                 <strong>Onboarding Card Information</strong>
-                <span>Core setup details, implementation planning, and the OB dashboard.</span>
+                <span id="stage2Preview">Core setup details, implementation planning, and the OB dashboard.</span>
               </div>
-              <span class="flow-stage-chevron">⌄</span>
+              <span class="flow-stage-toggle-meta">
+                <span class="flow-stage-action" id="stage2Action">Complete section</span>
+                <span class="flow-stage-chevron">⌄</span>
+              </span>
             </button>
             <div class="flow-stage-content">
           <div class="step2-journey-stage" id="step3JourneyCard">
@@ -1818,9 +1846,12 @@
             <button class="flow-stage-toggle" type="button" data-stage-toggle aria-expanded="false">
               <div class="flow-stage-copy">
                 <strong>Build &amp; Launch Checklist</strong>
-                <span>Track launch readiness and sync each completed workstream back to Monday.</span>
+                <span id="stage3Preview">Track launch readiness and sync each completed workstream back to Monday.</span>
               </div>
-              <span class="flow-stage-chevron">⌄</span>
+              <span class="flow-stage-toggle-meta">
+                <span class="flow-stage-action" id="stage3Action">Open section</span>
+                <span class="flow-stage-chevron">⌄</span>
+              </span>
             </button>
             <div class="flow-stage-content">
             <div class="step3-layout">
@@ -1983,9 +2014,12 @@
             <button class="flow-stage-toggle" type="button" data-stage-toggle aria-expanded="false">
               <div class="flow-stage-copy">
                 <strong>Resource Glossary</strong>
-                <span>Reference links and notes based on the selections made throughout the flow.</span>
+                <span id="stage5Preview">Reference links and notes based on the selections made throughout the flow.</span>
               </div>
-              <span class="flow-stage-chevron">⌄</span>
+              <span class="flow-stage-toggle-meta">
+                <span class="flow-stage-action" id="stage5Action">Open section</span>
+                <span class="flow-stage-chevron">⌄</span>
+              </span>
             </button>
             <div class="flow-stage-content">
             <div class="step-card">
@@ -2017,12 +2051,20 @@
       inviteBox: document.getElementById("inviteBox"),
       inviteLink: document.getElementById("inviteLink"),
       step1Section: document.getElementById("step1Section"),
+      stage1Preview: document.getElementById("stage1Preview"),
+      stage1Action: document.getElementById("stage1Action"),
       step2Card: document.getElementById("step2Card"),
+      stage2Preview: document.getElementById("stage2Preview"),
+      stage2Action: document.getElementById("stage2Action"),
       step2Heading: document.getElementById("step2Heading"),
       step2Lead: document.getElementById("step2Lead"),
       step3JourneyCard: document.getElementById("step3JourneyCard"),
       step3Card: document.getElementById("step3Card"),
+      stage3Preview: document.getElementById("stage3Preview"),
+      stage3Action: document.getElementById("stage3Action"),
       step5Card: document.getElementById("step5Card"),
+      stage5Preview: document.getElementById("stage5Preview"),
+      stage5Action: document.getElementById("stage5Action"),
       modePill: document.getElementById("modePill"),
       summaryVenue: document.getElementById("summaryVenue"),
       summaryClient: document.getElementById("summaryClient"),
@@ -2496,6 +2538,8 @@
           row.classList.add("status-not-started");
         }
       });
+
+      updateStageSummaries();
     }
 
     function applyStep3Statuses(step3Statuses = {}) {
@@ -2518,6 +2562,45 @@
       els.summaryVenue.textContent = els.venueName.value.trim() || '—';
       els.summaryClient.textContent = els.clientName.value.trim() || '—';
       els.summaryClientEmail.textContent = els.clientEmail.value.trim() || '—';
+      updateStageSummaries();
+    }
+
+    function updateStageSummaries() {
+      const stage1Parts = [
+        els.venueName.value.trim(),
+        els.clientName.value.trim(),
+        els.clientEmail.value.trim()
+      ].filter(Boolean);
+      const stage1HasData = stage1Parts.length > 0 || els.region.value || els.onboarder.value;
+      els.stage1Preview.textContent = stage1HasData
+        ? stage1Parts.join(' · ') || 'Setup details saved.'
+        : 'Internal setup details for the onboarding handoff.';
+      els.stage1Action.textContent = stage1HasData ? 'Click to edit' : 'Complete section';
+
+      const stage2Parts = [
+        els.launchDate.value || '',
+        els.posSystem.value || '',
+        els.reservationSystem.value || '',
+        els.prepayments.value || ''
+      ].filter(Boolean);
+      const stage2HasData = stage2Parts.length > 0 || els.otherIntegrations.value || els.smsRequired.value || els.iPads.value;
+      els.stage2Preview.textContent = stage2HasData
+        ? stage2Parts.join(' · ')
+        : 'Core setup details, implementation planning, and the OB dashboard.';
+      els.stage2Action.textContent = stage2HasData ? 'Click to edit' : 'Complete section';
+
+      const completedCount = Array.from(sectionChecks).filter((check) => check.checked).length;
+      const totalCount = sectionChecks.length;
+      els.stage3Preview.textContent = completedCount
+        ? `${completedCount} of ${totalCount} launch workstreams complete.`
+        : 'Track launch readiness and sync each completed workstream back to Monday.';
+      els.stage3Action.textContent = completedCount ? 'Click to edit' : 'Open section';
+
+      const glossaryCount = els.glossaryGrid.querySelectorAll('.glossary-card').length;
+      els.stage5Preview.textContent = glossaryCount
+        ? `${glossaryCount} resource ${glossaryCount === 1 ? 'card' : 'cards'} ready from your selections.`
+        : 'Reference links and notes based on the selections made throughout the flow.';
+      els.stage5Action.textContent = glossaryCount ? 'Click to edit' : 'Open section';
     }
 
     function applyOnboardingItem(data) {
@@ -2676,6 +2759,7 @@
 
       els.glossaryGrid.innerHTML = cards.join('');
       els.glossaryEmpty.style.display = cards.length ? 'none' : 'block';
+      updateStageSummaries();
     }
 
     function syncStep3Status(sectionName, completed) {
