@@ -216,7 +216,8 @@ app.post('/save-intake', async (req, res) => {
     onboarder,
     venueName,
     clientName,
-    clientEmail
+    clientEmail,
+    salesforceCaseNumber
   } = req.body || {};
 
   if (!region || !onboarder || !venueName || !clientName || !clientEmail) {
@@ -276,6 +277,11 @@ app.post('/save-intake', async (req, res) => {
     const onboarderColumn = findColumn(board.columns, ['Onboarder']);
     const clientNameColumn = findColumn(board.columns, ['Client name']);
     const clientEmailColumn = findColumn(board.columns, ['Client email']);
+    const salesforceCaseColumn =
+      findColumn(board.columns, ['Salesforce Case Number', 'Salesforce Case ID', 'SF Case Number', 'Case Number', 'Case ID']) ||
+      findColumnByContains(board.columns, ['salesforce', 'case']) ||
+      findColumnByContains(board.columns, ['case', 'number']) ||
+      findColumnByContains(board.columns, ['case', 'id']);
 
     const columnValues = {};
     if (venueColumn) columnValues[venueColumn.id] = venueName;
@@ -283,6 +289,7 @@ app.post('/save-intake', async (req, res) => {
     if (onboarderColumn) columnValues[onboarderColumn.id] = onboarder;
     if (clientNameColumn) columnValues[clientNameColumn.id] = clientName;
     if (clientEmailColumn) columnValues[clientEmailColumn.id] = clientEmail;
+    if (salesforceCaseColumn && salesforceCaseNumber) columnValues[salesforceCaseColumn.id] = salesforceCaseNumber;
 
     const updateQuery = `
       mutation {
@@ -702,6 +709,7 @@ app.get('/onboarding-item', async (req, res) => {
       onboarder: getText(['Onboarder']),
       clientName: getText(['Client name']),
       clientEmail: getText(['Client email']),
+      salesforceCaseNumber: getText(['Salesforce Case Number', 'Salesforce Case ID', 'SF Case Number', 'Case Number', 'Case ID'], ['case']),
       launchDate: launchDateValue?.date || launchDateText || '',
       spendPerHead: getText(['Spend per head', 'Spend Per Head'], ['spend']),
       additionalUsersText: extractNotesBlock(notes, 'Additional users', ['PrePayments details', 'SMS details']),
