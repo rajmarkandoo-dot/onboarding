@@ -1583,9 +1583,7 @@
       </div>
 
       <div class="auth-actions">
-        <button class="btn primary" id="requestOtpBtn" type="button">Send code</button>
-        <button class="btn secondary hidden" id="verifyOtpBtn" type="button">Verify code</button>
-        <button class="btn ghost" id="continueBtn" type="button">Continue for now</button>
+        <button class="btn primary" id="continueBtn" type="button">Continue</button>
       </div>
 
       <div id="authStatus" class="auth-status">Verification required.</div>
@@ -2408,8 +2406,8 @@
       els.authModePill.textContent = authMode === "client" ? "Client verification" : "Internal verification";
       els.authTitle.textContent = authMode === "client" ? "Verify client access" : "Verify OB access";
       els.authCopy.textContent = authMode === "client"
-        ? "Enter the invited client email to receive a one-time code before opening this onboarding."
-        : "Enter your @sevenrooms.com email to receive a one-time code before editing the onboarding flow.";
+        ? "Enter the invited client email, then continue into the onboarding flow."
+        : "Enter your @sevenrooms.com email, then continue into the onboarding flow.";
     }
 
     function showAppShell() {
@@ -3296,10 +3294,8 @@
       }
     });
 
-    els.requestOtpBtn.addEventListener("click", requestOtp);
-    els.verifyOtpBtn.addEventListener("click", verifyOtp);
     els.continueBtn.addEventListener("click", () => {
-      setAuthStatus("You can continue and come back to verify later.", "");
+      setAuthStatus("You can continue into the onboarding flow.", "");
       showAppShell();
       ensureFlowInitialized();
     });
