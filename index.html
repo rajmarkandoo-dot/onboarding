@@ -1436,12 +1436,7 @@
     }
 
     .auth-gate {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 28px 20px 48px;
-      background: linear-gradient(180deg, #ffffff 0%, var(--bg) 100%);
+      padding: 0 0 18px;
     }
 
     .auth-card {
@@ -1590,13 +1585,14 @@
       <div class="auth-actions">
         <button class="btn primary" id="requestOtpBtn" type="button">Send code</button>
         <button class="btn secondary hidden" id="verifyOtpBtn" type="button">Verify code</button>
+        <button class="btn ghost" id="continueBtn" type="button">Continue for now</button>
       </div>
 
       <div id="authStatus" class="auth-status">Verification required.</div>
     </div>
   </div>
 
-  <div class="page auth-hidden" id="appShell">
+  <div class="page" id="appShell">
     <div class="shell">
       <div class="topbar">
         <div class="brand brand-full">
@@ -2140,6 +2136,7 @@
       otpCode: document.getElementById("otpCode"),
       requestOtpBtn: document.getElementById("requestOtpBtn"),
       verifyOtpBtn: document.getElementById("verifyOtpBtn"),
+      continueBtn: document.getElementById("continueBtn"),
       authStatus: document.getElementById("authStatus"),
       region: document.getElementById("region"),
       onboarder: document.getElementById("onboarder"),
@@ -2259,6 +2256,7 @@
         "Triple Seat": "https://help.sevenrooms.com/hc/en-us"
       }
     };
+    let flowInitialized = false;
 
     function getDemoItem(itemId) {
       return {
@@ -2378,6 +2376,12 @@
       els.authStatus.textContent = text;
     }
 
+    function ensureFlowInitialized() {
+      if (flowInitialized) return;
+      flowInitialized = true;
+      initializeFlow();
+    }
+
     function setStep2Status(text, type = "") {
       els.step2Status.className = `status ${type}`.trim();
       els.step2Status.textContent = text;
@@ -2400,7 +2404,6 @@
     }
 
     function showAuthGate() {
-      els.appShell.classList.add("auth-hidden");
       els.authGate.classList.remove("auth-hidden");
       els.authModePill.textContent = authMode === "client" ? "Client verification" : "Internal verification";
       els.authTitle.textContent = authMode === "client" ? "Verify client access" : "Verify OB access";
@@ -2411,7 +2414,6 @@
 
     function showAppShell() {
       els.authGate.classList.add("auth-hidden");
-      els.appShell.classList.remove("auth-hidden");
     }
 
     function slugify(value) {
@@ -3062,7 +3064,7 @@
         .then(() => {
           setAuthStatus('Access verified.', 'good');
           showAppShell();
-          initializeFlow();
+          ensureFlowInitialized();
         })
         .catch((err) => {
           console.error(err);
@@ -3071,6 +3073,7 @@
     }
 
     function initAuth() {
+      ensureFlowInitialized();
       showAuthGate();
       requestJson('/session')
         .then((data) => {
@@ -3079,7 +3082,7 @@
 
           if (data.authenticated && sessionMatchesRole && sessionMatchesItem) {
             showAppShell();
-            initializeFlow();
+            ensureFlowInitialized();
             return;
           }
 
@@ -3295,13 +3298,18 @@
 
     els.requestOtpBtn.addEventListener("click", requestOtp);
     els.verifyOtpBtn.addEventListener("click", verifyOtp);
+    els.continueBtn.addEventListener("click", () => {
+      setAuthStatus("You can continue and come back to verify later.", "");
+      showAppShell();
+      ensureFlowInitialized();
+    });
 
     setButtonsState(Boolean(currentItemId));
     els.inviteBox.style.display = clientMode ? "block" : "none";
 
     if (DEMO_MODE) {
       showAppShell();
-      initializeFlow();
+      ensureFlowInitialized();
     } else {
       initAuth();
     }
