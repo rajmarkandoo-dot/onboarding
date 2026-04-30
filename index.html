@@ -1773,7 +1773,7 @@
       <h2 id="authTitle">Verify your access</h2>
       <p class="auth-copy" id="authCopy">Enter your email to receive a one-time code before accessing the onboarding form.</p>
 
-      <div class="field">
+      <div class="field" id="authEmailField">
         <label for="authEmail">Email</label>
         <input id="authEmail" type="email" placeholder="name@company.com" />
       </div>
@@ -2420,6 +2420,7 @@
       authModePill: document.getElementById("authModePill"),
       authTitle: document.getElementById("authTitle"),
       authCopy: document.getElementById("authCopy"),
+      authEmailField: document.getElementById("authEmailField"),
       authEmail: document.getElementById("authEmail"),
       otpCodeWrap: document.getElementById("otpCodeWrap"),
       otpCode: document.getElementById("otpCode"),
@@ -2772,11 +2773,12 @@
       els.authGate.classList.remove("auth-hidden");
       els.authModePill.textContent = dashboardMode ? "Internal dashboard" : (authMode === "client" ? "Client verification" : "Internal verification");
       els.authTitle.textContent = dashboardMode ? "Open the onboarding dashboard" : (authMode === "client" ? "Verify client access" : "Verify OB access");
+      els.authEmailField.classList.toggle("hidden", authMode === "ob" || dashboardMode);
       els.authCopy.textContent = dashboardMode
-        ? "Enter your @sevenrooms.com email, then continue into the internal onboarding dashboard."
+        ? "Continue into the internal onboarding dashboard."
         : authMode === "client"
         ? "Enter the invited client email, then continue into the onboarding flow."
-        : "Enter your @sevenrooms.com email, then continue into the onboarding flow.";
+        : "Continue into the onboarding flow.";
     }
 
     function showAppShell() {
@@ -3035,12 +3037,6 @@
 
       const payload = { itemId: currentItemId, ...collectStep2Data() };
 
-      if (verificationBypassed && !DEMO_MODE) {
-        localStorage.setItem(`step2_${currentItemId}`, JSON.stringify(collectStep2Data()));
-        setStep2Status("Verification skipped. Step 2 saved locally only.", "warn");
-        return Promise.resolve({ ok: true, localOnly: true });
-      }
-
       return requestJson("/update-step2", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -3052,12 +3048,6 @@
         })
         .catch((err) => {
           console.error(err);
-          if (isVerificationError(err)) {
-            verificationBypassed = true;
-            localStorage.setItem(`step2_${currentItemId}`, JSON.stringify(collectStep2Data()));
-            setStep2Status("Verification skipped. Step 2 saved locally only.", "warn");
-            return;
-          }
           localStorage.setItem(`step2_${currentItemId}`, JSON.stringify(collectStep2Data()));
           setStep2Status("Step 2 saved locally (backend route to wire next).", "warn");
         });
@@ -3705,16 +3695,6 @@
         return Promise.reject(new Error("Missing required fields"));
       }
 
-      if (verificationBypassed && !DEMO_MODE) {
-        const itemId = currentItemId || `local_${Date.now()}`;
-        currentItemId = itemId;
-        localStorage.setItem("currentItemId", currentItemId);
-        localStorage.setItem(`intake_${currentItemId}`, JSON.stringify(payload));
-        setButtonsState(true);
-        setStatus("Verification skipped. Setup saved locally only.", "warn");
-        return Promise.resolve({ ok: true, itemId: currentItemId, localOnly: true });
-      }
-
       return requestJson("/save-intake", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -3732,16 +3712,6 @@
         })
         .catch((err) => {
           console.error(err);
-          if (isVerificationError(err)) {
-            verificationBypassed = true;
-            const itemId = currentItemId || `local_${Date.now()}`;
-            currentItemId = itemId;
-            localStorage.setItem("currentItemId", currentItemId);
-            localStorage.setItem(`intake_${currentItemId}`, JSON.stringify(payload));
-            setButtonsState(true);
-            setStatus("Verification skipped. Setup saved locally only.", "warn");
-            return { ok: true, itemId: currentItemId, localOnly: true };
-          }
           setStatus(err.message || "Error saving to Monday", "warn");
           throw err;
         });
@@ -3766,15 +3736,6 @@
       els.inviteLink.textContent = inviteUrl;
       els.inviteBox.style.display = "block";
 
-      if (verificationBypassed && !DEMO_MODE) {
-        const inviteData = {
-          ...(getLocalIntakeData(currentItemId) || {}),
-          inviteUrl
-        };
-        localStorage.setItem(`intake_${currentItemId}`, JSON.stringify(inviteData));
-        return Promise.resolve({ inviteUrl, data: { columnTitle: 'Local invite link', localOnly: true } });
-      }
-
       return requestJson("/save-invite-link", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -3793,15 +3754,6 @@
       }
 
       const internalUrl = `${window.location.origin}${window.location.pathname}?itemId=${encodeURIComponent(currentItemId)}`;
-
-      if (verificationBypassed && !DEMO_MODE) {
-        const internalData = {
-          ...(getLocalIntakeData(currentItemId) || {}),
-          internalUrl
-        };
-        localStorage.setItem(`intake_${currentItemId}`, JSON.stringify(internalData));
-        return Promise.resolve({ internalUrl, data: { columnTitle: 'Local internal link', localOnly: true } });
-      }
 
       return requestJson('/save-internal-link', {
         method: 'POST',
@@ -3862,7 +3814,7 @@
     });
 
     els.continueBtn.addEventListener("click", () => {
-      verificationBypassed = true;
+      verificationBypassed = false;
       setAuthStatus(dashboardMode ? "You can continue into the dashboard." : "You can continue into the onboarding flow.", "");
       if (dashboardMode) {
         showDashboardShell();
