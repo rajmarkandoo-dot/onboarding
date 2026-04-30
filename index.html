@@ -2804,6 +2804,13 @@
       sidebarEmail.textContent = email || "—";
     }
 
+    function getFallbackOnboarders(region) {
+      const fallbackNames = DEMO_ONBOARDERS[region] || [];
+      const currentName = els.onboarder.value.trim();
+      const savedName = getLocalIntakeData(currentItemId).onboarder || '';
+      return Array.from(new Set([currentName, savedName, ...fallbackNames].filter(Boolean)));
+    }
+
     function populateOnboarders(region) {
       if (!region) {
         els.onboarder.innerHTML = '<option value="">Select region first</option>';
@@ -2825,6 +2832,15 @@
         })
         .catch((err) => {
           console.error("Onboarder load failed:", err);
+          const fallbackNames = getFallbackOnboarders(region);
+          if (fallbackNames.length) {
+            els.onboarder.innerHTML =
+              '<option value="">Select onboarder</option>' +
+              fallbackNames.map((name) => `<option value="${name}">${name}</option>`).join("");
+            els.onboarder.disabled = false;
+            return;
+          }
+
           els.onboarder.innerHTML = `<option>${err.message}</option>`;
           els.onboarder.disabled = true;
         });
