@@ -1590,7 +1590,7 @@
     </div>
   </div>
 
-  <div class="page" id="appShell">
+  <div class="page auth-hidden" id="appShell">
     <div class="shell">
       <div class="topbar">
         <div class="brand brand-full">
@@ -2402,6 +2402,7 @@
     }
 
     function showAuthGate() {
+      els.appShell.classList.add("auth-hidden");
       els.authGate.classList.remove("auth-hidden");
       els.authModePill.textContent = authMode === "client" ? "Client verification" : "Internal verification";
       els.authTitle.textContent = authMode === "client" ? "Verify client access" : "Verify OB access";
@@ -2412,6 +2413,7 @@
 
     function showAppShell() {
       els.authGate.classList.add("auth-hidden");
+      els.appShell.classList.remove("auth-hidden");
     }
 
     function slugify(value) {
