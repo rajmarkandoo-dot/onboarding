@@ -52,6 +52,13 @@
       margin-bottom: 20px;
     }
 
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
     .brand {
       display: flex;
       align-items: center;
@@ -1876,7 +1883,10 @@
         <div class="brand brand-full">
           <img class="brand-logo" src="/images/7R_DD_STACKED_BLACK_1.png" alt="SevenRooms" />
         </div>
-        <div class="pill" id="modePill">Welcome</div>
+        <div class="topbar-actions">
+          <a class="btn secondary" id="dashboardLink" href="/?view=dashboard">Open Dashboard</a>
+          <div class="pill" id="modePill">Welcome</div>
+        </div>
       </div>
 
       <section class="hero">
@@ -2426,6 +2436,7 @@
       dashboardCountNotStarted: document.getElementById("dashboardCountNotStarted"),
       dashboardTableBody: document.getElementById("dashboardTableBody"),
       dashboardEmpty: document.getElementById("dashboardEmpty"),
+      dashboardLink: document.getElementById("dashboardLink"),
       region: document.getElementById("region"),
       onboarder: document.getElementById("onboarder"),
       venueName: document.getElementById("venueName"),
@@ -2547,6 +2558,7 @@
     };
     let dashboardItems = [];
     let flowInitialized = false;
+    let verificationBypassed = false;
 
     function getDemoItem(itemId) {
       return {
@@ -3010,6 +3022,11 @@
       }
     }
 
+    function isVerificationError(err) {
+      const message = String(err?.message || '').toLowerCase();
+      return message.includes('verification required') || message.includes('ob verification required') || message.includes('client verification required') || message.includes('http 403');
+    }
+
     function saveStep2() {
       if (!currentItemId) {
         setStep2Status("Save Step 1 first.", "warn");
@@ -3017,6 +3034,12 @@
       }
 
       const payload = { itemId: currentItemId, ...collectStep2Data() };
+
+      if (verificationBypassed && !DEMO_MODE) {
+        localStorage.setItem(`step2_${currentItemId}`, JSON.stringify(collectStep2Data()));
+        setStep2Status("Verification skipped. Step 2 saved locally only.", "warn");
+        return Promise.resolve({ ok: true, localOnly: true });
+      }
 
       return requestJson("/update-step2", {
         method: "POST",
@@ -3029,6 +3052,12 @@
         })
         .catch((err) => {
           console.error(err);
+          if (isVerificationError(err)) {
+            verificationBypassed = true;
+            localStorage.setItem(`step2_${currentItemId}`, JSON.stringify(collectStep2Data()));
+            setStep2Status("Verification skipped. Step 2 saved locally only.", "warn");
+            return;
+          }
           localStorage.setItem(`step2_${currentItemId}`, JSON.stringify(collectStep2Data()));
           setStep2Status("Step 2 saved locally (backend route to wire next).", "warn");
         });
@@ -3676,6 +3705,16 @@
         return Promise.reject(new Error("Missing required fields"));
       }
 
+      if (verificationBypassed && !DEMO_MODE) {
+        const itemId = currentItemId || `local_${Date.now()}`;
+        currentItemId = itemId;
+        localStorage.setItem("currentItemId", currentItemId);
+        localStorage.setItem(`intake_${currentItemId}`, JSON.stringify(payload));
+        setButtonsState(true);
+        setStatus("Verification skipped. Setup saved locally only.", "warn");
+        return Promise.resolve({ ok: true, itemId: currentItemId, localOnly: true });
+      }
+
       return requestJson("/save-intake", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -3693,6 +3732,16 @@
         })
         .catch((err) => {
           console.error(err);
+          if (isVerificationError(err)) {
+            verificationBypassed = true;
+            const itemId = currentItemId || `local_${Date.now()}`;
+            currentItemId = itemId;
+            localStorage.setItem("currentItemId", currentItemId);
+            localStorage.setItem(`intake_${currentItemId}`, JSON.stringify(payload));
+            setButtonsState(true);
+            setStatus("Verification skipped. Setup saved locally only.", "warn");
+            return { ok: true, itemId: currentItemId, localOnly: true };
+          }
           setStatus(err.message || "Error saving to Monday", "warn");
           throw err;
         });
@@ -3717,6 +3766,15 @@
       els.inviteLink.textContent = inviteUrl;
       els.inviteBox.style.display = "block";
 
+      if (verificationBypassed && !DEMO_MODE) {
+        const inviteData = {
+          ...(getLocalIntakeData(currentItemId) || {}),
+          inviteUrl
+        };
+        localStorage.setItem(`intake_${currentItemId}`, JSON.stringify(inviteData));
+        return Promise.resolve({ inviteUrl, data: { columnTitle: 'Local invite link', localOnly: true } });
+      }
+
       return requestJson("/save-invite-link", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -3735,6 +3793,15 @@
       }
 
       const internalUrl = `${window.location.origin}${window.location.pathname}?itemId=${encodeURIComponent(currentItemId)}`;
+
+      if (verificationBypassed && !DEMO_MODE) {
+        const internalData = {
+          ...(getLocalIntakeData(currentItemId) || {}),
+          internalUrl
+        };
+        localStorage.setItem(`intake_${currentItemId}`, JSON.stringify(internalData));
+        return Promise.resolve({ internalUrl, data: { columnTitle: 'Local internal link', localOnly: true } });
+      }
 
       return requestJson('/save-internal-link', {
         method: 'POST',
@@ -3795,6 +3862,7 @@
     });
 
     els.continueBtn.addEventListener("click", () => {
+      verificationBypassed = true;
       setAuthStatus(dashboardMode ? "You can continue into the dashboard." : "You can continue into the onboarding flow.", "");
       if (dashboardMode) {
         showDashboardShell();
