@@ -395,7 +395,7 @@
 
     .panel-layout {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 320px;
+      grid-template-columns: minmax(0, 1fr) minmax(420px, 560px);
       gap: 18px;
       align-items: start;
     }
@@ -408,6 +408,7 @@
       position: sticky;
       top: 20px;
       display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 12px;
       align-self: start;
     }
@@ -1495,6 +1496,7 @@
 
       .page-sidebar {
         position: static;
+        grid-template-columns: 1fr;
       }
 
       .stage-journey-grid,
