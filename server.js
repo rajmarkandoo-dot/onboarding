@@ -1,11 +1,17 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const cookie = require('cookie');
+const { Pool } = require('pg');
+const { Resend } = require('resend');
+const { randomInt, randomBytes, createHash, timingSafeEqual } = require('crypto');
 
 const app = express();
+app.set('trust proxy', 1);
 app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname));
+app.use(loadSession);
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
@@ -13,6 +19,20 @@ app.get('/', (req, res) => {
 
 const TEAM_BOARD_ID = 18408762899;
 const ONBOARDING_BOARD_ID = 18408847153;
+const SESSION_COOKIE_NAME = 'onboarding_session';
+const OTP_TTL_MINUTES = Number(process.env.OTP_TTL_MINUTES || 10);
+const SESSION_TTL_HOURS = Number(process.env.SESSION_TTL_HOURS || 8);
+
+const pool = process.env.DATABASE_URL
+  ? new Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: process.env.DATABASE_SSL === 'false'
+        ? false
+        : (process.env.DATABASE_URL.includes('localhost') ? false : { rejectUnauthorized: false })
+    })
+  : null;
+
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 const LOCAL_PROFILE_IMAGES = {
   raj: '/images/Raj.jpeg'
@@ -125,6 +145,306 @@ function extractLineValue(text, label) {
   const pattern = new RegExp(`${escapeRegex(label)}:\s*([^\n]+)`, 'i');
   return text.match(pattern)?.[1]?.trim() || '';
 }
+
+function parseMondayLink(columnValue) {
+  if (!columnValue) return '';
+
+  try {
+    const parsed = columnValue.value ? JSON.parse(columnValue.value) : null;
+    return parsed?.url || '';
+  } catch (error) {
+    return '';
+  }
+}
+
+function sha256(value) {
+  return createHash('sha256').update(String(value || '')).digest('hex');
+}
+
+function getSessionSecret() {
+  return process.env.SESSION_SECRET || 'local-dev-session-secret';
+}
+
+function hashOpaqueToken(token) {
+  return sha256(`${token}:${getSessionSecret()}`);
+}
+
+function generateOtpCode() {
+  return String(randomInt(0, 1000000)).padStart(6, '0');
+}
+
+function generateSessionToken() {
+  return randomBytes(24).toString('hex');
+}
+
+function getCookieOptions() {
+  return {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    path: '/',
+    maxAge: SESSION_TTL_HOURS * 60 * 60
+  };
+}
+
+function setSessionCookie(res, token) {
+  res.setHeader('Set-Cookie', cookie.serialize(SESSION_COOKIE_NAME, token, getCookieOptions()));
+}
+
+function clearSessionCookie(res) {
+  res.setHeader('Set-Cookie', cookie.serialize(SESSION_COOKIE_NAME, '', {
+    ...getCookieOptions(),
+    maxAge: 0
+  }));
+}
+
+function getRequestCookies(req) {
+  return cookie.parse(req.headers.cookie || '');
+}
+
+async function ensureAuthStorage() {
+  if (!pool) return;
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS otp_codes (
+      id BIGSERIAL PRIMARY KEY,
+      email TEXT NOT NULL,
+      item_id TEXT,
+      mode TEXT NOT NULL,
+      otp_hash TEXT NOT NULL,
+      expires_at TIMESTAMPTZ NOT NULL,
+      attempt_count INTEGER NOT NULL DEFAULT 0,
+      used_at TIMESTAMPTZ,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS app_sessions (
+      id BIGSERIAL PRIMARY KEY,
+      email TEXT NOT NULL,
+      item_id TEXT,
+      role TEXT NOT NULL,
+      session_token_hash TEXT NOT NULL,
+      expires_at TIMESTAMPTZ NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      revoked_at TIMESTAMPTZ
+    )
+  `);
+}
+
+async function sendOtpEmail(email, otpCode, mode) {
+  if (!resend) {
+    throw new Error('Missing Resend configuration');
+  }
+
+  const from = process.env.OTP_FROM_EMAIL;
+  if (!from) {
+    throw new Error('Missing OTP_FROM_EMAIL');
+  }
+
+  const subject = mode === 'client'
+    ? 'Your SevenRooms onboarding verification code'
+    : 'Your SevenRooms OB verification code';
+  const body = `Your verification code is ${otpCode}. It expires in ${OTP_TTL_MINUTES} minutes.`;
+
+  await resend.emails.send({
+    from,
+    to: email,
+    subject,
+    text: body
+  });
+}
+
+async function fetchOnboardingItemContext(itemId) {
+  const query = `
+    query {
+      boards(ids: ${ONBOARDING_BOARD_ID}) {
+        columns {
+          id
+          title
+          type
+        }
+      }
+      items(ids: [${itemId}]) {
+        id
+        name
+        column_values {
+          id
+          text
+          type
+          value
+        }
+      }
+    }
+  `;
+
+  const result = await mondayRequest(query);
+  const board = result.data?.boards?.[0];
+  const item = result.data?.items?.[0];
+
+  if (!board || !item) {
+    throw new Error('Onboarding item not found');
+  }
+
+  const getText = (aliases, containsFragments = []) => {
+    const column =
+      findColumn(board.columns, aliases) ||
+      (containsFragments.length ? findColumnByContains(board.columns, containsFragments) : null);
+    if (!column) return '';
+    return item.column_values.find((value) => value.id === column.id)?.text?.trim() || '';
+  };
+
+  return {
+    itemId: item.id,
+    venueName: item.name || '',
+    region: getText(['Region']),
+    onboarder: getText(['Onboarder']),
+    clientName: getText(['Client name']),
+    clientEmail: getText(['Client email']),
+    salesforceCaseNumber: getText(['Salesforce Case Number', 'Salesforce Case ID', 'SF Case Number', 'Case Number', 'Case ID'], ['case'])
+  };
+}
+
+async function createOtpRecord(email, itemId, mode) {
+  if (!pool) {
+    throw new Error('Missing DATABASE_URL');
+  }
+
+  const otpCode = generateOtpCode();
+  const expiresAt = new Date(Date.now() + OTP_TTL_MINUTES * 60 * 1000);
+
+  await pool.query(
+    `INSERT INTO otp_codes (email, item_id, mode, otp_hash, expires_at)
+     VALUES ($1, $2, $3, $4, $5)`,
+    [normalize(email), itemId || null, mode, sha256(otpCode), expiresAt]
+  );
+
+  return otpCode;
+}
+
+async function verifyOtpRecord(email, itemId, mode, otpCode) {
+  if (!pool) {
+    throw new Error('Missing DATABASE_URL');
+  }
+
+  const result = await pool.query(
+    `SELECT * FROM otp_codes
+     WHERE email = $1
+       AND mode = $2
+       AND COALESCE(item_id, '') = COALESCE($3, '')
+       AND used_at IS NULL
+     ORDER BY created_at DESC
+     LIMIT 1`,
+    [normalize(email), mode, itemId || '']
+  );
+
+  const row = result.rows[0];
+  if (!row) {
+    throw new Error('No OTP request found');
+  }
+
+  if (new Date(row.expires_at).getTime() < Date.now()) {
+    throw new Error('OTP has expired');
+  }
+
+  if (Number(row.attempt_count || 0) >= 5) {
+    throw new Error('Too many OTP attempts');
+  }
+
+  const expected = Buffer.from(row.otp_hash, 'hex');
+  const actual = Buffer.from(sha256(otpCode), 'hex');
+  const valid = expected.length === actual.length && timingSafeEqual(expected, actual);
+
+  if (!valid) {
+    await pool.query('UPDATE otp_codes SET attempt_count = attempt_count + 1 WHERE id = $1', [row.id]);
+    throw new Error('Invalid OTP');
+  }
+
+  await pool.query('UPDATE otp_codes SET used_at = NOW() WHERE id = $1', [row.id]);
+}
+
+async function createSession({ email, role, itemId }) {
+  if (!pool) {
+    throw new Error('Missing DATABASE_URL');
+  }
+
+  const token = generateSessionToken();
+  const tokenHash = hashOpaqueToken(token);
+  const expiresAt = new Date(Date.now() + SESSION_TTL_HOURS * 60 * 60 * 1000);
+
+  await pool.query(
+    `INSERT INTO app_sessions (email, item_id, role, session_token_hash, expires_at)
+     VALUES ($1, $2, $3, $4, $5)`,
+    [normalize(email), itemId || null, role, tokenHash, expiresAt]
+  );
+
+  return token;
+}
+
+async function getSessionFromRequest(req) {
+  if (!pool) return null;
+
+  const cookies = getRequestCookies(req);
+  const token = cookies[SESSION_COOKIE_NAME];
+  if (!token) return null;
+
+  const result = await pool.query(
+    `SELECT * FROM app_sessions
+     WHERE session_token_hash = $1
+       AND revoked_at IS NULL
+     ORDER BY created_at DESC
+     LIMIT 1`,
+    [hashOpaqueToken(token)]
+  );
+
+  const session = result.rows[0];
+  if (!session) return null;
+  if (new Date(session.expires_at).getTime() < Date.now()) return null;
+
+  return session;
+}
+
+async function loadSession(req, res, next) {
+  try {
+    req.authSession = await getSessionFromRequest(req);
+    next();
+  } catch (error) {
+    next(error);
+  }
+}
+
+function requireSession(req, res, next) {
+  if (!req.authSession) {
+    return res.status(401).json({ error: 'Verification required' });
+  }
+  next();
+}
+
+function requireObSession(req, res, next) {
+  if (!req.authSession || req.authSession.role !== 'ob') {
+    return res.status(403).json({ error: 'OB verification required' });
+  }
+  next();
+}
+
+function requireScopedItemAccess(req, res, next) {
+  const session = req.authSession;
+  if (!session) {
+    return res.status(401).json({ error: 'Verification required' });
+  }
+
+  if (session.role === 'ob') {
+    return next();
+  }
+
+  const targetItemId = String(req.body?.itemId || req.query?.itemId || '').trim();
+  if (!targetItemId || String(session.item_id || '') !== targetItemId) {
+    return res.status(403).json({ error: 'You do not have access to this onboarding record' });
+  }
+
+  next();
+}
 async function mondayRequest(query) {
   const token = process.env.MONDAY_API_TOKEN;
 
@@ -150,7 +470,207 @@ async function mondayRequest(query) {
   return result;
 }
 
-app.get('/onboarders', async (req, res) => {
+function buildSalesforceObNotes(payload = {}) {
+  const lines = [
+    'SevenRooms Onboarding',
+    '',
+    payload.venueName ? `Venue: ${payload.venueName}` : null,
+    payload.clientName ? `Client: ${payload.clientName}` : null,
+    payload.clientEmail ? `Client Email: ${payload.clientEmail}` : null,
+    payload.region ? `Region: ${payload.region}` : null,
+    payload.onboarder ? `Onboarder: ${payload.onboarder}` : null,
+    payload.launchDate ? `Launch Date: ${payload.launchDate}` : null,
+    payload.spendPerHead ? `Spend Per Head: ${payload.spendPerHead}` : null,
+    payload.posSystem ? `POS System: ${payload.posSystem}` : null,
+    payload.reservationSystem ? `Reservation System: ${payload.reservationSystem}` : null,
+    payload.prepayments ? `PrePayments / Card Holds: ${payload.prepayments}` : null,
+    payload.prepaymentType ? `Payment Processor: ${payload.prepaymentType}` : null,
+    payload.cancellationPeriod ? `Cancellation Period: ${payload.cancellationPeriod}` : null,
+    payload.chargeModel ? `Charge Basis: ${payload.chargeModel}` : null,
+    payload.localCurrencyAmount ? `Amount: ${payload.localCurrencyAmount}` : null,
+    payload.iPads ? `iPads Available: ${payload.iPads}` : null,
+    payload.smsRequired ? `SMS Required: ${payload.smsRequired}` : null,
+    payload.otherIntegrations ? `Other Integrations: ${payload.otherIntegrations}` : null
+  ];
+
+  if (payload.smsRequired === 'Yes') {
+    lines.push('');
+    lines.push('SMS Details');
+    if (payload.companyName) lines.push(`Company Name: ${payload.companyName}`);
+    if (payload.businessName) lines.push(`Business Name: ${payload.businessName}`);
+    if (payload.businessRegistrationNumber) lines.push(`Business Registration Number: ${payload.businessRegistrationNumber}`);
+    if (payload.businessWebsite) lines.push(`Business Website: ${payload.businessWebsite}`);
+    if (payload.businessAddress) lines.push(`Business Address: ${payload.businessAddress}`);
+    const repName = [payload.repFirstName, payload.repLastName].filter(Boolean).join(' ');
+    if (repName) lines.push(`Authorised Representative: ${repName}`);
+    if (payload.repPhone) lines.push(`Representative Phone: ${payload.repPhone}`);
+    if (payload.repEmail) lines.push(`Representative Email: ${payload.repEmail}`);
+  }
+
+  return lines.filter(Boolean).join('\n');
+}
+
+async function salesforceRequest(endpoint, options = {}) {
+  const baseUrl = process.env.SALESFORCE_BASE_URL;
+  const accessToken = process.env.SALESFORCE_ACCESS_TOKEN;
+
+  if (!baseUrl || !accessToken) {
+    throw new Error('Missing Salesforce configuration');
+  }
+
+  const response = await globalThis.fetch(`${baseUrl}${endpoint}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+      ...(options.headers || {})
+    }
+  });
+
+  if (response.status === 204) {
+    return null;
+  }
+
+  const data = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    throw new Error(JSON.stringify(data || { status: response.status }, null, 2));
+  }
+
+  return data;
+}
+
+app.get('/session', (req, res) => {
+  const session = req.authSession;
+  res.json({
+    ok: true,
+    authenticated: Boolean(session),
+    role: session?.role || null,
+    email: session?.email || null,
+    itemId: session?.item_id || null
+  });
+});
+
+app.post('/request-otp', async (req, res) => {
+  const { email, itemId, mode } = req.body || {};
+  const normalizedEmail = normalize(email);
+  const requestedMode = mode === 'client' ? 'client' : 'ob';
+
+  if (!normalizedEmail) {
+    return res.status(400).json({ error: 'Missing email' });
+  }
+
+  try {
+    let resolvedItemId = itemId ? String(itemId).trim() : '';
+
+    if (requestedMode === 'ob') {
+      if (!normalizedEmail.endsWith('@sevenrooms.com')) {
+        return res.status(403).json({ error: 'Only SevenRooms emails can access the internal flow' });
+      }
+      resolvedItemId = resolvedItemId || null;
+    } else {
+      if (!resolvedItemId) {
+        return res.status(400).json({ error: 'Missing itemId' });
+      }
+      const itemContext = await fetchOnboardingItemContext(resolvedItemId);
+      if (normalize(itemContext.clientEmail) !== normalizedEmail) {
+        return res.status(403).json({ error: 'Email does not match the invited client email' });
+      }
+    }
+
+    const otpCode = await createOtpRecord(normalizedEmail, resolvedItemId, requestedMode);
+    await sendOtpEmail(normalizedEmail, otpCode, requestedMode);
+
+    res.json({ ok: true, message: 'OTP sent' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message || 'Failed to send OTP' });
+  }
+});
+
+app.post('/verify-otp', async (req, res) => {
+  const { email, itemId, mode, otp } = req.body || {};
+  const normalizedEmail = normalize(email);
+  const requestedMode = mode === 'client' ? 'client' : 'ob';
+  const resolvedItemId = itemId ? String(itemId).trim() : '';
+
+  if (!normalizedEmail || !otp) {
+    return res.status(400).json({ error: 'Missing email or OTP' });
+  }
+
+  try {
+    if (requestedMode === 'client' && !resolvedItemId) {
+      return res.status(400).json({ error: 'Missing itemId' });
+    }
+
+    await verifyOtpRecord(normalizedEmail, resolvedItemId, requestedMode, String(otp).trim());
+    const sessionToken = await createSession({
+      email: normalizedEmail,
+      role: requestedMode,
+      itemId: requestedMode === 'client' ? resolvedItemId : null
+    });
+
+    setSessionCookie(res, sessionToken);
+    res.json({ ok: true, role: requestedMode, itemId: requestedMode === 'client' ? resolvedItemId : null });
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ error: error.message || 'Failed to verify OTP' });
+  }
+});
+
+app.post('/logout', async (req, res) => {
+  try {
+    const cookies = getRequestCookies(req);
+    const token = cookies[SESSION_COOKIE_NAME];
+    if (pool && token) {
+      await pool.query(
+        'UPDATE app_sessions SET revoked_at = NOW() WHERE session_token_hash = $1',
+        [hashOpaqueToken(token)]
+      );
+    }
+  } catch (error) {
+    console.error(error);
+  }
+
+  clearSessionCookie(res);
+  res.json({ ok: true });
+});
+
+async function syncSalesforceCaseNotes(caseNumber, noteBody) {
+  if (!caseNumber) {
+    return { skipped: true, reason: 'Missing Salesforce case number' };
+  }
+
+  const baseUrl = process.env.SALESFORCE_BASE_URL;
+  const accessToken = process.env.SALESFORCE_ACCESS_TOKEN;
+  const fieldApiName = process.env.SALESFORCE_OB_NOTES_FIELD || 'OB_Notes__c';
+  const apiVersion = process.env.SALESFORCE_API_VERSION || 'v60.0';
+  const lookupField = process.env.SALESFORCE_CASE_LOOKUP_FIELD || 'CaseNumber';
+
+  if (!baseUrl || !accessToken) {
+    return { skipped: true, reason: 'Salesforce not configured' };
+  }
+
+  const escapedCaseNumber = String(caseNumber).replace(/'/g, "\\'");
+  const soql = `SELECT Id FROM Case WHERE ${lookupField} = '${escapedCaseNumber}' LIMIT 1`;
+  const queryResult = await salesforceRequest(`/services/data/${apiVersion}/query/?q=${encodeURIComponent(soql)}`);
+  const caseId = queryResult?.records?.[0]?.Id;
+
+  if (!caseId) {
+    throw new Error(`Salesforce case not found for ${lookupField} ${caseNumber}`);
+  }
+
+  await salesforceRequest(`/services/data/${apiVersion}/sobjects/Case/${caseId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({
+      [fieldApiName]: noteBody
+    })
+  });
+
+  return { ok: true, caseId, fieldApiName, lookupField };
+}
+
+app.get('/onboarders', requireObSession, async (req, res) => {
   const region = String(req.query.region || '').trim();
 
   if (!region) {
@@ -210,7 +730,7 @@ app.get('/onboarders', async (req, res) => {
   }
 });
 
-app.post('/save-intake', async (req, res) => {
+app.post('/save-intake', requireObSession, async (req, res) => {
   const {
     region,
     onboarder,
@@ -304,12 +824,23 @@ app.post('/save-intake', async (req, res) => {
     `;
 
     const updateResult = await mondayRequest(updateQuery);
+    const salesforce = await syncSalesforceCaseNotes(
+      salesforceCaseNumber,
+      buildSalesforceObNotes({
+        venueName,
+        clientName,
+        clientEmail,
+        region,
+        onboarder
+      })
+    ).catch((error) => ({ ok: false, error: error.message }));
 
     res.json({
       ok: true,
       itemId,
       created: createResult.data,
-      updated: updateResult.data
+      updated: updateResult.data,
+      salesforce
     });
   } catch (error) {
     console.error(error);
@@ -352,7 +883,7 @@ function findAccessLinkColumn(columns, mode) {
   );
 }
 
-app.post('/save-invite-link', async (req, res) => {
+app.post('/save-invite-link', requireObSession, async (req, res) => {
   const { itemId, inviteUrl } = req.body || {};
 
   if (!itemId || !inviteUrl) {
@@ -422,7 +953,7 @@ app.post('/save-invite-link', async (req, res) => {
   }
 });
 
-app.post('/save-internal-link', async (req, res) => {
+app.post('/save-internal-link', requireObSession, async (req, res) => {
   const { itemId, internalUrl } = req.body || {};
 
   if (!itemId || !internalUrl) {
@@ -492,9 +1023,15 @@ app.post('/save-internal-link', async (req, res) => {
   }
 });
 
-app.post('/update-step2', async (req, res) => {
+app.post('/update-step2', requireScopedItemAccess, async (req, res) => {
   const {
     itemId,
+    venueName,
+    clientName,
+    clientEmail,
+    region,
+    onboarder,
+    salesforceCaseNumber,
     launchDate,
     spendPerHead,
     posSystem,
@@ -611,10 +1148,42 @@ app.post('/update-step2', async (req, res) => {
     `;
 
     const result = await mondayRequest(updateQuery);
+    const salesforce = await syncSalesforceCaseNotes(
+      salesforceCaseNumber,
+      buildSalesforceObNotes({
+        venueName,
+        clientName,
+        clientEmail,
+        region,
+        onboarder,
+        launchDate,
+        spendPerHead,
+        posSystem,
+        reservationSystem,
+        prepayments,
+        prepaymentType,
+        cancellationPeriod,
+        chargeModel,
+        localCurrencyAmount,
+        iPads,
+        smsRequired,
+        companyName,
+        businessName,
+        businessRegistrationNumber,
+        businessWebsite,
+        businessAddress,
+        repFirstName,
+        repLastName,
+        repPhone,
+        repEmail,
+        otherIntegrations
+      })
+    ).catch((error) => ({ ok: false, error: error.message }));
 
     res.json({
       ok: true,
-      updated: result.data
+      updated: result.data,
+      salesforce
     });
   } catch (error) {
     console.error(error);
@@ -623,7 +1192,7 @@ app.post('/update-step2', async (req, res) => {
 });
 
 
-app.get('/onboarding-item', async (req, res) => {
+app.get('/onboarding-item', requireScopedItemAccess, async (req, res) => {
   const itemId = String(req.query.itemId || '').trim();
 
   if (!itemId) {
@@ -742,8 +1311,102 @@ app.get('/onboarding-item', async (req, res) => {
   }
 });
 
+app.get('/dashboard-items', requireObSession, async (req, res) => {
+  try {
+    const query = `
+      query {
+        boards(ids: ${ONBOARDING_BOARD_ID}) {
+          columns {
+            id
+            title
+            type
+          }
+          items_page(limit: 500) {
+            items {
+              id
+              name
+              column_values {
+                id
+                text
+                type
+                value
+              }
+            }
+          }
+        }
+      }
+    `;
 
-app.post('/update-step3', async (req, res) => {
+    const result = await mondayRequest(query);
+    const board = result.data?.boards?.[0];
+
+    if (!board) {
+      return res.status(404).json({ error: 'Onboarding board not found' });
+    }
+
+    const step2Columns = resolveStep2Columns(board.columns);
+    const step3Aliases = getStep3SectionColumnAliases();
+    const internalLinkColumn = findAccessLinkColumn(board.columns, 'internal');
+    const inviteLinkColumn = findAccessLinkColumn(board.columns, 'invite');
+    const regionColumn = findColumn(board.columns, ['Region']);
+    const onboarderColumn = findColumn(board.columns, ['Onboarder']);
+    const clientNameColumn = findColumn(board.columns, ['Client name']);
+    const clientEmailColumn = findColumn(board.columns, ['Client email']);
+    const salesforceCaseColumn =
+      findColumn(board.columns, ['Salesforce Case Number', 'Salesforce Case ID', 'SF Case Number', 'Case Number', 'Case ID']) ||
+      findColumnByContains(board.columns, ['salesforce', 'case']) ||
+      findColumnByContains(board.columns, ['case', 'number']) ||
+      findColumnByContains(board.columns, ['case', 'id']);
+
+    const items = (board.items_page?.items || []).map((item) => {
+      const getByColumn = (column) =>
+        column ? item.column_values.find((value) => value.id === column.id) : null;
+      const getTextByColumn = (column) => getByColumn(column)?.text?.trim() || '';
+
+      const step3Statuses = Object.entries(step3Aliases).reduce((acc, [sectionName, aliases]) => {
+        const column = findColumn(board.columns, aliases);
+        acc[sectionName] = getTextByColumn(column) || 'Not Started';
+        return acc;
+      }, {});
+
+      const completeCount = Object.values(step3Statuses).filter((status) => normalize(status) === 'complete').length;
+      const percentComplete = Math.round((completeCount / Object.keys(step3Statuses).length) * 100);
+      let overallStatus = 'Not started';
+      if (percentComplete === 100) {
+        overallStatus = 'Complete';
+      } else if (percentComplete > 0) {
+        overallStatus = 'In progress';
+      }
+
+      return {
+        itemId: item.id,
+        venueName: item.name || '',
+        region: getTextByColumn(regionColumn),
+        onboarder: getTextByColumn(onboarderColumn),
+        clientName: getTextByColumn(clientNameColumn),
+        clientEmail: getTextByColumn(clientEmailColumn),
+        salesforceCaseNumber: getTextByColumn(salesforceCaseColumn),
+        launchDate: getTextByColumn(step2Columns.launchDateColumn),
+        posSystem: getTextByColumn(step2Columns.posColumn),
+        reservationSystem: getTextByColumn(step2Columns.reservationColumn),
+        otherIntegrations: getTextByColumn(step2Columns.otherIntegrationsColumn),
+        internalUrl: parseMondayLink(getByColumn(internalLinkColumn)) || getTextByColumn(internalLinkColumn),
+        inviteUrl: parseMondayLink(getByColumn(inviteLinkColumn)) || getTextByColumn(inviteLinkColumn),
+        step3Statuses,
+        percentComplete,
+        overallStatus
+      };
+    });
+
+    res.json({ ok: true, items });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message || 'Failed to load dashboard items' });
+  }
+});
+
+
+app.post('/update-step3', requireObSession, async (req, res) => {
   const {
     itemId,
     section,
@@ -824,7 +1487,7 @@ app.post('/update-step3', async (req, res) => {
   }
 });
 
-app.get('/monday-team-profile', async (req, res) => {
+app.get('/monday-team-profile', requireSession, async (req, res) => {
   const boardId = Number(req.query.boardId || TEAM_BOARD_ID);
   const name = String(req.query.name || '').trim();
 
@@ -889,7 +1552,7 @@ app.get('/monday-team-profile', async (req, res) => {
   }
 });
 
-app.get('/monday-resource-link', async (req, res) => {
+app.get('/monday-resource-link', requireSession, async (req, res) => {
   const boardId = Number(req.query.boardId || TEAM_BOARD_ID);
   const value = String(req.query.value || '').trim();
   const type = String(req.query.type || '').trim().toLowerCase();
@@ -972,6 +1635,14 @@ app.get('/monday-resource-link', async (req, res) => {
 
 const PORT = Number(process.env.PORT || 3000);
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+(async () => {
+  try {
+    await ensureAuthStorage();
+    app.listen(PORT, () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+})();

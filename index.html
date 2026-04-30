@@ -693,6 +693,183 @@
       display: inline-block;
     }
 
+    .dashboard-page .hero-head {
+      padding-bottom: 24px;
+    }
+
+    .dashboard-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .dashboard-toolbar-copy p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .dashboard-toolbar-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .dashboard-filter-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .dashboard-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin: 18px 0;
+    }
+
+    .dashboard-metric {
+      border: 1px solid #d8d8d2;
+      border-radius: 20px;
+      padding: 18px;
+      background: linear-gradient(180deg, #fcfcfb 0%, #f5f5f1 100%);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.04);
+    }
+
+    .dashboard-metric span {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+    }
+
+    .dashboard-metric strong {
+      display: block;
+      font-size: 30px;
+      letter-spacing: -0.04em;
+    }
+
+    .dashboard-table-wrap {
+      overflow: auto;
+      border: 1px solid #d8d8d2;
+      border-radius: 24px;
+      background: linear-gradient(180deg, #fcfcfb 0%, #f5f5f1 100%);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.05);
+    }
+
+    .dashboard-table {
+      width: 100%;
+      min-width: 980px;
+      border-collapse: collapse;
+    }
+
+    .dashboard-table th,
+    .dashboard-table td {
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 1px solid rgba(17, 17, 17, 0.08);
+      vertical-align: top;
+      font-size: 14px;
+    }
+
+    .dashboard-table th {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: rgba(255, 255, 255, 0.72);
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    .dashboard-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .dashboard-name strong {
+      display: block;
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+
+    .dashboard-name span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .dashboard-progress {
+      display: grid;
+      gap: 8px;
+      min-width: 120px;
+    }
+
+    .dashboard-progress strong {
+      font-size: 22px;
+      letter-spacing: -0.03em;
+    }
+
+    .dashboard-mini-bar {
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      background: #e7e7e2;
+      overflow: hidden;
+    }
+
+    .dashboard-mini-bar span {
+      display: block;
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #111111 0%, #535353 100%);
+    }
+
+    .dashboard-chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+
+    .dashboard-chip.is-complete {
+      background: #e7f6ec;
+      color: #1a7f37;
+    }
+
+    .dashboard-chip.is-progress {
+      background: #fff3d6;
+      color: #8a5b00;
+    }
+
+    .dashboard-chip.is-empty {
+      background: #efefeb;
+      color: #666666;
+    }
+
+    .dashboard-link {
+      color: #3f81b6;
+      font-weight: 700;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(63, 129, 182, 0.24);
+    }
+
+    .dashboard-empty {
+      padding: 24px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
     .step3-layout {
       display: grid;
       grid-template-columns: minmax(0, 1fr);
@@ -1490,6 +1667,8 @@
       .step2-layout,
       .step3-layout,
       .implementation-stage-grid,
+      .dashboard-filter-grid,
+      .dashboard-summary-grid,
       .glossary-grid {
         grid-template-columns: 1fr;
       }
@@ -1515,6 +1694,12 @@
       .schedule-day + .schedule-day {
         border-left: none;
         border-top: 1px solid #d6d6d3;
+      }
+    }
+
+    @media (max-width: 1280px) {
+      .implementation-stage-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
 
@@ -1568,6 +1753,14 @@
       .task-tag {
         justify-self: start;
       }
+
+      .dashboard-toolbar {
+        align-items: flex-start;
+      }
+
+      .implementation-stage-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -1593,6 +1786,92 @@
       </div>
 
       <div id="authStatus" class="auth-status">Verification required.</div>
+    </div>
+  </div>
+
+  <div class="page dashboard-page auth-hidden" id="dashboardShell">
+    <div class="shell">
+      <div class="topbar">
+        <div class="brand brand-full">
+          <img class="brand-logo" src="/images/7R_DD_STACKED_BLACK_1.png" alt="SevenRooms" />
+        </div>
+        <div class="pill">Internal Dashboard</div>
+      </div>
+
+      <section class="hero">
+        <div class="hero-head">
+          <div class="dashboard-toolbar">
+            <div class="dashboard-toolbar-copy">
+              <h1>Onboarding Dashboard</h1>
+              <p>Track progress across all onboarding accounts, filter by onboarder or region, and jump into each internal record.</p>
+            </div>
+            <div class="dashboard-toolbar-actions">
+              <a class="btn secondary" href="/">Open Onboarding Flow</a>
+            </div>
+          </div>
+
+          <div class="dashboard-filter-grid">
+            <div class="field">
+              <label for="dashboardObFilter">OB</label>
+              <select id="dashboardObFilter">
+                <option value="">All onboarders</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="dashboardRegionFilter">Region</label>
+              <select id="dashboardRegionFilter">
+                <option value="">All regions</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="dashboardSearch">Search</label>
+              <input id="dashboardSearch" type="text" placeholder="Venue, client, case number..." />
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="dashboard-summary-grid">
+            <div class="dashboard-metric">
+              <span>Total Accounts</span>
+              <strong id="dashboardCountAll">0</strong>
+            </div>
+            <div class="dashboard-metric">
+              <span>Complete</span>
+              <strong id="dashboardCountComplete">0</strong>
+            </div>
+            <div class="dashboard-metric">
+              <span>In Progress</span>
+              <strong id="dashboardCountProgress">0</strong>
+            </div>
+            <div class="dashboard-metric">
+              <span>Not Started</span>
+              <strong id="dashboardCountNotStarted">0</strong>
+            </div>
+          </div>
+
+          <div class="dashboard-table-wrap">
+            <table class="dashboard-table">
+              <thead>
+                <tr>
+                  <th>Account</th>
+                  <th>OB</th>
+                  <th>Region</th>
+                  <th>Launch</th>
+                  <th>Progress</th>
+                  <th>Status</th>
+                  <th>Setup</th>
+                  <th>Links</th>
+                </tr>
+              </thead>
+              <tbody id="dashboardTableBody"></tbody>
+            </table>
+            <div class="dashboard-empty hidden" id="dashboardEmpty">No onboarding accounts match the current filters.</div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 
@@ -2131,6 +2410,7 @@
 
     const els = {
       appShell: document.getElementById("appShell"),
+      dashboardShell: document.getElementById("dashboardShell"),
       authGate: document.getElementById("authGate"),
       authModePill: document.getElementById("authModePill"),
       authTitle: document.getElementById("authTitle"),
@@ -2142,6 +2422,15 @@
       verifyOtpBtn: document.getElementById("verifyOtpBtn"),
       continueBtn: document.getElementById("continueBtn"),
       authStatus: document.getElementById("authStatus"),
+      dashboardObFilter: document.getElementById("dashboardObFilter"),
+      dashboardRegionFilter: document.getElementById("dashboardRegionFilter"),
+      dashboardSearch: document.getElementById("dashboardSearch"),
+      dashboardCountAll: document.getElementById("dashboardCountAll"),
+      dashboardCountComplete: document.getElementById("dashboardCountComplete"),
+      dashboardCountProgress: document.getElementById("dashboardCountProgress"),
+      dashboardCountNotStarted: document.getElementById("dashboardCountNotStarted"),
+      dashboardTableBody: document.getElementById("dashboardTableBody"),
+      dashboardEmpty: document.getElementById("dashboardEmpty"),
       region: document.getElementById("region"),
       onboarder: document.getElementById("onboarder"),
       venueName: document.getElementById("venueName"),
@@ -2220,6 +2509,7 @@
     const sidebarEmail = document.getElementById("sidebarEmail");
 
     const urlParams = new URLSearchParams(window.location.search);
+    const dashboardMode = urlParams.get("view") === "dashboard";
     const urlItemId = urlParams.get("itemId") || "";
     let currentItemId = urlItemId || localStorage.getItem("currentItemId") || "";
     let inviteToken = urlParams.get("invite") || "";
@@ -2260,6 +2550,7 @@
         "Triple Seat": "https://help.sevenrooms.com/hc/en-us"
       }
     };
+    let dashboardItems = [];
     let flowInitialized = false;
 
     function getDemoItem(itemId) {
@@ -2269,6 +2560,63 @@
         step3Statuses: getLocalStep3Data(itemId),
         itemId
       };
+    }
+
+    function getDemoDashboardItems() {
+      const knownIds = new Set();
+      const currentId = currentItemId || localStorage.getItem("currentItemId") || "";
+      if (currentId) knownIds.add(currentId);
+
+      Object.keys(localStorage)
+        .filter((key) => key.startsWith("intake_"))
+        .forEach((key) => knownIds.add(key.replace("intake_", "")));
+
+      const items = Array.from(knownIds).map((itemId) => {
+        const item = getDemoItem(itemId);
+        const statuses = item.step3Statuses || {};
+        const total = 6;
+        const completeCount = Object.values(statuses).filter((status) => String(status).toLowerCase() === "complete").length;
+        const percentComplete = Math.round((completeCount / total) * 100);
+        const overallStatus = percentComplete === 100 ? "Complete" : percentComplete > 0 ? "In progress" : "Not started";
+
+        return {
+          itemId,
+          venueName: item.venueName || "Demo Venue",
+          clientName: item.clientName || "Demo Client",
+          clientEmail: item.clientEmail || "client@example.com",
+          onboarder: item.onboarder || "Raj Markandoo",
+          region: item.region || "EMEA",
+          salesforceCaseNumber: item.salesforceCaseNumber || "",
+          launchDate: item.launchDate || "",
+          posSystem: item.posSystem || "",
+          reservationSystem: item.reservationSystem || "",
+          otherIntegrations: item.otherIntegrations || "",
+          internalUrl: `${window.location.origin}${window.location.pathname}?itemId=${encodeURIComponent(itemId)}`,
+          inviteUrl: `${window.location.origin}${window.location.pathname}?invite=demo_${encodeURIComponent(itemId)}&itemId=${encodeURIComponent(itemId)}#step-2`,
+          percentComplete,
+          overallStatus
+        };
+      });
+
+      return items.length ? items : [
+        {
+          itemId: "demo_1",
+          venueName: "So Salsa",
+          clientName: "Gusto Group",
+          clientEmail: "team@sosalsa.com",
+          onboarder: "Raj Markandoo",
+          region: "EMEA",
+          salesforceCaseNumber: "00076675",
+          launchDate: "2026-05-12",
+          posSystem: "Toast",
+          reservationSystem: "OpenTable",
+          otherIntegrations: "The Fork",
+          internalUrl: `${window.location.origin}${window.location.pathname}?itemId=demo_1`,
+          inviteUrl: `${window.location.origin}${window.location.pathname}?invite=demo_demo_1&itemId=demo_1#step-2`,
+          percentComplete: 50,
+          overallStatus: "In progress"
+        }
+      ];
     }
 
     function requestJson(path, options = {}) {
@@ -2358,6 +2706,10 @@
         return Promise.resolve({ ok: true, item });
       }
 
+      if (url.pathname === "/dashboard-items") {
+        return Promise.resolve({ ok: true, items: getDemoDashboardItems() });
+      }
+
       if (url.pathname === "/update-step3") {
         const statuses = {
           ...getLocalStep3Data(body.itemId),
@@ -2408,18 +2760,28 @@
     }
 
     function showAuthGate() {
+      els.dashboardShell.classList.add("auth-hidden");
       els.appShell.classList.add("auth-hidden");
       els.authGate.classList.remove("auth-hidden");
-      els.authModePill.textContent = authMode === "client" ? "Client verification" : "Internal verification";
-      els.authTitle.textContent = authMode === "client" ? "Verify client access" : "Verify OB access";
-      els.authCopy.textContent = authMode === "client"
+      els.authModePill.textContent = dashboardMode ? "Internal dashboard" : (authMode === "client" ? "Client verification" : "Internal verification");
+      els.authTitle.textContent = dashboardMode ? "Open the onboarding dashboard" : (authMode === "client" ? "Verify client access" : "Verify OB access");
+      els.authCopy.textContent = dashboardMode
+        ? "Enter your @sevenrooms.com email, then continue into the internal onboarding dashboard."
+        : authMode === "client"
         ? "Enter the invited client email, then continue into the onboarding flow."
         : "Enter your @sevenrooms.com email, then continue into the onboarding flow.";
     }
 
     function showAppShell() {
       els.authGate.classList.add("auth-hidden");
+      els.dashboardShell.classList.add("auth-hidden");
       els.appShell.classList.remove("auth-hidden");
+    }
+
+    function showDashboardShell() {
+      els.authGate.classList.add("auth-hidden");
+      els.appShell.classList.add("auth-hidden");
+      els.dashboardShell.classList.remove("auth-hidden");
     }
 
     function slugify(value) {
@@ -3023,6 +3385,113 @@
       }
     }
 
+    function getDashboardStatusClass(status) {
+      const normalized = String(status || '').toLowerCase();
+      if (normalized === 'complete') return 'is-complete';
+      if (normalized === 'in progress') return 'is-progress';
+      return 'is-empty';
+    }
+
+    function populateDashboardFilters(items) {
+      const selectedOb = els.dashboardObFilter.value;
+      const selectedRegion = els.dashboardRegionFilter.value;
+      const onboarders = Array.from(new Set(items.map((item) => item.onboarder).filter(Boolean))).sort();
+      const regions = Array.from(new Set(items.map((item) => item.region).filter(Boolean))).sort();
+
+      els.dashboardObFilter.innerHTML = '<option value="">All onboarders</option>' + onboarders.map((value) => `<option value="${value}">${value}</option>`).join('');
+      els.dashboardRegionFilter.innerHTML = '<option value="">All regions</option>' + regions.map((value) => `<option value="${value}">${value}</option>`).join('');
+      els.dashboardObFilter.value = onboarders.includes(selectedOb) ? selectedOb : '';
+      els.dashboardRegionFilter.value = regions.includes(selectedRegion) ? selectedRegion : '';
+    }
+
+    function renderDashboardRows(items) {
+      els.dashboardCountAll.textContent = String(items.length);
+      els.dashboardCountComplete.textContent = String(items.filter((item) => item.overallStatus === 'Complete').length);
+      els.dashboardCountProgress.textContent = String(items.filter((item) => item.overallStatus === 'In progress').length);
+      els.dashboardCountNotStarted.textContent = String(items.filter((item) => item.overallStatus === 'Not started').length);
+
+      if (!items.length) {
+        els.dashboardTableBody.innerHTML = '';
+        els.dashboardEmpty.classList.remove('hidden');
+        return;
+      }
+
+      els.dashboardEmpty.classList.add('hidden');
+      els.dashboardTableBody.innerHTML = items.map((item) => {
+        const progress = Number(item.percentComplete || 0);
+        const statusClass = getDashboardStatusClass(item.overallStatus);
+        const setupSummary = [item.posSystem, item.reservationSystem, item.otherIntegrations].filter(Boolean).join(' · ') || 'Pending';
+        const links = [
+          item.internalUrl ? `<a class="dashboard-link" href="${item.internalUrl}" target="_blank" rel="noopener">Internal</a>` : '',
+          item.inviteUrl ? `<a class="dashboard-link" href="${item.inviteUrl}" target="_blank" rel="noopener">Client</a>` : ''
+        ].filter(Boolean).join(' · ');
+
+        return `
+          <tr>
+            <td>
+              <div class="dashboard-name">
+                <strong>${item.venueName || 'Untitled venue'}</strong>
+                <span>${item.clientName || 'No client'}${item.clientEmail ? ` · ${item.clientEmail}` : ''}${item.salesforceCaseNumber ? ` · Case ${item.salesforceCaseNumber}` : ''}</span>
+              </div>
+            </td>
+            <td>${item.onboarder || '—'}</td>
+            <td>${item.region || '—'}</td>
+            <td>${item.launchDate || '—'}</td>
+            <td>
+              <div class="dashboard-progress">
+                <strong>${progress}%</strong>
+                <div class="dashboard-mini-bar"><span style="width:${progress}%"></span></div>
+              </div>
+            </td>
+            <td><span class="dashboard-chip ${statusClass}">${item.overallStatus || 'Not started'}</span></td>
+            <td>${setupSummary}</td>
+            <td>${links || '—'}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function applyDashboardFilters() {
+      const obFilter = els.dashboardObFilter.value;
+      const regionFilter = els.dashboardRegionFilter.value;
+      const query = els.dashboardSearch.value.trim().toLowerCase();
+
+      const filteredItems = dashboardItems.filter((item) => {
+        if (obFilter && item.onboarder !== obFilter) return false;
+        if (regionFilter && item.region !== regionFilter) return false;
+        if (query) {
+          const haystack = [
+            item.venueName,
+            item.clientName,
+            item.clientEmail,
+            item.salesforceCaseNumber,
+            item.onboarder,
+            item.region
+          ].join(' ').toLowerCase();
+          if (!haystack.includes(query)) return false;
+        }
+        return true;
+      });
+
+      renderDashboardRows(filteredItems);
+    }
+
+    function initializeDashboard() {
+      requestJson('/dashboard-items')
+        .then((data) => {
+          dashboardItems = data.items || [];
+          populateDashboardFilters(dashboardItems);
+          applyDashboardFilters();
+        })
+        .catch((err) => {
+          console.error(err);
+          dashboardItems = [];
+          els.dashboardTableBody.innerHTML = '';
+          els.dashboardEmpty.textContent = err.message || 'Could not load dashboard data.';
+          els.dashboardEmpty.classList.remove('hidden');
+        });
+    }
+
     function requestOtp() {
       const email = els.authEmail.value.trim();
       if (!email) {
@@ -3081,7 +3550,9 @@
     }
 
     function initAuth() {
-      ensureFlowInitialized();
+      if (!dashboardMode) {
+        ensureFlowInitialized();
+      }
       showAuthGate();
       requestJson('/session')
         .then((data) => {
@@ -3089,8 +3560,13 @@
           const sessionMatchesItem = authMode !== 'client' || !currentItemId || String(data.itemId || '') === String(currentItemId || '');
 
           if (data.authenticated && sessionMatchesRole && sessionMatchesItem) {
-            showAppShell();
-            ensureFlowInitialized();
+            if (dashboardMode) {
+              showDashboardShell();
+              initializeDashboard();
+            } else {
+              showAppShell();
+              ensureFlowInitialized();
+            }
             return;
           }
 
@@ -3170,6 +3646,9 @@
       input.addEventListener("input", updateGlossary);
       input.addEventListener("change", updateGlossary);
     });
+    els.dashboardObFilter.addEventListener("change", applyDashboardFilters);
+    els.dashboardRegionFilter.addEventListener("change", applyDashboardFilters);
+    els.dashboardSearch.addEventListener("input", applyDashboardFilters);
 
     function saveStep1() {
       const payload = {
@@ -3305,17 +3784,27 @@
     });
 
     els.continueBtn.addEventListener("click", () => {
-      setAuthStatus("You can continue into the onboarding flow.", "");
-      showAppShell();
-      ensureFlowInitialized();
+      setAuthStatus(dashboardMode ? "You can continue into the dashboard." : "You can continue into the onboarding flow.", "");
+      if (dashboardMode) {
+        showDashboardShell();
+        initializeDashboard();
+      } else {
+        showAppShell();
+        ensureFlowInitialized();
+      }
     });
 
     setButtonsState(Boolean(currentItemId));
     els.inviteBox.style.display = clientMode ? "block" : "none";
 
     if (DEMO_MODE) {
-      showAppShell();
-      ensureFlowInitialized();
+      if (dashboardMode) {
+        showDashboardShell();
+        initializeDashboard();
+      } else {
+        showAppShell();
+        ensureFlowInitialized();
+      }
     } else {
       initAuth();
     }
