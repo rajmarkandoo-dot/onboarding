@@ -12,8 +12,11 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "cookie": "^1.1.1",
     "cors": "^2.8.6",
     "express": "^5.2.1",
-    "node-fetch": "^3.3.2"
+    "node-fetch": "^3.3.2",
+    "pg": "^8.20.0",
+    "resend": "^6.12.2"
   }
 }
