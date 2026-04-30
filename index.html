@@ -393,22 +393,34 @@
       margin-bottom: 10px;
     }
 
+    .panel-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel-main {
+      min-width: 0;
+    }
+
+    .page-sidebar {
+      position: sticky;
+      top: 20px;
+      display: grid;
+      gap: 12px;
+      align-self: start;
+    }
+
     .step2-layout {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 300px;
+      grid-template-columns: minmax(0, 1fr);
       gap: 18px;
       align-items: start;
     }
 
     .step2-main {
       min-width: 0;
-    }
-
-    .step2-sidebar {
-      position: sticky;
-      top: 20px;
-      display: grid;
-      gap: 12px;
     }
 
     .summary-grid {
@@ -682,7 +694,7 @@
 
     .step3-layout {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 290px;
+      grid-template-columns: minmax(0, 1fr);
       gap: 18px;
       align-items: start;
     }
@@ -709,13 +721,6 @@
       color: var(--muted);
       font-size: 14px;
       line-height: 1.5;
-    }
-
-    .step3-sidebar {
-      position: sticky;
-      top: 20px;
-      display: grid;
-      gap: 12px;
     }
 
     .sidebar-card {
@@ -1426,9 +1431,62 @@
       display: none;
     }
 
+    .auth-hidden {
+      display: none !important;
+    }
+
+    .auth-gate {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 28px 20px 48px;
+      background: linear-gradient(180deg, #ffffff 0%, var(--bg) 100%);
+    }
+
+    .auth-card {
+      width: min(520px, 100%);
+      border: 1px solid #d9d9d4;
+      border-radius: 30px;
+      background: #fff;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.05);
+      padding: 28px;
+    }
+
+    .auth-card h2 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      letter-spacing: -0.04em;
+    }
+
+    .auth-copy {
+      margin: 0 0 18px;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .auth-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .auth-status {
+      margin-top: 12px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    .auth-status.good { color: var(--good); }
+    .auth-status.warn { color: var(--warn); }
+
     .hidden { display: none !important; }
 
     @media (max-width: 980px) {
+      .panel-layout,
       .step2-layout,
       .step3-layout,
       .implementation-stage-grid,
@@ -1436,8 +1494,7 @@
         grid-template-columns: 1fr;
       }
 
-      .step2-sidebar,
-      .step3-sidebar {
+      .page-sidebar {
         position: static;
       }
 
@@ -1514,7 +1571,32 @@
   </style>
 </head>
 <body>
-  <div class="page">
+  <div id="authGate" class="auth-gate auth-hidden">
+    <div class="auth-card">
+      <div class="eyebrow" id="authModePill">Verification</div>
+      <h2 id="authTitle">Verify your access</h2>
+      <p class="auth-copy" id="authCopy">Enter your email to receive a one-time code before accessing the onboarding form.</p>
+
+      <div class="field">
+        <label for="authEmail">Email</label>
+        <input id="authEmail" type="email" placeholder="name@company.com" />
+      </div>
+
+      <div id="otpCodeWrap" class="field hidden">
+        <label for="otpCode">Verification code</label>
+        <input id="otpCode" type="text" inputmode="numeric" autocomplete="one-time-code" placeholder="Enter 6-digit code" />
+      </div>
+
+      <div class="auth-actions">
+        <button class="btn primary" id="requestOtpBtn" type="button">Send code</button>
+        <button class="btn secondary hidden" id="verifyOtpBtn" type="button">Verify code</button>
+      </div>
+
+      <div id="authStatus" class="auth-status">Verification required.</div>
+    </div>
+  </div>
+
+  <div class="page auth-hidden" id="appShell">
     <div class="shell">
       <div class="topbar">
         <div class="brand brand-full">
@@ -1529,6 +1611,8 @@
         </div>
 
         <div class="panel">
+          <div class="panel-layout">
+            <div class="panel-main">
           <div id="step1Section" class="flow-stage is-collapsed" data-stage>
             <button class="flow-stage-toggle" type="button" data-stage-toggle aria-expanded="false">
               <div class="flow-stage-copy">
@@ -1801,48 +1885,6 @@
                   <div id="step2Status" class="status">Waiting for Step 2 details</div>
                 </div>
               </div>
-
-              <aside class="step2-sidebar">
-                <div class="sidebar-card ob-dashboard-card">
-                  <div class="sidebar-label">OB Profile</div>
-                  <div class="ob-profile-head">
-                    <div id="sidebarAvatar" class="profile-avatar profile-avatar-round">SR</div>
-                    <div class="sidebar-profile-copy">
-                      <strong id="sidebarName">—</strong>
-                      <span id="sidebarEmail">—</span>
-                    </div>
-                  </div>
-                  <button class="btn secondary dashboard-action" id="watchCallBtn" type="button">Watch Call Recording</button>
-                  <div class="summary-grid">
-                    <div class="summary-row"><span>Venue</span><strong id="summaryVenue">—</strong></div>
-                    <div class="summary-row"><span>Client</span><strong id="summaryClient">—</strong></div>
-                    <div class="summary-row"><span>Email</span><strong id="summaryClientEmail">—</strong></div>
-                  </div>
-                  <div class="dashboard-divider"></div>
-                  <div class="sidebar-label">Configuration Progress</div>
-                  <div class="sidebar-progress-percent" id="overallPercent">0%</div>
-                  <div class="progress-bar">
-                    <div class="progress-fill" id="overallProgressFill"></div>
-                  </div>
-                  <div class="dashboard-divider"></div>
-                  <div class="sidebar-label">Customer Success</div>
-                  <ul class="dashboard-list">
-                    <li>Main point of contact after launch</li>
-                    <li>Strategy</li>
-                    <li>Optimization</li>
-                    <li>Adoption</li>
-                    <li>Business Reviews</li>
-                    <li>Success Plans</li>
-                  </ul>
-                  <div class="dashboard-divider"></div>
-                  <div class="sidebar-label">SevenRooms Support</div>
-                  <ul class="dashboard-links">
-                    <li><a href="mailto:support@sevenrooms.com">support@sevenrooms.com</a></li>
-                    <li><a href="https://help.sevenrooms.com/hc/en-us" target="_blank" rel="noopener">help.sevenrooms.com/hc/en-us</a></li>
-                    <li><a href="#">Live Chat</a></li>
-                  </ul>
-                </div>
-              </aside>
             </div>
             </div>
           </div>
@@ -1997,20 +2039,6 @@
                 </div>
               </div>
 
-              <aside class="step3-sidebar">
-                <div class="sidebar-card">
-                  <div class="sidebar-label">Status</div>
-                  <div class="status-list" id="statusList">
-                    <div class="status-row" data-status-name="Venue Configuration"><span>Venue Configuration</span><strong>Not started</strong></div>
-                    <div class="status-row" data-status-name="Marketing Configuration"><span>Marketing Configuration</span><strong>Not started</strong></div>
-                    <div class="status-row" data-status-name="IT Setup"><span>IT Setup</span><strong>Not started</strong></div>
-                    <div class="status-row" data-status-name="Data Imports"><span>Data Imports</span><strong>Not started</strong></div>
-                    <div class="status-row" data-status-name="Go Live"><span>Go Live</span><strong>Not started</strong></div>
-                    <div class="status-row" data-status-name="Add-ons"><span>Add-ons</span><strong>Not started</strong></div>
-                  </div>
-                </div>
-
-              </aside>
             </div>
             </div>
           </div>
@@ -2037,6 +2065,62 @@
             </div>
           </div>
 
+            </div>
+
+            <aside class="page-sidebar">
+              <div class="sidebar-card ob-dashboard-card">
+                <div class="sidebar-label">OB Profile</div>
+                <div class="ob-profile-head">
+                  <div id="sidebarAvatar" class="profile-avatar profile-avatar-round">SR</div>
+                  <div class="sidebar-profile-copy">
+                    <strong id="sidebarName">—</strong>
+                    <span id="sidebarEmail">—</span>
+                  </div>
+                </div>
+                <button class="btn secondary dashboard-action" id="watchCallBtn" type="button">Watch Call Recording</button>
+                <div class="summary-grid">
+                  <div class="summary-row"><span>Venue</span><strong id="summaryVenue">—</strong></div>
+                  <div class="summary-row"><span>Client</span><strong id="summaryClient">—</strong></div>
+                  <div class="summary-row"><span>Email</span><strong id="summaryClientEmail">—</strong></div>
+                </div>
+                <div class="dashboard-divider"></div>
+                <div class="sidebar-label">Configuration Progress</div>
+                <div class="sidebar-progress-percent" id="overallPercent">0%</div>
+                <div class="progress-bar">
+                  <div class="progress-fill" id="overallProgressFill"></div>
+                </div>
+                <div class="dashboard-divider"></div>
+                <div class="sidebar-label">Customer Success</div>
+                <ul class="dashboard-list">
+                  <li>Main point of contact after launch</li>
+                  <li>Strategy</li>
+                  <li>Optimization</li>
+                  <li>Adoption</li>
+                  <li>Business Reviews</li>
+                  <li>Success Plans</li>
+                </ul>
+                <div class="dashboard-divider"></div>
+                <div class="sidebar-label">SevenRooms Support</div>
+                <ul class="dashboard-links">
+                  <li><a href="mailto:support@sevenrooms.com">support@sevenrooms.com</a></li>
+                  <li><a href="https://help.sevenrooms.com/hc/en-us" target="_blank" rel="noopener">help.sevenrooms.com/hc/en-us</a></li>
+                  <li><a href="#">Live Chat</a></li>
+                </ul>
+              </div>
+
+              <div class="sidebar-card">
+                <div class="sidebar-label">Status</div>
+                <div class="status-list" id="statusList">
+                  <div class="status-row" data-status-name="Venue Configuration"><span>Venue Configuration</span><strong>Not started</strong></div>
+                  <div class="status-row" data-status-name="Marketing Configuration"><span>Marketing Configuration</span><strong>Not started</strong></div>
+                  <div class="status-row" data-status-name="IT Setup"><span>IT Setup</span><strong>Not started</strong></div>
+                  <div class="status-row" data-status-name="Data Imports"><span>Data Imports</span><strong>Not started</strong></div>
+                  <div class="status-row" data-status-name="Go Live"><span>Go Live</span><strong>Not started</strong></div>
+                  <div class="status-row" data-status-name="Add-ons"><span>Add-ons</span><strong>Not started</strong></div>
+                </div>
+              </div>
+            </aside>
+          </div>
         </div>
       </section>
     </div>
@@ -2046,6 +2130,17 @@
     const BOARD_ID = 18408762899;
 
     const els = {
+      appShell: document.getElementById("appShell"),
+      authGate: document.getElementById("authGate"),
+      authModePill: document.getElementById("authModePill"),
+      authTitle: document.getElementById("authTitle"),
+      authCopy: document.getElementById("authCopy"),
+      authEmail: document.getElementById("authEmail"),
+      otpCodeWrap: document.getElementById("otpCodeWrap"),
+      otpCode: document.getElementById("otpCode"),
+      requestOtpBtn: document.getElementById("requestOtpBtn"),
+      verifyOtpBtn: document.getElementById("verifyOtpBtn"),
+      authStatus: document.getElementById("authStatus"),
       region: document.getElementById("region"),
       onboarder: document.getElementById("onboarder"),
       venueName: document.getElementById("venueName"),
@@ -2129,6 +2224,7 @@
     let inviteToken = urlParams.get("invite") || "";
     const clientMode = Boolean(urlParams.get("invite"));
     const internalEditMode = Boolean(urlItemId && !clientMode);
+    const authMode = clientMode ? "client" : "ob";
     const DEMO_MODE = window.location.hostname.endsWith("github.io") || window.location.search.includes("demo=true");
     const DEMO_ONBOARDERS = {
       EMEA: ["Raj Markandoo"],
@@ -2188,6 +2284,28 @@
 
       if (url.pathname === "/onboarders") {
         return Promise.resolve({ onboarders: DEMO_ONBOARDERS[url.searchParams.get("region")] || [] });
+      }
+
+      if (url.pathname === "/session") {
+        return Promise.resolve({
+          ok: true,
+          authenticated: true,
+          role: authMode,
+          email: authMode === "ob" ? "raj.markandoo@sevenrooms.com" : (els.clientEmail.value.trim() || "client@example.com"),
+          itemId: currentItemId || null
+        });
+      }
+
+      if (url.pathname === "/request-otp") {
+        return Promise.resolve({ ok: true, message: "OTP sent" });
+      }
+
+      if (url.pathname === "/verify-otp") {
+        return Promise.resolve({ ok: true, role: authMode, itemId: currentItemId || null });
+      }
+
+      if (url.pathname === "/logout") {
+        return Promise.resolve({ ok: true });
       }
 
       if (url.pathname === "/monday-team-profile") {
@@ -2255,6 +2373,11 @@
       els.status.textContent = text;
     }
 
+    function setAuthStatus(text, type = "") {
+      els.authStatus.className = `auth-status ${type}`.trim();
+      els.authStatus.textContent = text;
+    }
+
     function setStep2Status(text, type = "") {
       els.step2Status.className = `status ${type}`.trim();
       els.step2Status.textContent = text;
@@ -2274,6 +2397,21 @@
       if (toggle) {
         toggle.setAttribute("aria-expanded", expanded ? "true" : "false");
       }
+    }
+
+    function showAuthGate() {
+      els.appShell.classList.add("auth-hidden");
+      els.authGate.classList.remove("auth-hidden");
+      els.authModePill.textContent = authMode === "client" ? "Client verification" : "Internal verification";
+      els.authTitle.textContent = authMode === "client" ? "Verify client access" : "Verify OB access";
+      els.authCopy.textContent = authMode === "client"
+        ? "Enter the invited client email to receive a one-time code before opening this onboarding."
+        : "Enter your @sevenrooms.com email to receive a one-time code before editing the onboarding flow.";
+    }
+
+    function showAppShell() {
+      els.authGate.classList.add("auth-hidden");
+      els.appShell.classList.remove("auth-hidden");
     }
 
     function slugify(value) {
@@ -2434,6 +2572,12 @@
 
     function collectStep2Data() {
       return {
+        region: els.region.value,
+        onboarder: els.onboarder.value,
+        venueName: els.venueName.value.trim(),
+        clientName: els.clientName.value.trim(),
+        clientEmail: els.clientEmail.value.trim(),
+        salesforceCaseNumber: els.salesforceCaseNumber.value.trim(),
         launchDate: els.launchDate.value,
         spendPerHead: els.spendPerHead.value.trim(),
         posSystem: els.posSystem.value,
@@ -2853,6 +2997,100 @@
         });
     }
 
+    function initializeFlow() {
+      showPrepaymentDetails();
+      showSmsDetails();
+      updateStep2Summary();
+      updateResourceButtons();
+      updateChecklistProgress();
+      syncSidebarProfile();
+      updateGlossary();
+
+      if (clientMode) {
+        showClientMode();
+      } else if (internalEditMode) {
+        showInternalEditMode();
+      }
+    }
+
+    function requestOtp() {
+      const email = els.authEmail.value.trim();
+      if (!email) {
+        setAuthStatus('Enter your email first.', 'warn');
+        return;
+      }
+
+      requestJson('/request-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          itemId: currentItemId || '',
+          mode: authMode
+        })
+      })
+        .then(() => {
+          els.otpCodeWrap.classList.remove('hidden');
+          els.verifyOtpBtn.classList.remove('hidden');
+          setAuthStatus('Verification code sent. Check your email.', 'good');
+        })
+        .catch((err) => {
+          console.error(err);
+          setAuthStatus(err.message || 'Failed to send code', 'warn');
+        });
+    }
+
+    function verifyOtp() {
+      const email = els.authEmail.value.trim();
+      const otp = els.otpCode.value.trim();
+
+      if (!email || !otp) {
+        setAuthStatus('Enter both email and verification code.', 'warn');
+        return;
+      }
+
+      requestJson('/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          otp,
+          itemId: currentItemId || '',
+          mode: authMode
+        })
+      })
+        .then(() => {
+          setAuthStatus('Access verified.', 'good');
+          showAppShell();
+          initializeFlow();
+        })
+        .catch((err) => {
+          console.error(err);
+          setAuthStatus(err.message || 'Failed to verify code', 'warn');
+        });
+    }
+
+    function initAuth() {
+      showAuthGate();
+      requestJson('/session')
+        .then((data) => {
+          const sessionMatchesRole = data.role === authMode;
+          const sessionMatchesItem = authMode !== 'client' || !currentItemId || String(data.itemId || '') === String(currentItemId || '');
+
+          if (data.authenticated && sessionMatchesRole && sessionMatchesItem) {
+            showAppShell();
+            initializeFlow();
+            return;
+          }
+
+          setAuthStatus('Verification required.', '');
+        })
+        .catch((err) => {
+          console.error(err);
+          setAuthStatus(err.message || 'Verification required.', 'warn');
+        });
+    }
+
     flowStages.forEach((stage) => {
       const toggle = stage.querySelector("[data-stage-toggle]");
       if (!toggle) return;
@@ -3055,21 +3293,17 @@
       }
     });
 
+    els.requestOtpBtn.addEventListener("click", requestOtp);
+    els.verifyOtpBtn.addEventListener("click", verifyOtp);
+
     setButtonsState(Boolean(currentItemId));
     els.inviteBox.style.display = clientMode ? "block" : "none";
 
-    showPrepaymentDetails();
-    showSmsDetails();
-    updateStep2Summary();
-    updateResourceButtons();
-    updateChecklistProgress();
-    syncSidebarProfile();
-    updateGlossary();
-
-    if (clientMode) {
-      showClientMode();
-    } else if (internalEditMode) {
-      showInternalEditMode();
+    if (DEMO_MODE) {
+      showAppShell();
+      initializeFlow();
+    } else {
+      initAuth();
     }
   </script>
 </body>
