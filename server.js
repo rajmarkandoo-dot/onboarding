@@ -4,7 +4,7 @@ const path = require('path');
 const cookie = require('cookie');
 const { Pool } = require('pg');
 const { Resend } = require('resend');
-const { randomInt, randomBytes, createHash, timingSafeEqual } = require('crypto');
+const { randomInt, randomBytes, createHash, createHmac, timingSafeEqual } = require('crypto');
 
 const app = express();
 app.set('trust proxy', 1);
@@ -160,6 +160,29 @@ function parseMondayLink(columnValue) {
 
 function sha256(value) {
   return createHash('sha256').update(String(value || '')).digest('hex');
+}
+
+function getEmailLinkSecret() {
+  return process.env.EMAIL_LINK_SECRET || getSessionSecret();
+}
+
+function signEmailDataToken(itemId, expiresAt) {
+  const payload = `${itemId}:${expiresAt}`;
+  const signature = createHmac('sha256', getEmailLinkSecret()).update(payload).digest('hex');
+  return `${expiresAt}.${signature}`;
+}
+
+function verifyEmailDataToken(itemId, token) {
+  if (!token || !itemId) return false;
+
+  const [expiresAt, signature] = String(token).split('.');
+  if (!expiresAt || !signature) return false;
+  if (Number(expiresAt) < Date.now()) return false;
+
+  const expected = createHmac('sha256', getEmailLinkSecret()).update(`${itemId}:${expiresAt}`).digest('hex');
+  const expectedBuf = Buffer.from(expected, 'hex');
+  const actualBuf = Buffer.from(signature, 'hex');
+  return expectedBuf.length === actualBuf.length && timingSafeEqual(expectedBuf, actualBuf);
 }
 
 function getSessionSecret() {
@@ -1406,6 +1429,101 @@ app.get('/dashboard-items', requireObSession, async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: error.message || 'Failed to load dashboard items' });
+  }
+});
+
+app.get('/email-data/build-launch', async (req, res) => {
+  const itemId = String(req.query.itemId || '').trim();
+  const token = String(req.query.token || '').trim();
+
+  if (!itemId || !token) {
+    return res.status(400).json({ error: 'Missing itemId or token' });
+  }
+
+  if (!verifyEmailDataToken(itemId, token)) {
+    return res.status(403).json({ error: 'Invalid or expired token' });
+  }
+
+  try {
+    const query = `
+      query {
+        boards(ids: ${ONBOARDING_BOARD_ID}) {
+          columns {
+            id
+            title
+            type
+          }
+        }
+        items(ids: [${itemId}]) {
+          id
+          name
+          column_values {
+            id
+            text
+            type
+            value
+          }
+        }
+      }
+    `;
+
+    const result = await mondayRequest(query);
+    const board = result.data?.boards?.[0];
+    const item = result.data?.items?.[0];
+
+    if (!board || !item) {
+      return res.status(404).json({ error: 'Onboarding item not found' });
+    }
+
+    const step2Columns = resolveStep2Columns(board.columns);
+    const step3Aliases = getStep3SectionColumnAliases();
+    const onboarderColumn = findColumn(board.columns, ['Onboarder']);
+    const clientNameColumn = findColumn(board.columns, ['Client name']);
+    const internalLinkColumn = findAccessLinkColumn(board.columns, 'internal');
+    const inviteLinkColumn = findAccessLinkColumn(board.columns, 'invite');
+
+    const getByColumn = (column) =>
+      column ? item.column_values.find((value) => value.id === column.id) : null;
+    const getTextByColumn = (column) => getByColumn(column)?.text?.trim() || '';
+
+    const sections = Object.entries(step3Aliases).map(([name, aliases]) => {
+      const column = findColumn(board.columns, aliases);
+      const status = getTextByColumn(column) || 'Not Started';
+      const normalizedStatus = normalize(status);
+      return {
+        name,
+        status,
+        note: normalizedStatus === 'complete'
+          ? 'This workstream is complete.'
+          : normalizedStatus === 'in progress'
+            ? 'This workstream is currently in progress.'
+            : 'This workstream has not started yet.',
+        isComplete: normalizedStatus === 'complete',
+        isInProgress: normalizedStatus === 'in progress',
+        isNotStarted: normalizedStatus !== 'complete' && normalizedStatus !== 'in progress'
+      };
+    });
+
+    const completeCount = sections.filter((section) => section.isComplete).length;
+    const progressPercent = Math.round((completeCount / sections.length) * 100);
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+
+    res.json({
+      venueName: item.name || '',
+      clientName: getTextByColumn(clientNameColumn),
+      onboarder: getTextByColumn(onboarderColumn),
+      launchDate: getTextByColumn(step2Columns.launchDateColumn),
+      progressPercent,
+      sections,
+      links: {
+        dashboard: `${baseUrl}/?view=dashboard`,
+        internal: parseMondayLink(getByColumn(internalLinkColumn)) || `${baseUrl}/?itemId=${encodeURIComponent(item.id)}`,
+        client: parseMondayLink(getByColumn(inviteLinkColumn)) || ''
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message || 'Failed to load email data' });
   }
 });
 
