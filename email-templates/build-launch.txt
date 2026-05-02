@@ -1,0 +1,18 @@
+Build & Launch Update
+
+Venue: {{venueName}}
+Client: {{clientName}}
+Onboarder: {{onboarder}}
+Launch: {{launchDate}}
+Progress: {{progressPercent}}%
+
+Sections:
+{{#sections}}
+- {{name}}: {{status}}
+  {{note}}
+{{/sections}}
+
+Links:
+- Dashboard: {{links.dashboard}}
+- Internal record: {{links.internal}}
+{{#links.client}}- Client view: {{links.client}}{{/links.client}}
